@@ -1,0 +1,6 @@
+/.idea
+/docs/*
+/media/proPic/*
+/temp/*
+/data-migration
+/application/library/dal.php

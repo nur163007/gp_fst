@@ -1,0 +1,4 @@
+#1 SELECT
+SELECT * FROM `wc_t_po` WHERE `poid`='300033451PI1'
+#2 DELETE
+DELETE FROM `wc_t_po` WHERE `poid` = '300033451PI1';

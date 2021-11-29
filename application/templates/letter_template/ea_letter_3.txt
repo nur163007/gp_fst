@@ -1,0 +1,34 @@
+<html xmlns:o='urn:schemas-microsoft-com:office:office' 
+    xmlns:w='urn:schemas-microsoft-com:office:word'
+    xmlns='http://www.w3.org/TR/REC-html40'>
+    <head><title>Time</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=Windows-1252">
+<body>
+<table width='100%'>
+<tr>
+  <td>&nbsp;</td>
+        <td style='width:150px;'>Grameenphone Ltd.<br /> GP HOUSE, Bashundhara, Baridhara<br />Dhaka-1229</td>
+</tr>
+<tr>
+  <td>&nbsp;</td>  
+</tr>
+<tr>
+  <td>Date: ##letterDate##</td>
+  <td>Ref: Clearance/ 8711</td>
+</tr>
+</table>
+<p><b>Deputy Commissioner of Customs</b> <br />Customs House<br />Chittagong.</p>
+<p>Subject: <b>Letter of Authorisation</b>.</p>
+<p>Dear Sir,<br />We hereby authorise Messrs <b>##cNfAgentName##</b> to clear and take delivery of our consignment as referred below:</p>
+<p><b>Vessel:  ANTWERPEN EXPRESS 012E05.</b><br /><b>B/L No.: NYKS5240212760.</b> <br/></p>
+<p>Messrs <b>##cNfAgentName1##</b> will complete the necessary customs formalities on our behalf.<br /><br />The value and composition of the shipment is stated on the shipper's invoice.</p>
+<p>Yours faithfully<br /><br />For Grameenphone Ltd.<br /><br /><br /><br /><br /></p>
+<table width='100%'>
+<tr>
+  <td>Benazir Ahmed<br />Specialist, External Approvals,<br />Sourcing Operation.</td>
+        <td>&nbsp;</td>
+</tr>
+</table>
+</body>
+</html>

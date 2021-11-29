@@ -1,0 +1,30 @@
+@media print {
+    #Header, #Footer { display: none !important; }
+    input {
+        display:none !important;
+    }
+    .ui-helper-hidden-accessible {
+        display:none !important;
+    }
+    #headRow {
+        display:none;
+    }
+    .sidebar-nav {
+        display:none !important;
+    }
+    select {
+        display:none !important;
+    }
+    .dataList {
+        width:90% !important;
+    }
+}
+
+.print-table-bordered > tbody > tr > td, 
+.print-table-bordered > tbody > tr > th, 
+.print-table-bordered > tfoot > tr > td, 
+.print-table-bordered > tfoot > tr > th, 
+.print-table-bordered > thead > tr > td, 
+.print-table-bordered > thead >
+tr > th { border: 1px solid #999; }
+

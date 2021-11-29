@@ -1,0 +1,1 @@
+<?php include("letter_template\lc-opening-letter.php"); ?>

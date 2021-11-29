@@ -1,0 +1,35 @@
+<html xmlns:o='urn:schemas-microsoft-com:office:office' 
+    xmlns:w='urn:schemas-microsoft-com:office:word'
+    xmlns='http://www.w3.org/TR/REC-html40'>
+    <head><title>Time</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=Windows-1252">
+<body>
+<table width='100%'>
+<tr>
+  <td>&nbsp;</td>
+        <td style='width:150px;'>Grameenphone Ltd.<br /> GP HOUSE, Bashundhara, Baridhara<br />Dhaka-1229</td>
+</tr>
+<tr>
+  <td>&nbsp;</td>  
+</tr>
+<tr>
+  <td>Date:  ##letterDate##</td>
+  <td>Ref: Clearance/ 8331</td>
+</tr>
+</table>
+<p>SG Logistics (Pvt.) Ltd.<br /> Custom Airfreight Unit,<br />206/A Tejgaon I/A, 4th Floor<br />Dhaka.</p>
+<p>Subject: Authorization of taking delivery of original documents.</p>
+<p>Dear Sir,<br />We hereby authorize ##cNfAgentName## to clear and take delivery of our consignment as referred below:</p>
+<p>MAWB NO. ##mawbNo##.<br />HAWB NO. ##hawbNo##.<br/></p>
+<p>##cNfAgentName1## will complete the necessary customs formalities on our behalf.<br />So you are requested to give delivery of the said original documents whose signature is 
+attested bellow.<br /></p>
+<p>Yours faithfully<br />For Grameenphone Ltd.<br /><br /><br /><br /><br /></p>
+<table width='100%'>
+<tr>
+  <td width='50%'>Benazir Ahmed<br />Specialist, External Approvals,<br />Sourcing Operation.</td>
+        <td style='width:150px;'>Copy:<br />Deputy General Manager<br />Biman Cargo Complex,<br/>Biman, Bangladesh Airlines<br/>Hazrat Shajalal International Airport</td>
+</tr>
+</table>
+</body>
+</html>

@@ -17,13 +17,13 @@ if (!empty($_GET["action"]) || isset($_GET["action"]))
     switch($_GET["action"])
     {
         case 1:	// get all fx request info
-                echo GetFx(0);
+                echo GetFx(1);
             break;
         case 2:	// get all fx request info
                 echo GetFxDetail($_GET["fxrFqRowId"]);
             break;
-        case 3:
-            echo GetFx(1);
+   /*     case 3:
+            echo GetFx(0);*/
         default:
             break;
     }

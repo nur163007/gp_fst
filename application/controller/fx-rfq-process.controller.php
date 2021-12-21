@@ -16,6 +16,8 @@ require_once(LIBRARY_PATH . "/loginId.php");
 //exit();
 
 if (!empty($_POST)){
+//    var_dump($_POST);
+//    exit();
     if (!empty($_POST["postAction"])){
         switch ($_POST["postAction"]){
             case 1:
@@ -45,7 +47,10 @@ function SubmitDealAmount(){
     $objdal = new dal();
 
     for ($i = 0; $i < count($_POST['hdnFxRfqRowId']); $i++) {
+
         $id = $_POST['hdnFxRfqRowId'][$i];
+//        echo $id;
+//        exit();
         $query = "UPDATE
                     `fx_rfq_request`
                 SET
@@ -53,6 +58,7 @@ function SubmitDealAmount(){
                     `Selected` = " . $_POST['SelectCheckbox_'.$id] . "
                 WHERE
                     `fx_rfq_request`.`Id` = " . $_POST['hdnFxRfqRowId'][$i];
+
         $objdal->update($query, "Failed to submit Bank FX Rate");
     }
     $statusUpadte = "UPDATE

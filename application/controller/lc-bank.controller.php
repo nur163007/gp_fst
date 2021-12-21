@@ -91,7 +91,8 @@ if (!empty($_POST)){
 
 //SUBMIT LC COPY TO TFO
 
-function submitLCToTFO(){
+function submitLCToTFO()
+{
 
     $refId = decryptId($_POST["refId2"]);
     global $user_id;
@@ -102,26 +103,28 @@ function submitLCToTFO(){
 
     // attachment data in an 3D array
 
-    if($actionID == 401) {
+    if ($actionID == 401) {
         $attachLC = $objdal->sanitizeInput($_POST['attachLC']);
-        $attachBRC = $objdal->sanitizeInput($_POST['attachBRC']);
-        $attachBCA = $objdal->sanitizeInput($_POST['attachBCA']);
+//        $attachBRC = $objdal->sanitizeInput($_POST['attachBRC']);
+//        $attachBCA = $objdal->sanitizeInput($_POST['attachBCA']);
     }
 
-    if($actionID == 402) {
-        $lcno = htmlspecialchars($_POST['lcno'],ENT_QUOTES, "ISO-8859-1");
+    if ($actionID == 402) {
+        $lcno = htmlspecialchars($_POST['lcno'], ENT_QUOTES, "ISO-8859-1");
 
-        if($_POST['lcissuedate']!=""){
-            $lcissuedate = htmlspecialchars($_POST['lcissuedate'],ENT_QUOTES, "ISO-8859-1");
+        if ($_POST['lcissuedate'] != "") {
+            $lcissuedate = htmlspecialchars($_POST['lcissuedate'], ENT_QUOTES, "ISO-8859-1");
             $lcissuedate = date('Y-m-d', strtotime($lcissuedate));
-            $lcissuedate = "`lcissuedate` = '".$lcissuedate."'";
-        }else{
+            $lcissuedate = "`lcissuedate` = '" . $lcissuedate . "'";
+        } else {
             $lcissuedate = '';
         }
 
-        $lcexpirydate = htmlspecialchars($_POST['lcexpirydate'],ENT_QUOTES, "ISO-8859-1");
+        $lcexpirydate = htmlspecialchars($_POST['lcexpirydate'], ENT_QUOTES, "ISO-8859-1");
         $lcexpirydate = date('Y-m-d', strtotime($lcexpirydate));
         $attachLC = $objdal->sanitizeInput($_POST['attachLC']);
+        $attachBRC = $objdal->sanitizeInput($_POST['attachBRC']);
+        $attachBCA = $objdal->sanitizeInput($_POST['attachBCA']);
 
         $query = "UPDATE `wc_t_lc` SET 
         `lcno` = '$lcno', 
@@ -137,15 +140,14 @@ function submitLCToTFO(){
 
     // insert attachment
     $res["message"] = 'Failed to save attachments!';
-    if($actionID == 401) {
+    if ($actionID == 401) {
         $query = "INSERT INTO `wc_t_attachments`(`poid`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`) VALUES 
-        ('$po', 'Draft LC Copy', '$attachLC', $user_id, '$ip', $loginRole),
+        ('$po', 'Draft LC Copy', '$attachLC', $user_id, '$ip', $loginRole)";
+    } elseif ($actionID == 402) {
+        $query = "INSERT INTO `wc_t_attachments`(`poid`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`) VALUES 
+        ('$po', 'Final LC Copy', '$attachLC', $user_id, '$ip', $loginRole),
         ('$po', 'Bank Received Copy', '$attachBRC', $user_id, '$ip', $loginRole),
         ('$po', 'Bank Charge Advice', '$attachBCA', $user_id, '$ip', $loginRole)";
-    }
-    elseif($actionID == 402){
-        $query = "INSERT INTO `wc_t_attachments`(`poid`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`) VALUES 
-        ('$po', 'Final LC Copy', '$attachLC', $user_id, '$ip', $loginRole)";
     }
     $objdal->insert($query);
     //echo($query);
@@ -154,22 +156,21 @@ function submitLCToTFO(){
     fileTransferTempToDocs($po);
 
 
-if($actionID == 401){
-    $action = array(
-        'refid' => $refId,
-        'pono' => "'".$po."'",
-        'actionid' => action_Draft_LC_Copy_Sent_to_GP,
-        'status' => 1,
-        'msg' => "'Draft LC Copy Sent to GP against  PO# ".$po."'",
-    );
-}
-    elseif($actionID == 402){
+    if ($actionID == 401) {
         $action = array(
             'refid' => $refId,
-            'pono' => "'".$po."'",
+            'pono' => "'" . $po . "'",
+            'actionid' => action_Draft_LC_Copy_Sent_to_GP,
+            'status' => 1,
+            'msg' => "'Draft LC Copy Sent to GP against PO# " . $po . "'",
+        );
+    } elseif ($actionID == 402) {
+        $action = array(
+            'refid' => $refId,
+            'pono' => "'" . $po . "'",
             'actionid' => action_Final_LC_Copy_Sent_to_GP,
             'status' => 1,
-            'msg' => "'Final LC Copy Sent to GP against PO# ".$po."'",
+            'msg' => "'Final LC Copy Sent to GP against PO# " . $po . "'",
         );
     }
 
@@ -397,7 +398,7 @@ function GetPODetail($id, $forPI=0, $shipno=0)
                 INNER JOIN `wc_t_category` c1 ON p.`currency` = c1.`id` 
                 INNER JOIN `wc_t_company` c2 ON p.`supplier` = c2.`id`
                 LEFT JOIN `wc_t_lc` l ON p.`poid` = l.`pono`
-                LEFT JOIN `wc_t_bank_insurance` i ON l.`insurance` = i.`id`
+                LEFT JOIN `wc_t_company` i ON l.`insurance` = i.`id`
                 
             WHERE p.`poid` = '$id';";
     //echo $sql;

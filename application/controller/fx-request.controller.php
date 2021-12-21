@@ -52,6 +52,12 @@ if (!empty($_GET["action"]) || isset($_GET["action"]))
         case 11:
             echo OpenRFQforEdit($_GET["fxreqid"], 0);
             break;
+        case 12:
+            echo GenerateRFQ();
+            break;
+        case 13:
+            if(!empty($_GET["id"])) { echo SelectBankData($_GET["id"]); } else { echo 0; };
+            break;
         default:
             break;
     }
@@ -121,12 +127,9 @@ function GetAllFxReq($status=0)
 
         $strQuery = "SELECT
                     fx.`id`,
-                    c.`name` AS supplier_name,
-                    cn.`name` AS nature_of_service,
                     req.`name` AS req_type,
                     wc.`name` AS currency,
                     FORMAT(fx.`value`, 2) AS fx_value,
-                    DATE_FORMAT(fx.`value_date`, '%d-%M-%Y') AS `value_date`,
                     fx.`CuttsOffTime`,
                     fx.`status`
                 FROM
@@ -135,10 +138,6 @@ function GetAllFxReq($status=0)
                     fx.`currency` = wc.`id`
                 LEFT JOIN `wc_t_users` u ON
                     fx.`created_by` = u.`id`
-                LEFT JOIN `wc_t_company` c ON
-                    fx.`supplier_id` = c.`id`
-                LEFT JOIN `wc_t_category` cn ON
-                    fx.`nature_of_service` = cn.`id`
                 LEFT JOIN `wc_t_category` req ON
                     fx.`requisition_type` = req.`id`
                 WHERE
@@ -189,7 +188,7 @@ function GetFx($id)
             fx.`remarks`,
             fx.`attachment`
         FROM
-            `fx_request` fx
+            `fx_request_primary` fx
         WHERE
             fx.`id` = $id;";
 
@@ -259,14 +258,15 @@ function SelectedBank($id){
             fx.`value_date`,
             fx.`value`,
             fxr.`remarks`,
-            ROUND (((fxr.`FxRate` - (SELECT MIN(fxr1.`FxRate`) FROM `fx_rfq_request` fxr1 WHERE fxr1.`FxRequestId`=fxr.`FxRequestId`))*fxr.`OfferedVolumeAmount`),2) `PotentialLoss`,
+            ROUND (((fxr.`FxRate` - (SELECT MIN(fxr1.`FxRate`) FROM `fx_rfq_request` fxr1 WHERE fxr1.`FxRequestId`=fxr.`FxRequestId`))*fxr.`DealAmount`),2) `PotentialLoss`,
             fxr.`DealAmount`,
-            fxr.`Selected`
+            fxr.`Selected`,
+            (SELECT MIN(fxr2.`FxRate`) FROM `fx_rfq_request` as `fxr2` WHERE fxr2.`FxRequestId`=fxr.`FxRequestId`) `minRate`
         FROM
             `fx_rfq_request` fxr
         LEFT JOIN `wc_t_company` co ON
             fxr.`BankId` = co.`Id`
-        LEFT JOIN `fx_request` fx ON fxr.`FxRequestId` = fx.`Id`
+        LEFT JOIN `fx_request_primary` fx ON fxr.`FxRequestId` = fx.`Id`
         WHERE
             fxr.`FxRequestId` = $id;";
 
@@ -280,12 +280,14 @@ function SelectedBank($id){
     }
     unset($objdal);
     $json = json_encode($rows);
-    if ($json == "" || $json == 'null') {
-        $json = "[]";
-    }
-    $table_data = '{"data": ' . $json . '}';
-    //return $table_data;
-    return $table_data;
+    echo $json;
+
+//    if ($json == "" || $json == 'null') {
+//        $json = "[]";
+//    }
+//    $table_data = '{"data": ' . $json . '}';
+//    //return $table_data;
+//    return $table_data;
 
 }
 
@@ -340,7 +342,7 @@ function OpenRFQforEdit($fxreqid, $btnOpenRfqforEdit){
     $objdal = new dal();
 
     $query = "UPDATE
-                `fx_request`
+                `fx_request_primary`
             SET
                 `open` = $btnOpenRfqforEdit
             WHERE
@@ -354,4 +356,106 @@ function OpenRFQforEdit($fxreqid, $btnOpenRfqforEdit){
     return json_encode($res);
 }
 
+
+function GenerateRFQ()
+{
+    global $loginRole;
+    global $user_id;
+    if ($loginRole == role_foreign_strategy) {
+        $objdal = new dal();
+
+        $strQuery = "SELECT `currency`,`requisition_type`,sum(`value`) as `total`,GROUP_CONCAT(`id`) as `group_id`,
+                    `status`,`open` FROM `fx_request_primary` WHERE `status` = 0 GROUP BY `currency`,
+                    `requisition_type`,`open`;";
+        //echo $strQuery;
+        $objdal->read($strQuery);
+
+//        $rows = array();
+        if (!empty($objdal->data)) {
+            foreach ($objdal->data as $row) {
+//                $rows[] = $row;
+                $currency = $row['currency'];
+                $req_type = $row['requisition_type'];
+                $total = $row['total'];
+                $status = $row['status'];
+                $groupId= $row['group_id'];
+                $open= $row['open'];
+
+                $query = "INSERT INTO `fx_request` (`requisition_type`, `currency`,`value`,`status`,`created_by`,`groupId`,`open`)
+                VALUES ('$req_type','$currency','$total','$status','$user_id','$groupId','$open')";
+//                echo $query;
+//                exit();
+                $objdal->insert($query);
+
+                $lastFxId = $objdal->LastInsertId();
+
+                $action = array(
+                    'pono' => "'FXRFP".$lastFxId."'",
+                    'actionid' => action_ready_for_fx_request,
+                    'msg' => "'Ready for RFQ request'",
+                );
+                UpdateAction($action);
+            }
+        }
+
+        $updateQuery = "UPDATE `fx_request_primary` set `status` = 1";
+        $objdal->update($updateQuery);
+
+        unset($objdal);
+
+
+    }
+
+    $res["status"] = 1;
+    $res["message"] = 'RFQ generated Successfully';
+    return json_encode($res);
+}
+
+function SelectBankData($id){
+    /*   echo ($id);
+       exit();*/
+    $object = new dal();
+    $bankQuery ="SELECT
+            fxr.`Id`,
+            fxr.`FxRequestId`,
+            fxr.`RfqDate`,
+            fxr.`CuttsOffTime`,
+            co.`name` AS `BankName`,
+            fxr.`FxRate`,
+            fxr.`OfferedVolumeAmount`,
+            fx.`value_date`,
+            fx.`value`,
+            fxr.`remarks`,
+            ROUND (((fxr.`FxRate` - (SELECT MIN(fxr1.`FxRate`) FROM `fx_rfq_request` fxr1 WHERE fxr1.`FxRequestId`=fxr.`FxRequestId`))*fxr.`DealAmount`),2) `PotentialLoss`,
+            fxr.`DealAmount`,
+            fxr.`Selected`,
+            (SELECT MIN(fxr2.`FxRate`) FROM `fx_rfq_request` as `fxr2` WHERE fxr2.`FxRequestId`=fxr.`FxRequestId`) `minRate`
+        FROM
+            `fx_rfq_request` fxr
+        LEFT JOIN `wc_t_company` co ON
+            fxr.`BankId` = co.`Id`
+        LEFT JOIN `fx_request_primary` fx ON fxr.`FxRequestId` = fx.`Id`
+        WHERE
+            fxr.`FxRequestId` = $id;";
+
+    $object->read($bankQuery);
+
+    $rows = array();
+    if (!empty($object->data)) {
+        foreach ($object->data as $row) {
+            $rows[] = $row;
+        }
+    }
+    unset($objdal);
+    $json = json_encode($rows);
+//    echo $json;
+
+    if ($json == "" || $json == 'null') {
+        $json = "[]";
+    }
+    $table_data = '{"data": ' . $json . '}';
+    //return $table_data;
+    return $table_data;
+
+}
 ?>

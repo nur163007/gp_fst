@@ -24,6 +24,7 @@ $actionLog = GetActionRef($_GET['ref']);
                     <input name="refId" id="refId" type="hidden" value="<?php if(!empty($_GET['ref'])){ echo $_GET['ref']; } ?>" />
                     <input name="shipno" id="shipno" type="hidden" value="<?php if(!empty($_GET['ship'])){ echo $_GET['ship']; } ?>" />
                     <input name="LcNo1" id="LcNo1" type="hidden" value="" />
+                    <input name="userAction" id="userAction" type="hidden" value="1" />
                     <div class="row row-lg">
                         <div class="col-md-12">
                             <h4 class="well well-sm example-title">Shipment & LC Information</h4>
@@ -257,7 +258,7 @@ $actionLog = GetActionRef($_GET['ref']);
                             <div class="text-right">
                             	<!--button type="button" class="btn btn-primary" id="btn_makeSightPayment" data-target="#modalSightPayment" data-toggle="modal" ><i class="icon wb-payment" aria-hidden="true"></i> Sight Payment</button-->
                                 <a class="btn btn-primary" href="#" id="btn_makeSightPayment"><i class="icon wb-payment" aria-hidden="true"></i> Sight Payment</a>
-                                <button type="button" class="btn btn-primary" id="btn_mailForInsPolicy"><i class="icon wb-envelope" aria-hidden="true"></i> Mail for Insurance Policy</button>
+                                <button type="button" class="btn btn-primary" id="btn_ForInsPolicy"><i class="fas fa-share" aria-hidden="true"></i> Request For Insurance Policy</button>
                             </div>
                         </div>
                     </div>

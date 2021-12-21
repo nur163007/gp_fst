@@ -283,6 +283,8 @@ $(document).ready(function() {
         }
     });
 
+    writeDeliveredPOLones(poid);
+
 });
 
 $('#scheduleETA,#scheduleETD, #awbOrBlDate, #ciDate')

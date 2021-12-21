@@ -2,14 +2,14 @@
 var poid = $('#pono').val();
 var podata, comments, attach,commentsTFO;
 $(document).ready(function() {
-    if(poid){
+    if (poid) {
 
-        $.get('api/lc-bank?action=1&id='+poid, function (data) {
+        $.get('api/lc-bank?action=1&id=' + poid, function (data) {
 
-            if(!$.trim(data)){
+            if (!$.trim(data)) {
                 $(".panel-body").empty();
                 $(".panel-body").append(`<h4 class="well well-sm well-warning">No data found</h4>`);
-            }else {
+            } else {
 
                 var row = JSON.parse(data);
                 podata = row[0][0];
@@ -18,7 +18,7 @@ $(document).ready(function() {
                 // PO info
                 $('#ponum').html(poid);
                 $('#insurancebank').html(podata['insurancebank']);
-                $('#icvalue').html(commaSeperatedFormat(podata['povalue'])+' '+podata['curname']);
+                $('#icvalue').html(commaSeperatedFormat(podata['povalue']) + ' ' + podata['curname']);
                 $('#lcdesc').html(podata['lcdesc']);
                 $('#supplier').html(podata['supname']);
                 $('#pi_num').html(podata['pinum']);
@@ -31,59 +31,100 @@ $(document).ready(function() {
         });
     }
 
-
-        $("#btnLCShareToTFO").click(function (e) {
-            // alert('clicked');
-            $('#userAction1').val('1');
-            e.preventDefault();
-            if (validate() === true) {
-                alertify.confirm('Are you sure you want submit?', function () {
-                    $.ajax({
-                        type: "POST",
-                        url: "api/lc-bank",
-                        data: $('#form-lc').serialize(),
-                        cache: false,
-                        success: function (response) {
-                            // alert(response);
-                            try {
-                                var res = JSON.parse(response);
-                                console.log(res);
-                                if (res["status"] == 1) {
-                                    ResetForm();
-                                    alertify.success(res['message']);
-                                    window.location.href = _dashboardURL;
-                                } else {
-                                    //$("#SendPO_btn").show();
-                                    alertify.error(res['message']);
-                                    return false;
-                                }
-                            } catch (e) {
-                                console.log(e);
-                                alertify.error(response + ' Failed to process the request.');
+    $("#btnDraftLCShareToTFO").click(function (e) {
+        // alert('clicked');
+        $('#userAction1').val('1');
+        e.preventDefault();
+        if (validate() === true) {
+            alertify.confirm('Are you sure you want submit?', function () {
+                $.ajax({
+                    type: "POST",
+                    url: "api/lc-bank",
+                    data: $('#form-lc').serialize(),
+                    cache: false,
+                    success: function (response) {
+                        // alert(response);
+                        try {
+                            var res = JSON.parse(response);
+                            console.log(res);
+                            if (res["status"] == 1) {
+                                ResetForm();
+                                alertify.success(res['message']);
+                                window.location.href = _dashboardURL;
+                            } else {
+                                //$("#SendPO_btn").show();
+                                alertify.error(res['message']);
                                 return false;
                             }
-                        },
-                        error: function (xhr, textStatus, error) {
-                            alertify.error(textStatus + ": " + xhr.status + " " + error);
+                        } catch (e) {
+                            console.log(e);
+                            alertify.error(response + ' Failed to process the request.');
+                            return false;
                         }
-                    });
+                    },
+                    error: function (xhr, textStatus, error) {
+                        alertify.error(textStatus + ": " + xhr.status + " " + error);
+                    }
+                });
 
-                    });
+            });
 
-            }else{
-                return false;
-            }
-        });
+        } else {
+            return false;
+        }
+    });
 
+    $("#btnFinalLCShareToTFO").click(function (e) {
+        // alert('clicked');
+        $('#userAction1').val('1');
+        e.preventDefault();
+        if (validate() === true) {
+            alertify.confirm('Are you sure you want submit?', function () {
+                $.ajax({
+                    type: "POST",
+                    url: "api/lc-bank",
+                    data: $('#form-lc').serialize(),
+                    cache: false,
+                    success: function (response) {
+                        // alert(response);
+                        try {
+                            var res = JSON.parse(response);
+                            console.log(res);
+                            if (res["status"] == 1) {
+                                ResetForm();
+                                alertify.success(res['message']);
+                                window.location.href = _dashboardURL;
+                            } else {
+                                //$("#SendPO_btn").show();
+                                alertify.error(res['message']);
+                                return false;
+                            }
+                        } catch (e) {
+                            console.log(e);
+                            alertify.error(response + ' Failed to process the request.');
+                            return false;
+                        }
+                    },
+                    error: function (xhr, textStatus, error) {
+                        alertify.error(textStatus + ": " + xhr.status + " " + error);
+                    }
+                });
+
+            });
+
+        } else {
+            return false;
+        }
+    });
 
     //LC DRAFT/FINAL COPY FROM BANK
 
-    $.get('api/lc-bank?action=2&id='+poid, function (data) {
+    $.get('api/lc-bank?action=2&id=' + poid, function (data) {
 
-        if(!$.trim(data)){
+        if (!$.trim(data)) {
             $(".panel-body").empty();
             $(".panel-body").append(`<h4 class="well well-sm well-warning">No data found</h4>`);
-        }else {
+        } else {
 
             var row = JSON.parse(data);
             attach = row[0];
@@ -96,7 +137,7 @@ $(document).ready(function() {
 
     //LC FEEDBACK MESSAGE FROM BUYERS AND SUPPLIERS
 
-    $.get('api/purchaseorder?action=4&po='+poid+'&step='+ACTION_FINAL_LC_REQUEST_SENT_TO_BANK, function(r) {
+    $.get('api/purchaseorder?action=4&po=' + poid + '&step=' + ACTION_FINAL_LC_REQUEST_SENT_TO_BANK, function (r) {
         if (r == 1) {
             $.get('api/lc-bank?action=3&id=' + poid, function (data) {
 
@@ -117,7 +158,7 @@ $(document).ready(function() {
         }
     });
 
-    $.get('api/purchaseorder?action=4&po='+poid+'&step='+ACTION_DRAFT_LC_REQUEST_SENT_TO_BANK, function(r) {
+    $.get('api/purchaseorder?action=4&po=' + poid + '&step=' + ACTION_FEEDBACK_GIVEN_BY_BUYER, function (r) {
         if (r == 1) {
             $.get('api/lc-bank?action=4&id=' + poid, function (data) {
                 if (!$.trim(data)) {
@@ -143,84 +184,6 @@ $(document).ready(function() {
         $('#userAction1').val('2');
         e.preventDefault();
         alertify.confirm('Are you sure you want submit?', function () {
-                $.ajax({
-                    type: "POST",
-                    url: "api/lc-bank",
-                    data: $('#form-lc').serialize(),
-                    cache: false,
-                    success: function (response) {
-                        // alert(response);
-                        try {
-                            var res = JSON.parse(response);
-                            console.log(res)
-                            if (res["status"] == 1) {
-                                ResetForm();
-                                alertify.success(res['message']);
-                                window.location.href = _dashboardURL;
-                            } else {
-                                //$("#SendPO_btn").show();
-                                alertify.error(res['message']);
-                                return false;
-                            }
-                        } catch (e) {
-                            console.log(e);
-                            alertify.error(response + ' Failed to process the request.');
-                            return false;
-                        }
-                    },
-                    error: function (xhr, textStatus, error) {
-                        alertify.error(textStatus + ": " + xhr.status + " " + error);
-                    }
-                });
-
-                });
-
-    });
-
-    //SEND FEEDBACK BY BUYER TO TFO
-    $("#btnLCFeedbackBuyer").click(function (e) {
-        $('#userAction1').val('3');
-        e.preventDefault();
-            if (e) {
-                $.ajax({
-                    type: "POST",
-                    url: "api/lc-bank",
-                    data: $('#form-lc').serialize(),
-                    cache: false,
-                    success: function (response) {
-                        // alert(response);
-                        try {
-                            var res = JSON.parse(response);
-                            console.log(res)
-                            if (res["status"] == 1) {
-                                ResetForm();
-                                alertify.success(res['message']);
-                                window.location.href = _dashboardURL;
-                            } else {
-                                //$("#SendPO_btn").show();
-                                alertify.error(res['message']);
-                                return false;
-                            }
-                        } catch (e) {
-                            console.log(e);
-                            alertify.error(response + ' Failed to process the request.');
-                            return false;
-                        }
-                    },
-                    error: function (xhr, textStatus, error) {
-                        alertify.error(textStatus + ": " + xhr.status + " " + error);
-                    }
-                });
-            }else {
-
-            }
-    });
-
-    //SEND FEEDBACK BY SUPPLIER TO TFO
-    $("#btnLCFeedbackSupplier").click(function (e) {
-        $('#userAction1').val('4');
-        e.preventDefault();
-        if (e) {
             $.ajax({
                 type: "POST",
                 url: "api/lc-bank",
@@ -250,7 +213,89 @@ $(document).ready(function() {
                     alertify.error(textStatus + ": " + xhr.status + " " + error);
                 }
             });
-        }else {
+
+        });
+
+    });
+
+    //SEND FEEDBACK BY BUYER TO TFO
+    $("#btnLCFeedbackBuyer").click(function (e) {
+        $('#userAction1').val('3');
+        e.preventDefault();
+        if (e) {
+            if (validatemsg() === true) {
+                $.ajax({
+                    type: "POST",
+                    url: "api/lc-bank",
+                    data: $('#form-lc').serialize(),
+                    cache: false,
+                    success: function (response) {
+                        // alert(response);
+                        try {
+                            var res = JSON.parse(response);
+                            console.log(res)
+                            if (res["status"] == 1) {
+                                ResetForm();
+                                alertify.success(res['message']);
+                                window.location.href = _dashboardURL;
+                            } else {
+                                //$("#SendPO_btn").show();
+                                alertify.error(res['message']);
+                                return false;
+                            }
+                        } catch (e) {
+                            console.log(e);
+                            alertify.error(response + ' Failed to process the request.');
+                            return false;
+                        }
+                    },
+                    error: function (xhr, textStatus, error) {
+                        alertify.error(textStatus + ": " + xhr.status + " " + error);
+                    }
+                });
+            }
+        } else {
+
+        }
+    });
+
+    //SEND FEEDBACK BY SUPPLIER TO TFO
+    $("#btnLCFeedbackSupplier").click(function (e) {
+        $('#userAction1').val('4');
+        e.preventDefault();
+        if (e) {
+            if (validatemsg() === true) {
+                $.ajax({
+                    type: "POST",
+                    url: "api/lc-bank",
+                    data: $('#form-lc').serialize(),
+                    cache: false,
+                    success: function (response) {
+                        // alert(response);
+                        try {
+                            var res = JSON.parse(response);
+                            console.log(res)
+                            if (res["status"] == 1) {
+                                ResetForm();
+                                alertify.success(res['message']);
+                                window.location.href = _dashboardURL;
+                            } else {
+                                //$("#SendPO_btn").show();
+                                alertify.error(res['message']);
+                                return false;
+                            }
+                        } catch (e) {
+                            console.log(e);
+                            alertify.error(response + ' Failed to process the request.');
+                            return false;
+                        }
+                    },
+                    error: function (xhr, textStatus, error) {
+                        alertify.error(textStatus + ": " + xhr.status + " " + error);
+                    }
+                });
+            }
+        } else {
 
         }
     });
@@ -290,7 +335,7 @@ $(document).ready(function() {
                 }
             });
 
-            });
+        });
 
     });
 });
@@ -335,6 +380,17 @@ function validate() {
     if ($("#attachBCA").val() == "") {
         $("#attachBCA").focus();
         alertify.error("Attached bank charge advise!");
+        return false;
+    }
+
+    return true
+}
+
+function validatemsg() {
+
+    if ($("#feedbackmessage").val() == "") {
+        $("#feedbackmessage").focus();
+        alertify.error("Give a Feedback");
         return false;
     }
 

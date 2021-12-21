@@ -35,7 +35,17 @@ $(document).ready(function (e) {
         });
     }
 
-    if ($("#currentRole").val() != const_role_Supplier) {
+    var SCMFeatureExcludeRole = [const_role_Supplier,
+        const_role_lc_bank,
+        const_role_bank_fx,
+        const_role_insurance_company,
+        const_role_cnf_agent,
+        const_role_foreign_strategy,
+        const_role_foreign_payment_team
+    ];
+    //if ($("#currentRole").val() != const_role_Supplier) {
+    // alert($("#currentRole").val());
+    if(jQuery.inArray(parseInt($("#currentRole").val()), SCMFeatureExcludeRole) == -1) {
         $(function () {
             start = moment().subtract(1, 'week').startOf('week');
             end = moment().subtract(1, 'week').endOf('week').add(1, 'day');

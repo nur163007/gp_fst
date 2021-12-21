@@ -167,74 +167,59 @@ $actionLog = GetActionRef($_GET['ref']);
                             </div>
                         </div>
                     </div>
-                    <hr />
-                    <!--LINE WAYS PO-->
 
                     <div class="row row-lg">
                         <!--PO Lines-->
                         <div class="col-xlg-12 col-md-12 margin-bottom-20">
-                            <h4 class="well well-sm example-title" style="background-color: #BFEDD8;">PO Lines
-                                <!--<span class="pull-right">
-                                    <button class="btn btn-primary btn-xs" style="margin-top: -5px;" id="btnLoadPoLines"><i class="icon wb-refresh" aria-hidden="true"></i> Reload PO Lines</button>
-                                </span>-->
-                            </h4>
-                            <div class="nav-tabs-horizontal">
-                                <ul class="nav nav-tabs" data-plugin="nav-tabs" role="tablist">
-                                    <li role="presentation" class="active"><a data-toggle="tab" href="#tabDelivered" aria-controls="tabDelivered" role="tab"><span class="text-primary">Delivered <span id="delivCount1">(0)</span></span></a></li>
-                                </ul>
+                            <h4 class="well well-sm example-title" style="background-color: #BFEDD8;">PO Lines</h4>
+                            <div id="deliveredPOLinesDetail">
+                                <table class="table table-bordered table-striped table-highlight order margin-0 small" id="dtPOLinesDelivered">
+                                <thead>
+                                <tr>
+                                    <th style="width:5%" class="text-center" rowspan="2">Line #</th>
+                                    <th style="width:10%" class="text-center" rowspan="2">Item</th>
+                                    <th style="width:24%" class="text-center" rowspan="2">Item Description</th>
+                                    <th style="width:10%" class="text-center" rowspan="2">Delivery Date</th>
+                                    <th style="width:5%" class="text-center" rowspan="2">UOM</th>
+                                    <th style="width:10%" class="text-center" rowspan="2">Unit Price</th>
+                                    <th style="width:10%" class="text-center poBg" colspan="2">PO</th>
+                                    <th style="width:5%" class="text-center delivBg" colspan="2">Delivered</th>
+                                    <!--<th style="width:5%" class="text-center" rowspan="2">LD</th>-->
+                                </tr>
+                                <tr>
+                                    <th style="width:5%" class="text-center poBg">Qty.</th>
+                                    <th style="width:10%" class="text-center poBg">Total Price</th>
+                                    <th style="width:5%" class="text-cente delivBg">Qty.</th>
+                                    <th style="width:10%" class="text-center delivBg">Total Price</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td class="text-center"></td>
+                                    <td class="text-left"></td>
+                                    <td class="text-left"></td>
+                                    <td class="text-left"></td>
+                                    <td class="text-left"></td>
+                                    <td class="text-right"></td>
+                                    <td class="text-right poBg"></td>
+                                    <td class="text-right poBg"></td>
+                                    <td class="text-right delivBg"></td>
+                                    <td class="text-right delivBg"></td>
+                                    <!--<td class="text-right"></td>-->
+                                </tr>
+                                </tbody>
+                                <tfoot>
+                                <tr style="font-weight: bolder;">
+                                    <th colspan="6" class="text-right padding-top-15" style="font-weight: bold; font-size: inherit">Total: </th>
+                                    <th class="text-center poBg padding-top-15" id="poQtyTotal" style="font-weight: bold; font-size: inherit"></th>
+                                    <th class="text-right poBg padding-top-15" id="grandTotal" style="font-weight: bold; font-size: inherit"></th>
+                                    <th class="text-center delivBg padding-top-15" id="dlvQtyTotal" style="font-weight: bold; font-size: inherit"></th>
+                                    <th class="text-right delivBg padding-top-15" id="dlvGrandTotal" style="font-weight: bold; font-size: inherit"></th>
+                                    <!--<th class="text-right" id="ldAmntTotal"></th>-->
+                                </tr>
+                                </tfoot>
+                            </table>
                             </div>
-                            <div class="tab-content padding-top-20">
-                                <!--Delivered PO Lines-->
-                                <div class="tab-pane active" id="tabDelivered" role="tabpanel">
-                                    <table class="table table-bordered table-striped table-highlight order margin-0 small" id="dtPOLinesDelivered">
-                                        <thead>
-                                        <tr>
-                                            <th style="width:5%" class="text-center" rowspan="2">Line #</th>
-                                            <th style="width:10%" class="text-center" rowspan="2">Item</th>
-                                            <th style="width:24%" class="text-center" rowspan="2">Item Description</th>
-                                            <th style="width:10%" class="text-center" rowspan="2">Delivery Date</th>
-                                            <th style="width:5%" class="text-center" rowspan="2">UOM</th>
-                                            <th style="width:10%" class="text-center" rowspan="2">Unit Price</th>
-                                            <th style="width:10%" class="text-center poBg" colspan="2">PO</th>
-                                            <th style="width:5%" class="text-center delivBg" colspan="2">Delivered</th>
-                                            <!--<th style="width:5%" class="text-center" rowspan="2">LD</th>-->
-                                        </tr>
-                                        <tr>
-                                            <th style="width:5%" class="text-center poBg">Qty.</th>
-                                            <th style="width:10%" class="text-center poBg">Total Price</th>
-                                            <th style="width:5%" class="text-cente delivBg">Qty.</th>
-                                            <th style="width:10%" class="text-center delivBg">Total Price</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr>
-                                            <td class="text-center"></td>
-                                            <td class="text-left"></td>
-                                            <td class="text-left"></td>
-                                            <td class="text-left"></td>
-                                            <td class="text-left"></td>
-                                            <td class="text-right"></td>
-                                            <td class="text-right poBg"></td>
-                                            <td class="text-right poBg"></td>
-                                            <td class="text-right delivBg"></td>
-                                            <td class="text-right delivBg"></td>
-                                            <!--<td class="text-right"></td>-->
-                                        </tr>
-                                        </tbody>
-                                        <tfoot>
-                                        <tr style="font-weight: bolder;">
-                                            <th colspan="6" class="text-right padding-top-15" style="font-weight: bold; font-size: inherit">Total: </th>
-                                            <th class="text-center poBg padding-top-15" id="poQtyTotal" style="font-weight: bold; font-size: inherit"></th>
-                                            <th class="text-right poBg padding-top-15" id="grandTotal" style="font-weight: bold; font-size: inherit"></th>
-                                            <th class="text-center delivBg padding-top-15" id="dlvQtyTotal" style="font-weight: bold; font-size: inherit"></th>
-                                            <th class="text-right delivBg padding-top-15" id="dlvGrandTotal" style="font-weight: bold; font-size: inherit"></th>
-                                            <!--<th class="text-right" id="ldAmntTotal"></th>-->
-                                        </tr>
-                                        </tfoot>
-                                    </table>
-                                </div>
-                            </div>
-
                         </div>
                     </div>
 
@@ -260,7 +245,7 @@ $actionLog = GetActionRef($_GET['ref']);
                                 </div>
                             </div>
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label">Expanse Type: </label>
+                                    <label class="col-sm-4 control-label">Expense Type: </label>
                                     <div class="col-sm-8">
                                         <select class="form-control" data-plugin="select2" name="exp_type" id="exp_type">
                                             <option value="">Select expanse type</option>

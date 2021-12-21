@@ -25,11 +25,22 @@ if (!empty($_GET["action"]) || isset($_GET["action"]))
 		case 3:	// delete Company
 			if(!empty($_GET["id"])) { echo DeleteCompany($_GET["id"]); } else { echo 0; };
 			break;
-		case 4:	// get Role List 
-			echo GetCompanyList();
+		case 4:	// get type wise company list
+			if(!empty($_GET["type"])) {
+				if(!empty($_GET["bankid"])) {
+					echo GetCompanyList($_GET["type"], $_GET["bankid"]);
+				} else {
+					echo GetCompanyList($_GET["type"]);
+				}
+			} else {
+				echo GetCompanyList();
+			}
 			break;
-		case 5:	// get Role List 
+		case 5:	//
 			echo GetEmails($_GET["id"]);
+			break;
+		case 6:	// get default bank account
+			echo GetDefaultBankAccount($_GET["bankid"]);
 			break;
 	}
 }
@@ -136,22 +147,26 @@ function DeleteCompany($id)
 function GetCompany($id)
 {
 	global $loginRole;
-	if ($loginRole == 1) {
-		$objdal = new dal();
-		$query = "SELECT * FROM `wc_t_company` WHERE `id` = $id;";
-		//echo $query;
-		$objdal->read($query);
-		if (!empty($objdal->data)) {
-			$res = $objdal->data[0];
-			extract($res);
-		}else{
-			$res = '';
-		}
-		unset($objdal);
-		return json_encode($res);
+
+	/*if ($loginRole == 1) {
+
 	} else {
 		return 'Invalid request';
 	}
+	*/
+	$objdal = new dal();
+	$query = "SELECT * FROM `wc_t_company` WHERE `id` = $id;";
+//	echo $query;
+	$objdal->read($query);
+	if (!empty($objdal->data)) {
+		$res = $objdal->data[0];
+		extract($res);
+	}else{
+		$res = '';
+	}
+	unset($objdal);
+	return json_encode($res);
+
 }
 // Get All for DataTables
 function GetAllCompany()
@@ -183,11 +198,19 @@ function GetAllCompany()
 	}
 }
 
-function GetCompanyList()
+function GetCompanyList($type=0, $bankid=null)
 {
 	$objdal = new dal();
-	$strQuery="SELECT `id`, upper(`name`) as `name` FROM `wc_t_company` ORDER BY `name`;";
-	$objdal->read($strQuery); 
+	if($type==0) {
+		$strQuery = "SELECT `id`, `name` as `name` FROM `wc_t_company` ORDER BY `name`;";    // By default select supplier list
+	} else {
+		if($bankid==null) {
+			$strQuery = "SELECT `id`, `name` as `name` FROM `wc_t_company` WHERE `type` = $type ORDER BY `name`;";
+		} else {
+			$strQuery = "SELECT `id`, `accountNo` as `name` FROM `bank_account` WHERE `bankId` = $bankid ORDER BY `name`;";
+		}
+	}
+	$objdal->read($strQuery);
 	
     // json
 	$jsondata = '[';
@@ -204,7 +227,6 @@ function GetCompanyList()
     
 }
 
-
 function GetEmails($id)
 {
 	$objdal = new dal();
@@ -216,6 +238,18 @@ function GetEmails($id)
 	}
 	unset($objdal);
 	return json_encode($res);
+}
+
+function GetDefaultBankAccount($bankid){
+
+	$objdal = new dal();
+
+	$strQuery = "SELECT `id` FROM `bank_account` WHERE `bankId` = $bankid AND `default` = 1;";
+//	echo  $strQuery;
+	$defaultBAcc = $objdal->getScalar($strQuery);
+
+	unset($objdal);
+	return $defaultBAcc;
 }
 ?>
 

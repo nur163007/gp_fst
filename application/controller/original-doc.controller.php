@@ -34,6 +34,9 @@ if (!empty($_GET["action"]) || isset($_GET["action"]))
 }
 
 if (!empty($_POST)){
+
+//	var_dump($_POST);
+//	exit();
 	if (!empty($_POST["LcNo1"]) || isset($_POST["LcNo1"])){
 	   echo SubmitODocAcceptenceRequest();        
 	}
@@ -43,6 +46,9 @@ if (!empty($_POST)){
     if (!empty($_POST["attachOriginalDoc"]) || isset($_POST["attachOriginalDoc"])){
         echo OriginalDocDeliver();
     }
+	if (!empty($_POST["userAction"])){
+		echo InsPolicyRequest();
+	}
 }
 
 function OriginalDocDeliver()
@@ -316,5 +322,30 @@ function GetLetterInfo($bankId, $po)
 	return json_encode($res);
 }
 
+function InsPolicyRequest(){
+
+	$refId = decryptId($_POST["refId"]);
+
+	global $user_id;
+	global $loginRole;
+	$objdal = new dal();
+	$po = $objdal->sanitizeInput($_POST['pono']);
+	$insurance = $objdal->sanitizeInput($_POST['insurance']);
+
+		$action = array(
+			'refid' => $refId,
+			'pono' => "'".$po."'",
+			'actionid' => action_Requested_for_Ins_Policy_by_TFO,
+			'pendingtoco' => $insurance,
+			'msg' => "'Insurance policy request sent against  PO# ".$po."'",
+		);
+		UpdateAction($action);
+
+	unset($objdal);
+
+	$res["status"] = 1;
+	$res["message"] = 'Insurance Policy Request sent Successfully';
+	return json_encode($res);
+}
 ?>
 

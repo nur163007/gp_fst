@@ -145,7 +145,7 @@ function SubmitToBTRC()
                 'msg' => "'BTRC NOC process rejected against PO #" . $poid . "'",
                 'usermsg' => "'".$messageUser."'",
             );
-        } elseif($loginRole==role_public_regulatory_affairs) {
+        } elseif($loginRole==const_role_public_regulatory_affairs) {
             $action = array(
                 'refid' => $refId,
                 'pono' => "'" . $poid . "'",

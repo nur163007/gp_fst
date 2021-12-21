@@ -367,7 +367,7 @@ Please Note: Final PI-BOQ-Catalog needs to be send within 5 days.</textarea>
                                         <tr>
                                             <th class="text-center">
                                                                 <span class="checkbox-custom checkbox-default">
-                                                                    <input type="checkbox" id="chkAllLine"><label for="chkAllLine"></label>
+                                                                    <input type="checkbox" id="chkAllLine" disabled><label for="chkAllLine"></label>
                                                                 </span>
                                             </th>
                                             <th></th>
@@ -378,7 +378,7 @@ Please Note: Final PI-BOQ-Catalog needs to be send within 5 days.</textarea>
                                             <th></th>
                                             <th></th>
                                             <th></th>
-                                            <th><input type="text" class="form-control input-sm text-center" id="dlvQtyAll" title="Delivered Qty" /></th>
+                                            <th><input type="text" class="form-control input-sm text-center" id="dlvQtyAll" title="Delivered Qty" readonly /></th>
                                             <th></th>
                                             <!--                                                            <th></th>-->
                                         </tr>

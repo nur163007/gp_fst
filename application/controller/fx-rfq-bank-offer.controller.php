@@ -34,8 +34,6 @@ function GetFxDetail($fxrFqRowId)
     $query = "SELECT
             fxr.`Id`,
             fxr.`FxRequestId`,
-            fx.`value` AS `FxValue`,
-            fx.`value_date` AS `FxDate`,
             cat.`name` as `CurName`,
             fxr.`CuttsOffTime`,
             fxr.`FxRate`,
@@ -74,6 +72,7 @@ function submitBankRate($fxrFqRowId, $bankRate,$ownBankOffervol,$remarks){
 
     $refId = decryptId($_POST["refId"]);
     $poid = $_POST["poid"];
+    $OfferedVolumeAmount = str_replace(",", "", $ownBankOffervol);
 
     $objdal = new dal();
 
@@ -82,7 +81,7 @@ function submitBankRate($fxrFqRowId, $bankRate,$ownBankOffervol,$remarks){
                     `fx_rfq_request`
                 SET
                     `FxRate` = $bankRate,
-                    `OfferedVolumeAmount` = $ownBankOffervol,
+                    `OfferedVolumeAmount` = $OfferedVolumeAmount,
                     `remarks`= '$remarks'
                 WHERE
                     `fx_rfq_request`.`Id` = $fxrFqRowId;";

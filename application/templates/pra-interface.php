@@ -39,7 +39,7 @@ require_once(LIBRARY_PATH . "/lib.php");
 
                                     <div class="model-footer text-right">
                                         <label class="wc-error pull-left" id="form_error"></label>
-                                        <button type="button" class="btn btn-primary" id="btnPraReject" >Reject</button>
+                                        <button type="button" class="btn btn-danger" id="btnPraReject" >Reject</button>
                                         <button type="button" class="btn btn-default btn-outline" data-dismiss="modal" aria-label="Close" onclick="ResetForm();">Cancel</button>
                                     </div>
                                 </div>
@@ -72,7 +72,7 @@ require_once(LIBRARY_PATH . "/lib.php");
 
                                     <div class="model-footer text-right">
                                         <label class="wc-error pull-left" id="form_error"></label>
-                                        <button type="button" class="btn btn-primary" id="btnBtrcReject" >Reject</button>
+                                        <button type="button" class="btn btn-danger" id="btnBtrcReject" >Reject</button>
                                         <button type="button" class="btn btn-default btn-outline" data-dismiss="modal" aria-label="Close" onclick="ResetForm();">Cancel</button>
                                     </div>
                                 </div>

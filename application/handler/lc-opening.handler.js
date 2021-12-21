@@ -186,8 +186,8 @@ $(document).ready(function() {
 
                 var issuerBank = $("#lcissuerbank").val();
                 $('#lcissuerbankNew').val($("#lcissuerbank :selected").text());
-
-                $.getJSON("api/bankinsurance?action=4&type=bank&id=" + issuerBank, function (list) {
+// alert("api/company?action=4&type=118&id=" + issuerBank);
+                $.getJSON("api/company?action=4&type=118&bankid=" + issuerBank, function (list) {
                     $("#bankaccount").empty();
                     $("#bankaccount").select2({
                         data: list,
@@ -196,13 +196,17 @@ $(document).ready(function() {
                         allowClear: false,
                         width: "100%"
                     });
-                    if (lcinfo['bankaccount'] != "") {
+                    if (lcinfo['bankaccount']!='' && lcinfo['bankaccount']!=null) {
                         $("#bankaccount").val(lcinfo['bankaccount']).change();
+                    } else{
+                        $.get("api/company?action=6&bankid=" + issuerBank, function (data) {
+                            $("#bankaccount").val(data.trim()).change();
+                        });
                     }
                 });
             });
 
-            $.getJSON("api/bankinsurance?action=4&type=bank", function (list) {
+            $.getJSON("api/company?action=4&type=118", function (list) {
                 $("#lcissuerbank").select2({
                     data: list,
                     placeholder: "Select a Bank",
@@ -217,7 +221,7 @@ $(document).ready(function() {
                 $('#insuranceNew').val($('#insurance :selected').text());
             });
 
-            $.getJSON("api/bankinsurance?action=4&type=insurance", function (list) {
+            $.getJSON("api/company?action=4&type=119", function (list) {
                 $("#insurance").select2({
                     data: list,
                     placeholder: "Select an insurance company",
@@ -236,8 +240,10 @@ $(document).ready(function() {
                     allowClear: false,
                     width: "100%"
                 });
-                if (lcinfo['lctype'] != "") {
+                if (lcinfo['lctype'] != "" && lcinfo['lctype'] != null) {
                     $("#lctype").val(lcinfo['lctype']).change();
+                } else{
+                    $("#lctype").val(22).change();
                 }
             });
 
@@ -270,6 +276,7 @@ $(document).ready(function() {
                     placeholder: "Select Product Type",
                     width: "100%"
                 });
+                $("#producttype").val(podata['producttype']).change();
                 //alert(lcinfo['producttype']);
                 if (lcinfo['producttype'] != "" && lcinfo['producttype'] != 'null' && lcinfo['producttype'] != null && lcinfo['producttype'] != 0) {
                     $("#producttype").val(lcinfo['producttype']).change();
@@ -413,36 +420,41 @@ $(document).ready(function() {
     //COVER NOTE SUBMIT
 
     $("#btnCoverNote").click(function (e) {
-        $('#userAction').val('6');
-        e.preventDefault();
-        $("#btnCoverNote").prop('disabled', true);
-        alertify.confirm('Are you sure you want submit?', function () {
-            $.ajax({
-                type: "POST",
-                url: "api/lc-opening",
-                data: $('#lcrequest-form').serialize(),
-                cache: false,
-                success: function (response) {
-                    $("#btnCoverNote").prop('disabled', false);
-                    // alert(response);
-                    try {
-                        var res = JSON.parse(response);
+        if($("#xr2").val()>0) {
+            $('#userAction').val('6');
+            e.preventDefault();
+            $("#btnCoverNote").prop('disabled', true);
+            alertify.confirm('Are you sure you want submit?', function () {
+                $.ajax({
+                    type: "POST",
+                    url: "api/lc-opening",
+                    data: $('#lcrequest-form').serialize(),
+                    cache: false,
+                    success: function (response) {
+                        $("#btnCoverNote").prop('disabled', false);
+                        // alert(response);
+                        try {
+                            var res = JSON.parse(response);
 
-                        if (res['status'] == 1) {
-                            alertify.success(res['message']);
-                            window.location.href = _dashboardURL;
-                        } else {
-                            alertify.error("FAILED!");
+                            if (res['status'] == 1) {
+                                alertify.success(res['message']);
+                                window.location.href = _dashboardURL;
+                            } else {
+                                alertify.error("FAILED!");
+                                return false;
+                            }
+                        } catch (e) {
+                            alertify.error(response + ' Failed to process the request.', 20);
                             return false;
                         }
-                    } catch (e) {
-                        alertify.error(response + ' Failed to process the request.', 20);
-                        return false;
                     }
-                }
-            });
+                });
 
-        });
+            });
+        } else {
+            alertify.error('Please provide BCS rate', 5);
+            return false;
+        }
     });
 
 
@@ -527,12 +539,13 @@ $(document).ready(function() {
 
     $("#producttype").change(function (e) {
 
-        if ($("#lcissuedate").val() == "") {
+        //commented on 15.12.21 because everything auto load popups a warning
+        /*if ($("#lcissuedate").val() == "") {
             $("#lcissuedate").focus();
             alertify.warning("Please provide LC Date to calculate expiry!");
             return false;
-        }
-        if (lcinfo['daysofexpiry'] == null) {
+        }*/
+        if ($("#lcissuedate").val() !='' && lcinfo['daysofexpiry'] == null) {
             var selected = $(this).find('option:selected');
             var tag = selected.data('tag');
 
@@ -829,15 +842,24 @@ $(document).ready(function() {
 
     });
 
+
     $.get('api/purchaseorder?action=4&po='+poid+'&step='+ACTION_COVER_NOTE_SUBMITTED_BY_IC, function(r){
         // console.log(r)
         if(r==1){
             // alert(1);
             $("#btnCoverNote").hide();
+            $("#btnViewIC").show();
             // $("#btnViewIC").removeAttr("disabled");
         }else{
-            $("#btnViewIC").hide();
-            // $("#btnCoverNote").removeAttr("disabled");
+            $.get('api/purchaseorder?action=4&po='+poid+'&step='+ACTION_COVER_NOTE_REQUESTED_BY_TFO, function(r){
+                // console.log(r)
+                if(r==1){
+                    $("#btnCoverNote").attr('disabled',true)
+                    $("#btnViewIC").hide();
+                } else {
+                    $("#btnViewIC").hide();
+                }
+            });
         }
     });
 
@@ -845,7 +867,7 @@ $(document).ready(function() {
         // console.log(r)
         if(r==1){
             // alert(1);
-            $("#SendLCCopyToSourcing_btn").attr('disabled',true)
+            // $("#SendLCCopyToSourcing_btn").attr('disabled',true)
             $("#btnBCSEXrate").show();
             // $("#btnViewIC").removeAttr("disabled");
         }else {
@@ -864,42 +886,63 @@ $(document).ready(function() {
         }
     });
 
-    //all data show
-    $.get('api/purchaseorder?action=4&po='+poid+'&step='+ACTION_COVER_NOTE_SUBMITTED_BY_IC, function(r){
+    //LC request status
+    $.get('api/purchaseorder?action=4&po='+poid+'&step='+ACTION_DRAFT_LC_REQUEST_SENT_TO_BANK, function(r){
         if(r==1){
-    $.get('api/ici-interface?action=2&id='+poid, function (data) {
-
-        if(!$.trim(data)){
-            $(".panel-body").empty();
-            $(".panel-body").append(`<h4 class="well well-sm well-warning">No data found</h4>`);
-        }else {
-
-            var row = JSON.parse(data);
-            podata = row[0][0];
-            attach = row[1];
-            if(podata !=null){
-                // CN info
-                $('#cn_number').val(podata['cn_no']);
-                $('#cn_date').val(podata['cn_date']);
-                $('#pay_order_amount').val(commaSeperatedFormat(podata['pay_order_amount']));
-                $('#pay_order_charge').val(commaSeperatedFormat(podata['pay_order_charge']));
-
-                //alert(attach.length);
-                attachmentLogScript(attach, '#CNAttachments');
-
-                $.get('api/purchaseorder?action=4&po='+poid+'&step='+ACTION_COVER_NOTE_ACCEPTED_BY_TFO, function(r){
-                    if(r==1){
-                        // alert(1);
-                        $("#btnCnRequest").attr('disabled',true);
-                        $("#btnRejectCN").attr('disabled',true);
-                        $("#remarks").attr('disabled',true);
-                        // $("#btnViewIC").removeAttr("disabled");
-                    }
-                });
-            }
+            //LC request status
+            $.get('api/purchaseorder?action=4&po='+poid+'&step='+ACTION_BUYER_SUPPLIER_FEEDBACK_ACCEPTED, function(r){
+                if(r==1){
+                    $("#draftLC").attr("disabled",true);
+                    $("#finalLC").attr("checked", true).parent().addClass("checked");
+                    /*$("#finalLC").attr("disabled",false);
+                    $("#btnLCRequestToBank").attr('disabled',false);*/
+                } else {
+                    $("#draftLC").attr("disabled",true);
+                    $("#finalLC").attr("disabled",true);
+                    $("#btnLCRequestToBank").attr('disabled',true);
+                    $("#btnLCRequestToBank").attr('title','Draft LC request sent');
+                }
+            });
         }
     });
-}
+
+
+    //all data show
+    $.get('api/purchaseorder?action=4&po='+poid+'&step='+ACTION_COVER_NOTE_SUBMITTED_BY_IC, function(r){
+        if(r==1) {
+            $.get('api/ici-interface?action=2&id=' + poid, function (data) {
+
+                if (!$.trim(data)) {
+                    $(".panel-body").empty();
+                    $(".panel-body").append(`<h4 class="well well-sm well-warning">No data found</h4>`);
+                } else {
+
+                    var row = JSON.parse(data);
+                    podata = row[0][0];
+                    attach = row[1];
+                    if (podata != null) {
+                        // CN info
+                        $('#cn_number').val(podata['cn_no']);
+                        $('#cn_date').val(podata['cn_date']);
+                        $('#pay_order_amount').val(commaSeperatedFormat(podata['pay_order_amount']));
+                        $('#pay_order_charge').val(commaSeperatedFormat(podata['pay_order_charge']));
+
+                        //alert(attach.length);
+                        attachmentLogScript(attach, '#CNAttachments');
+
+                        $.get('api/purchaseorder?action=4&po=' + poid + '&step=' + ACTION_COVER_NOTE_ACCEPTED_BY_TFO, function (r) {
+                            if (r == 1) {
+                                // alert(1);
+                                $("#btnCnRequest").attr('disabled', true);
+                                $("#btnRejectCN").attr('disabled', true);
+                                $("#remarks").attr('disabled', true);
+                                // $("#btnViewIC").removeAttr("disabled");
+                            }
+                        });
+                    }
+                }
+            });
+        }
     });
     //CN REQUEST SUBMIT
 
@@ -980,7 +1023,7 @@ $(document).ready(function() {
 
     //LC SENT TO BANK
 
-    $("#btnLCToBank").click(function (e) {
+    $("#btnLCRequestToBank").click(function (e) {
         $('#userAction').val('9');
         e.preventDefault();
         if (validateAttach() === true) {
@@ -1056,15 +1099,29 @@ $(document).ready(function() {
 
 });
 function validateAttach() {
-    if ($("#attachLCOpenRequest").val() == "") {
-        $("#attachLCOpenRequest").focus();
-        alertify.error("Give lc attachment");
+
+    /*if ($("input[name='lcRequestType']").filter(":checked").length < 1){
+        alertify.error("Please select option for LC request");
+        return false;
+    }*/
+
+    var lcReqType = $('input:radio[name=lcRequestType]:checked').val();
+
+    if(lcReqType==undefined)
+    {
+        alertify.error("Please select option for LC request!");
         return false;
     }
-    if ($("input[name='lc']").filter(":checked").length < 1){
-        alertify.error("Please choose one option for LC request");
-        return false;
+
+    if(lcReqType=="1"){
+        if ($("#attachLCOpenRequest").val() == "") {
+            $("#attachLCOpenRequest").focus();
+            alertify.error("Attach LC Opening Request letter");
+            return false;
+        }
     }
+
+
     return true;
 }
 
@@ -1124,13 +1181,13 @@ function validate(){
             return false;
         }
         
-        if($("#bankservice").find('option:selected').text()!="Good"){
+        /*if($("#bankservice").find('option:selected').text()!="Good"){
             if($("#serviceremark").val()==""){
                 $("#serviceremark").focus();
                 alertify.error("You must write remarks for this performance.");
                 return false;
             }
-        }
+        }*/
 
     
     } else if($('#userAction').val()==2){

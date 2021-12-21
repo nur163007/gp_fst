@@ -478,6 +478,12 @@ $title="EA Inputs";
                                             <hr />
                                             <div class="row row-lg">
                                                 <div class="col-sm-12 text-right">
+                                                    <?php if ($actionLog['ActionID']==action_Requested_for_EA_Inputs){?>
+                                                        <button type="button" class="btn btn-primary" id="btnPreAlerttoCNF"><i class="icon fa-arrow-circle-right" aria-hidden="true"></i> Send Pre-Alert to C&F</button>
+                                                    <?php }
+                                                    else {?>
+                                                        <button type="button" class="btn btn-primary" id="btnPreAlerttoCNF" disabled><i class="icon fa-arrow-circle-right" aria-hidden="true"></i> Send Pre-Alert to C&F</button>
+                                                    <?php } ?>
                                                     <button type="button" class="btn btn-primary" id="btnSubmitBasicInputs"><i class="icon fa-save" aria-hidden="true"></i> Save Basic Inputs</button>
                                                 </div>`
                                             </div>

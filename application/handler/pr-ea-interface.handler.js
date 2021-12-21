@@ -350,19 +350,20 @@ $(document).ready(function() {
             return false;
         }
     });
-    //PO INFO LOAD
-    var id = $('#poid').val();
 
-    //PO LINE LOAD
+    //PO INFO LOAD
+    writeDeliveredPOLones(poid);
+
+    /*//PO LINE LOAD
     $.get("api/view-po?action=2&id="+id, function (data) {
         var res = JSON.parse(data);
         var qty = 0, totalQty = 0, totalPrice = 0, grandTotal = 0, delivQty = 0, totalDelivQty = 0, delivPrice = 0,
             delivTotal = 0;
         //alert(rejectedLines);
 
-        /**
+        /!**
          * Delivered po lines
-         */
+         *!/
         var d1 = res[0];
 
 
@@ -383,7 +384,7 @@ $(document).ready(function() {
                     '<td class="text-right poBg">' + commaSeperatedFormat(d1[i]['poTotal'], 4) + '</td>' +
                     '<td class="text-center delivBg">' + commaSeperatedFormat(d1[i]['delivQty'], 4) + '</td>' +
                     '<td class="text-right delivBg">' + commaSeperatedFormat(d1[i]['delivTotal'], 4) + '</td>' +
-                    /*'<td class="text-right">' + commaSeperatedFormat(poline[i]['ldAmount']) + '</td>' +*/
+                    /!*'<td class="text-right">' + commaSeperatedFormat(poline[i]['ldAmount']) + '</td>' +*!/
                     '</tr>';
                 $("#dtPOLinesDelivered tbody:last").append(strRow);
 
@@ -415,7 +416,7 @@ $(document).ready(function() {
             $('#dlvQtyTotal').html(commaSeperatedFormat(sumdata['grandDelivQty']));
             $('#dlvGrandTotal').html(commaSeperatedFormat(sumdata['grandDelivTotal']));
         }
-    });
+    });*/
 });
 
 

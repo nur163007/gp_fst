@@ -760,6 +760,39 @@ if(isset($_REQUEST['q'])) {
                 '<link rel="stylesheet" href="assets/vendor/asspinner/asSpinner.css">'
             );
             break;
+
+        case "cnf-inputs":
+            $page_specific_css = array(
+                '<link rel="stylesheet" href="assets/vendor/bootstrap-datepicker/bootstrap-datepicker.css">',
+                '<link rel="stylesheet" href="assets/vendor/daterangepicker/daterangepicker.css" />',
+                '<link rel="stylesheet" href="assets/vendor/select2/select2.css">',
+                '<link rel="stylesheet" href="assets/vendor/bootstrap-select/bootstrap-select.css">',
+                '<link rel="stylesheet" href="assets/vendor/datatables-bootstrap/dataTables.bootstrap.css" />',
+                '<link rel="stylesheet" href="assets/vendor/asspinner/asSpinner.css">'
+            );
+            break;
+
+            case "fx_request_primary":
+            $page_specific_css = array(
+                '<link rel="stylesheet" href="assets/vendor/bootstrap-datepicker/bootstrap-datepicker.css">',
+                '<link rel="stylesheet" href="assets/vendor/daterangepicker/daterangepicker.css" />',
+                '<link rel="stylesheet" href="assets/vendor/select2/select2.css">',
+                '<link rel="stylesheet" href="assets/vendor/bootstrap-select/bootstrap-select.css">',
+                '<link rel="stylesheet" href="assets/vendor/datatables-bootstrap/dataTables.bootstrap.css" />',
+                '<link rel="stylesheet" href="assets/vendor/asspinner/asSpinner.css">'
+            );
+            break;
+
+        case "ins-policy-share":
+            $page_specific_css = array(
+                '<link rel="stylesheet" href="assets/vendor/daterangepicker/daterangepicker.css" />',
+                '<link rel="stylesheet" href="assets/vendor/select2/select2.css">',
+                '<link rel="stylesheet" href="assets/vendor/bootstrap-select/bootstrap-select.css">',
+                '<link rel="stylesheet" href="assets/vendor/datatables-bootstrap/dataTables.bootstrap.css" />',
+                '<link rel="stylesheet" href="assets/vendor/asspinner/asSpinner.css">'
+            );
+            break;
+
         default:
             $page_specific_css = array();
     }

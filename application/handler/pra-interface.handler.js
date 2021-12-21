@@ -655,6 +655,17 @@ function UpdateAttached(id) {
 
 function downloadApp_eo_letter(ref){
     console.log(ref)
+    $.get("api/pra-interface?action=7&ref=" + ref, function (data) {
+
+        poData = JSON.parse(data);
+        console.log(poData.length)
+        var d = new Date();
+        letterRef = "";
+            if (ref == "115") {
+                letterRef = docref_custom_pra_letter_ref + d.getFullYear() + "/" + zeroPad(1);
+            } else if(ref == "116"){
+                letterRef = docref_custom_pra_letter_ref + d.getFullYear() + "/" + zeroPad(2);
+            }
         $.ajax({
             url: 'application/templates/letter_template/application_eo_letter.html',
             cache: false,
@@ -664,8 +675,22 @@ function downloadApp_eo_letter(ref){
 
                 try {
                     var temp = response;
-
+                    // console.log(temp)
                     //---------------replace data-----------------
+                    var html="";
+                    for (var i=0; i < poData.length;i++){
+
+                        html += '<tr style="border: 1px solid black;border-collapse: collapse;">\n' +
+                            '        <td style="width: 50%;border-collapse: collapse;border: 1px solid black; font-size: 12px;">'+poData[i]["itemDesc"]+'</td>\n' +
+                            '        <td style="width: 50%;border-collapse: collapse;border: 1px solid black;font-size: 12px;">'+poData[i]["justification"]+'</td>\n' +
+                            '    </tr>'
+                        // temp = temp.replace('##itemDesc##', poData[i]["itemDesc"]);
+                        // temp = temp.replace('##summary##', poData[i]["justification"]);
+                    }
+                    temp = temp.replace('##tBody##',html);
+                    temp = temp.replace('##SL##',letterRef);
+                    //---------------end replace data-------------
+
                     $("#fileName").val('Application_E&O'+'.doc');
                     $("#letterContent").val(temp);
                     document.getElementById("formLetterContent").submit();
@@ -676,7 +701,11 @@ function downloadApp_eo_letter(ref){
                     return false;
                 }
             }
+        // });
+
         });
+
+         });
     // }
 
 
@@ -686,6 +715,10 @@ function downloadApp_eo_letter(ref){
 
 function downloadApp_equipment_letter(ref){
     console.log(ref)
+    $.get("api/pra-interface?action=7&ref=" + ref, function (data) {
+
+        poData = JSON.parse(data);
+        console.log(poData)
     $.ajax({
         url: "application/templates/letter_template/equipment_list_description.html",
         cache: false,
@@ -695,6 +728,23 @@ function downloadApp_equipment_letter(ref){
             try {
                 var temp = response;
 
+                var html="";
+                for (var i=0; i < poData.length;i++){
+
+                    html += '<tr style="border: 1px solid black;border-collapse: collapse;">\n' +
+                        '        <td style="width: 5%;border-collapse: collapse;border: 1px solid black; font-size: 12px;">'+ i +'</td>\n' +
+                        '        <td style="width: 15%;border-collapse: collapse;border: 1px solid black; font-size: 12px;">'+poData[i]["supplier"]+'</td>\n' +
+                        '        <td style="width: 15%;border-collapse: collapse;border: 1px solid black; font-size: 12px;">'+poData[i]["poNo"]+'</td>\n' +
+                        '        <td style="width: 15%;border-collapse: collapse;border: 1px solid black; font-size: 12px;">'+poData[i]["pinum"]+'</td>\n' +
+                        '        <td style="width: 15%;border-collapse: collapse;border: 1px solid black; font-size: 12px;">'+poData[i]["pidate"]+'</td>\n' +
+                        '        <td style="width: 24%;border-collapse: collapse;border: 1px solid black; font-size: 12px;">'+poData[i]["itemDesc"]+'</td>\n' +
+                        '        <td style="width: 15%;border-collapse: collapse;border: 1px solid black; font-size: 12px;">'+poData[i]["poTotal"]+'</td>\n' +
+                        '        <td style="width: 15%;border-collapse: collapse;border: 1px solid black; font-size: 12px;">'+poData[i]["currency"]+'</td>\n' +
+                        '    </tr>'
+                    // temp = temp.replace('##itemDesc##', poData[i]["itemDesc"]);
+                    // temp = temp.replace('##summary##', poData[i]["justification"]);
+                }
+                temp = temp.replace('##tBody##',html);
                 //---------------replace data-----------------
                 $("#fileName").val('Equipment_list_description'+'.doc');
                 $("#letterContent").val(temp);
@@ -705,11 +755,20 @@ function downloadApp_equipment_letter(ref){
             }
         }
     });
+
+    });
 }
 
 //SPECTTRUM LETTER GENERATE
 
 function downloadApp_spectrum_letter(ref) {
+    var d = new Date();
+    letterRef = "";
+    if (ref == "115") {
+        letterRef = docref_custom_pra_letter_ref + d.getFullYear() + "/" + zeroPad(1);
+    } else if(ref == "116"){
+        letterRef = docref_custom_pra_letter_ref + d.getFullYear() + "/" + zeroPad(1);
+    }
     $.ajax({
         url: "application/templates/letter_template/application_spectrum_letter.html",
         cache: false,
@@ -719,6 +778,7 @@ function downloadApp_spectrum_letter(ref) {
             try {
                 var temp = response;
 
+                temp = temp.replace('##SL##',letterRef);
                 //---------------replace data-----------------
                 $("#fileName").val('Application_Spectrum'+'.doc');
                 $("#letterContent").val(temp);
@@ -736,6 +796,10 @@ function downloadApp_spectrum_letter(ref) {
 
 function  downloadApp_quantity_letter(ref) {
     console.log(ref)
+    $.get("api/pra-interface?action=7&ref=" + ref, function (data) {
+
+        poData = JSON.parse(data);
+        // console.log(poData)
     $.ajax({
         url: "application/templates/letter_template/equipments_quantity.html",
         cache: false,
@@ -744,7 +808,18 @@ function  downloadApp_quantity_letter(ref) {
             //alert(response);
             try {
                 var temp = response;
+                var html="";
+                for (var i=0; i < poData.length;i++){
 
+                    html += '<tr style="border: 1px solid black;border-collapse: collapse;">\n' +
+                        '        <td style="width: 10%;border-collapse: collapse;border: 1px solid black; font-size: 12px;">'+ i +'</td>\n' +
+                        '        <td style="width: 75%;border-collapse: collapse;border: 1px solid black; font-size: 12px;text-align: left;">'+poData[i]["itemDesc"]+'</td>\n' +
+                        '        <td style="width: 15%;border-collapse: collapse;border: 1px solid black; font-size: 12px;">'+poData[i]["poQty"]+'</td>\n' +
+                        '    </tr>'
+                    // temp = temp.replace('##itemDesc##', poData[i]["itemDesc"]);
+                    // temp = temp.replace('##summary##', poData[i]["justification"]);
+                }
+                temp = temp.replace('##tBody##',html);
                 //---------------replace data-----------------
                 $("#fileName").val('Equipments_Quantity'+'.doc');
                 $("#letterContent").val(temp);
@@ -755,6 +830,8 @@ function  downloadApp_quantity_letter(ref) {
             }
         }
     });
+
+      });
 
 }
 

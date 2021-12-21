@@ -29,8 +29,8 @@ $(document).ready(function() {
                 
                 $("#assuredAmountCur").html($("#currency").find('option:selected').text());
             });            
-            
-            $.getJSON("api/bankinsurance?action=4&type=bank", function (list) {
+
+            $.getJSON("api/company?action=4&type=118", function (list) {
                 $("#lcissuerbank").select2({
                     data: list,
                     placeholder: "Select a Bank",
@@ -40,7 +40,7 @@ $(document).ready(function() {
                 $('#lcissuerbank').val(lcinfo['lcissuerbank']).change();
             });
             
-            $.getJSON("api/bankinsurance?action=4&type=insurance", function (list) {
+            $.getJSON("api/company?action=4&type=119", function (list) {
                 $("#insurance").select2({
                     data: list,
                     placeholder: "Select an insurance company",
@@ -181,7 +181,7 @@ $(document).ready(function() {
             // $("#marine-insurance-form input, #marine-insurance-form textarea, #marine-insurance-form select, #marine-insurance-form button").attr('disabled',true);
         
         } else{
-            
+
             $.get("api/lc-opening?action=3&po="+$("#pono").val(), function (lcInfo){
                 
                 if($.trim(lcInfo)!=""){
@@ -232,7 +232,15 @@ function CalculateAll(){
     $("#netPremium").val(commaSeperatedFormat(netPremium.toFixed(2)));
     vat = (netPremium * 0.15);
     $("#vat").val(commaSeperatedFormat(vat.toFixed(2)));
-    total = (netPremium + vat + stampDuty + otherCharges);
+
+    if(podata['shipmode']=='sea') {
+        stampDuty = assuredAmountBDT / 1500;
+    } else if(podata['shipmode']=='air'){
+        stampDuty = 50;
+    }
+    $("#stampDuty").val(commaSeperatedFormat(stampDuty.toFixed(2)));
+
+        total = (netPremium + vat + stampDuty + otherCharges);
     $("#total").val(commaSeperatedFormat(total.toFixed(2)));
     vatRebateAmount = (vat * vatRebate)/100;
     $("#vatRebateAmount").val(commaSeperatedFormat(vatRebateAmount.toFixed(2)));
@@ -242,7 +250,6 @@ function CalculateAll(){
     $("#vatPayable").val(commaSeperatedFormat(vatPayable.toFixed(2)));
 }
 
-        
 function validate()
 {
     if($("#bankname").val()=="")

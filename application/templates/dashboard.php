@@ -186,7 +186,11 @@
 
                 <?php }?>
             </div>
-            <?php if($_SESSION[session_prefix.'wclogin_role']!=role_Supplier){ ?>
+            <?php /*if($_SESSION[session_prefix.'wclogin_role']!=role_Supplier){ */?>
+            <?php if(in_array($_SESSION[session_prefix.'wclogin_role'],
+                    array(role_Supplier, role_bank_fx, role_bank_lc, role_insurance_company,
+                        role_cnf_agent, role_foreign_payment_team,
+                        role_foreign_strategy))!=1){ ?>
                 <!-- PO operation bar chart -->
             <div class="col-xlg-5 col-lg-5 col-md-5">
 

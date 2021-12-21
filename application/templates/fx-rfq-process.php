@@ -44,9 +44,10 @@ $actionLog = GetActionRef($_GET['ref']);
                                                 <input name="refId" id="refId" type="hidden" value="<?php if(!empty($_GET['ref'])){ echo $_GET['ref']; } ?>" />
                                                 <input type="hidden" id="hdnFxRequestId" name="hdnFxRequestId">
                                                 <input type="hidden" id="postAction" name="postAction" value="1">
+                                                <input type="hidden" id="userrole" name="userrole" value="<?php echo $_SESSION[session_prefix . 'wclogin_role']; ?>">
                                                 <div class="row">
                                                     <div class="col-xs-12" style="margin-top: 25px;">
-                                                        <table class="table table-bordered table-hover dataTable table-striped width-full" id="BankData">
+                                                        <table class="table" id="BankData">
                                                             <thead>
                                                             <tr>
                                                                 <th>ID</th>
@@ -61,7 +62,7 @@ $actionLog = GetActionRef($_GET['ref']);
                                                                 <th>Select</th>
                                                             </tr>
                                                             </thead>
-                                                            <tbody>
+                                                            <tbody id="BankTable">
 
                                                             </tbody>
                                                         </table>
@@ -136,7 +137,13 @@ $actionLog = GetActionRef($_GET['ref']);
                                                             <div class="col-xs-12" style=" margin-top:10px; text-align: right;">
                                                                 <textarea type="text" class="form-control" id="FxConvMsg" name="FxConvMsg" placeholder="Type your Message" rows="3" maxlength="300" style="margin-top: 10px; background: white; border-radius: 15px;"></textarea>
                                                                 <div style="margin-bottom: 25px;"><span id="display_count">0/300</span></div>
-                                                                <button type="submit" class="btn-primary" id="fsomessage" style="border: none;border-radius: 3px ;padding: 8px;line-height: 20px; margin-bottom: 20px;">Send To FSO</button>
+                                                                <?php if ($_SESSION[session_prefix.'wclogin_role']==role_foreign_strategy){ ?>
+                                                                    <button type="submit" class="btn-primary" id="fsomessage" style="border: none;border-radius: 3px ;padding: 8px;line-height: 20px; margin-bottom: 20px;">Send To HOT</button>
+                                                               <?php }
+                                                               elseif ($_SESSION[session_prefix.'wclogin_role']==role_head_of_treasury){ ?>
+                                                                   <button type="submit" class="btn-primary" id="fsomessage" style="border: none;border-radius: 3px ;padding: 8px;line-height: 20px; margin-bottom: 20px;">Send To FSO</button>
+                                                               <?php  } ?>
+
                                                             </div>
                                                         </div>
                                                     </div>

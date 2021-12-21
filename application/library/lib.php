@@ -423,7 +423,11 @@ function sendActionEmail($aLogId, $to='', $cc='', $debug=0)
     } else {
         if ($_SERVER['SERVER_NAME'] != 'localhost') {
         //if ($_SERVER['SERVER_NAME'] == 'https://fst.grameenphone.com') {
-            $returnVal = wcMailFunction($to, $subject, $message, $cc, $link, $logref);
+            try {
+                $returnVal = wcMailFunction($to, $subject, $message, $cc, $link, $logref);
+            } catch (Exception $e){
+                $returnVal = 0;
+            }
         }
     }
     return $returnVal;
@@ -553,14 +557,16 @@ function checkStepOver($po, $actionId, $shipNo = null, $info = null, $reject = f
     $objdal = new dal();
     if($reject=='false') {
         $query = "SELECT COUNT(`ActionID`) `stepOver`, `Msg`, `UserMsg`
-          FROM `wc_t_action_log` WHERE `PO` = '$po' AND `ActionID` = $actionId AND `Status` in (0,1)  GROUP BY `Msg`, `UserMsg`";
+          FROM `wc_t_action_log` WHERE `PO` = '$po' AND `ActionID` = $actionId AND `Status` in (0,1)";
     } else {
         $query = "SELECT COUNT(`ActionID`) `stepOver`, `Msg`, `UserMsg`
-          FROM `wc_t_action_log` WHERE `PO` = '$po' AND `ActionID` = $actionId AND `Status` in (0,1,-1)  GROUP BY `Msg`, `UserMsg`";
+          FROM `wc_t_action_log` WHERE `PO` = '$po' AND `ActionID` = $actionId AND `Status` in (0,1,-1)";
     }
     if($shipNo!=null && $shipNo!=""){
-        $query .= " AND `shipNo` = $shipNo;";
+        $query .= " AND `shipNo` = $shipNo";
     }
+    $query .= "  GROUP BY `Msg`, `UserMsg`;";
+
 //    echo $query;
     
 	$objdal->read($query);
@@ -1084,7 +1090,7 @@ function fileTransferFxRequest($lastFxId){
 
     $objdal = new dal();
 
-    $sql = "SELECT `attachment`, `created_at` FROM `fx_request` WHERE `id` = $lastFxId;";
+    $sql = "SELECT `attachment`, `created_at` FROM `fx_request_primary` WHERE `id` = $lastFxId;";
 
     $document = $objdal->getRow($sql);
 

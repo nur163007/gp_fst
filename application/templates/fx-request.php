@@ -59,7 +59,7 @@
                                                                             <th>BankName</th>
                                                                             <th>Fx Rate</th>
                                                                             <th>Offer Amount</th>
-                                                                            <th>Value Date </th>
+<!--                                                                            <th>Value Date </th>-->
                                                                             <th>Total Amount</th>
                                                                             <th>Remarks</th>
                                                                             <th>Potential Loss</th>
@@ -205,7 +205,7 @@
                 <!-- Table-->
                 <div class="table-responsive" style="overflow-x: hidden; min-height: 350px;">
                     <div class="row">
-                        <div class="col-sm-3">
+                        <div class="col-sm-10">
                             <div class="btn-group">
                                 <button type="button" class="btn btn-primary dropdown-toggle" id="exampleAnimationDropdown1" data-toggle="dropdown" aria-expanded="false">RFQ Status
                                     <span class="caret"></span>
@@ -219,17 +219,21 @@
                                 </ul>
                             </div>
                         </div>
+<!--                        --><?php //if ($actionLog['ActionID']==action_ready_for_fx_request){?>
+<!--                            <button type="button" class="btn btn-primary margin-bottom-25 text-right" id="primaryReqForRFQ"> Request for RFQ </button>-->
+<!--                        --><?php //}?>
+
                     </div>
                     <table class="table table-bordered table-hover dataTable table-striped width-full" id="dtFx">
                         <thead>
                         <tr>
                             <th>Id</th>
-                            <th>Supplier Name</th>
-                            <th>Nature of Service</th>
+<!--                            <th>Supplier Name</th>-->
+<!--                            <th>Nature of Service</th>-->
                             <th>Requisition Type</th>
                             <th>Currency</th>
                             <th>Value</th>
-                            <th>Value Date</th>
+<!--                            <th>Value Date</th>-->
                             <th>Cutts of Date</th>
                             <th>Status</th>
                         </tr>

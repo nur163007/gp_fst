@@ -85,9 +85,9 @@ require_once(LIBRARY_PATH . "/csrf_token.php");
                         <div class="panel nav-tabs-horizontal">
                             <div class="row">
                                 <div class="col-sm-8">
-                                    <h4>Fx RFQ Request</h4>
+                                    <h4>Fx RFQ Request (Submitted)</h4>
                                 </div>
-                                <div class="col-sm-4 text-right">
+                             <!--   <div class="col-sm-4 text-right">
                                     <div class="row text-right">
                                             <div class="row">
                                                 <div class="col-sm-6">
@@ -104,7 +104,7 @@ require_once(LIBRARY_PATH . "/csrf_token.php");
                                                 </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div>-->
                             </div>
                             <div class="tab-content padding-top-5">
                                 <div class="tab-pane active" id="myPendings" role="tabpanel">
@@ -178,7 +178,7 @@ require_once(LIBRARY_PATH . "/csrf_token.php");
                                                                             </div>
                                                                         </div>
                                                                         <div class="form-group">
-                                                                            <label class="col-sm-6 control-label text-right">Cuttsoff Time :</label>
+                                                                            <label class="col-sm-6 control-label text-right">Cut-of-Time :</label>
                                                                             <div class="col-sm-6">
                                                                                 <label class="control-label text-left" id="cuttsofftime"><img src="assets/images/busy.gif" /></b></label>
                                                                             </div>
@@ -221,7 +221,7 @@ require_once(LIBRARY_PATH . "/csrf_token.php");
                                                                                 <label class="wc-error pull-center" id="form_error"></label>
                                                                             </div>
                                                                             <div class="col-sm-3 text-right">
-                                                                                <button type="button" class="btn btn-primary" id="btnFxRfqRequest">Submit</button>
+                                                                                <button type="button" class="btn btn-primary" id="btnFxRfqRequest">Re-Submit</button>
                                                                             </div>
                                                                         </div>
                                                                     </div>

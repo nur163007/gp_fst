@@ -172,7 +172,7 @@ function GetPODetail($id, $forPI=0, $shipno=0)
     $extraWhere = ($loginRole == role_Supplier) ? " AND c2.`id` = $companyId" : "" ;
 
     $sql = "SELECT p.`poid`, p.`povalue`, p.`podesc`, p.`lcdesc`, p.`importAs`, c4.`name` `importAsName`, p.`supplier`, c2.`name` `supname`, p.`supplier_address` `supadd`, 
-            p.`currency`, c1.`name` `curname`, p.`contractref`,p.`pr_no`,p.`department`, p.`pi_description` `pidesc`,p.`exp_type`,p.`user_justification` `user_just`, c3.`contractName` AS `contractrefName`, p.`deliverydate`, 
+            p.`currency`, c1.`name` `curname`, p.`contractref`,p.`pr_no`,p.`department`, p.`pi_description` `pidesc`,p.`exp_type`,p.`producttype`,p.`user_justification` `user_just`, c3.`contractName` AS `contractrefName`, p.`deliverydate`, 
             p.`draftsendby`, p.`actualPoDate`, p.`emailto`, p.`emailcc`, p.`pruserto`, p.`prusercc`, p.`noflcissue`, p.`nofshipallow`, 
             p.`installbysupplier`, p.`pinum`, p.`pivalue`, p.`hscode`, p.`shipmode`, p.`pidate`, p.`basevalue`, p.`origin`, 
             p.`negobank`, p.`shipport`, p.`lcbankaddress`, p.`productiondays`, p.`buyercontact`, p.`techcontact`, 
@@ -389,6 +389,7 @@ function SubmitPO()
     //return $refId;
 
     $oldPoid = $objdal->sanitizeInput($_POST['poid']);
+    $originalPOnum = $objdal->sanitizeInput($_POST['poid1']);
     $poid = $objdal->sanitizeInput($_POST['poid1'].$_POST['pino']);
     $povalue = $objdal->sanitizeInput($_POST['povalue']);
     $povalue = str_replace(",","", $povalue);
@@ -447,6 +448,7 @@ function SubmitPO()
         // insert new po
         $query = "INSERT INTO `wc_t_po` SET 
     		`poid` = '".replaceRegex($poid)."',
+    		`originalPONum` = $originalPOnum,
             `povalue` = $povalue, 
             `podesc` = '$podesc',
             `importAs` = $importAs,
@@ -626,7 +628,13 @@ function stageList()
 function GetDumpPO()
 {
     $objdal = new dal();
-    $strQuery="SELECT DISTINCT (`poNo`) FROM `wc_t_po_dump` where `poQty` > `delivQty` ;";
+    $strQuery="SELECT
+            DISTINCT pd.poNo
+        FROM
+            `wc_t_po` po
+        RIGHT JOIN wc_t_po_dump pd ON
+            po.`originalPONum` = pd.poNo
+            WHERE po.`originalPONum` IS NULL;";
     $objdal->read($strQuery);
 
     // json
@@ -687,7 +695,7 @@ function getPODumpInfo($id)
 
     $objdal = new dal();
 
-    $sql = "SELECT p.`poNo`, p.`poTotal`, p.`itemDesc`, p.`currency`, p.`poDate`, DATE_FORMAT(p.`needByDate`, '%M %d, %Y') as`needByDate`
+    $sql = "SELECT p.`poNo`, p.`POAmount`, p.`poDesc`, p.`itemDesc`, p.`currency`,DATE_FORMAT(p.`poDate`, '%M %d, %Y') as `poDate`, DATE_FORMAT(p.`needByDate`, '%M %d, %Y') as`needByDate`,p.`PRUserDept`,p.`supplierId`,p.`ContractNo`
             FROM `wc_t_po_dump` p 
             WHERE p.`poNo` = '$id' LIMIT 1;";
     //echo $sql;

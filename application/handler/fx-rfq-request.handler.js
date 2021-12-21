@@ -47,18 +47,18 @@ $(document).ready(function () {
             var row = JSON.parse(JSON.stringify(data));
             // console.log(row);
             $("#rfqId").html($("#poid").val());
-            $('#supplier_id').html(row["supplier_name"]);
-            $('#nature_of_service').html(row["nature_of_services"]);
+            // $('#supplier_id').html(row["supplier_name"]);
+            // $('#nature_of_service').html(row["nature_of_services"]);
             $('#requisition_type').html(row["requisition_type"]);
             $('#currency').html(row["currency"]);
             $('#fx_value').html(row["value"]);
-            $('#value_date').html(row["value_date"]);
-            $('#remarks').html((row["remarks"] == '')  ? 'N/A' : row["remarks"]);
+            // $('#value_date').html(row["value_date"]);
+            // $('#remarks').html((row["remarks"] == '')  ? 'N/A' : row["remarks"]);
 
-            var attachmentFileName = row["attachment"];
-            var attachmentFilePath = "FxRequest/" + $("#poid").val() + "/" + row["attachment"];
-            var ext = attachmentFileName.substring(attachmentFileName.lastIndexOf('.')+1).toLowerCase();
-            $('#attachment').html((row["attachment"] == '') ? 'N/A' : `<i class="icon fa-${ext}"></i> <a href="download-attachment/${attachmentFilePath}" title="${attachmentFileName}" target="_blank">${attachmentFileName}</a>`);
+            // var attachmentFileName = row["attachment"];
+            // var attachmentFilePath = "FxRequest/" + $("#poid").val() + "/" + row["attachment"];
+            // var ext = attachmentFileName.substring(attachmentFileName.lastIndexOf('.')+1).toLowerCase();
+            // $('#attachment').html((row["attachment"] == '') ? 'N/A' : `<i class="icon fa-${ext}"></i> <a href="download-attachment/${attachmentFilePath}" title="${attachmentFileName}" target="_blank">${attachmentFileName}</a>`);
 
         });
     }

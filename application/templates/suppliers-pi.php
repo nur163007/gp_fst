@@ -159,6 +159,13 @@ $actionLog = GetActionRef($_GET['ref']);
                                 </div>
                             </div>
                             <div class="form-group">
+                                <label class="col-sm-4 control-label">Product Type:</label>
+                                <div class="col-sm-6">
+                                    <select class="form-control" data-plugin="select2" name="producttype" id="producttype">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
                                 <label class="col-sm-4 control-label">Shipment Mode: </label>
                                 <div class="col-sm-8">
                                     <ul class="list-unstyled list-block margin-top-5">

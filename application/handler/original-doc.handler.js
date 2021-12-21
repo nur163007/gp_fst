@@ -208,30 +208,64 @@ $(document).ready(function() {
         }
     });
 
-    $('#btn_mailForInsPolicy').click(function (event) {
+    $('#btn_ForInsPolicy').click(function (e) {
 
-        var domain = window.location.protocol+"//"+window.location.hostname+_adminURL,
-            mailAttachemnt = "";
-        $('#usersAttachments').find('a').each(function(e) {
-            //mailAttachemnt += '<a href="' + domain + $(this).attr('href') + '>'+ $(this).attr('href').replace('temp/','') +'</a>'+"%0D%0A ";
-            mailAttachemnt += $(this).html() + ": " + domain + $(this).attr('href') + "%0D%0A";
-            //alert($(this).attr('href'));
+        e.preventDefault();
+        alertify.confirm('Are you sure you want proceed?', function (e) {
+            if (e) {
+                $("#btn_ForInsPolicy").prop('disabled', true);
+                $.ajax({
+                    type: "POST",
+                    url: "api/original-doc",
+                    data: $('#originaldoc-form').serialize() + "&insurance=" + $("#insurance").val() + "&pono=" + $("#poNumber").val() + "&refId=" + $("#refId").val() + "&userAction=" + $("#userAction").val(),
+                    cache: false,
+                    success: function (response) {
+                        $("#btn_ForInsPolicy").prop('disabled', false);
+                        //alert(response);
+                        try {
+                            var res = JSON.parse(response);
+                            if (res['status'] == 1) {
+                                alertify.success(res['message']);
+                                // window.location.href = _dashboardURL;
+                            } else {
+                                alertify.error("FAILED to add!");
+                                return false;
+                            }
+                        } catch (err) {
+                            alertify.error(response + ' Failed to process the request.', 20);
+                            return false;
+                        }
+                    },
+                    error: function (xhr) {
+                        console.log('Error: ' + xhr);
+                    }
+                });
+            } else { // canceled
+                //alertify.error(e);
+            }
         });
-        //alert(mailAttachemnt);
-        window.location = "mailto:?" +
-            "body=" + "Dear Concern" +
-                "%0A%0A" +
-                "Please issue Insurance Policy against Cover Note No " + $("#coverNoteNo").val() + " as per attached documents." +
-                "%0A%0A" +
-                "Best Regards," +
-                "%0A%0A" +
-                "Trade Finance Operation,%0D%0A" +
-                "Treasury, Finance%0D%0A" +
-                "Grameenphone Ltd.%0D%0A" +
-                "%0A%0A" +
-                "Please download the documents from the following links:%0D%0A" +
-                mailAttachemnt +
-                "&subject=Insurance Policy against Covernote-" + $("#coverNoteNo").val();
+        // var domain = window.location.protocol+"//"+window.location.hostname+_adminURL,
+        //     mailAttachemnt = "";
+        // $('#usersAttachments').find('a').each(function(e) {
+        //     //mailAttachemnt += '<a href="' + domain + $(this).attr('href') + '>'+ $(this).attr('href').replace('temp/','') +'</a>'+"%0D%0A ";
+        //     mailAttachemnt += $(this).html() + ": " + domain + $(this).attr('href') + "%0D%0A";
+        //     //alert($(this).attr('href'));
+        // });
+        // //alert(mailAttachemnt);
+        // window.location = "mailto:?" +
+        //     "body=" + "Dear Concern" +
+        //         "%0A%0A" +
+        //         "Please issue Insurance Policy against Cover Note No " + $("#coverNoteNo").val() + " as per attached documents." +
+        //         "%0A%0A" +
+        //         "Best Regards," +
+        //         "%0A%0A" +
+        //         "Trade Finance Operation,%0D%0A" +
+        //         "Treasury, Finance%0D%0A" +
+        //         "Grameenphone Ltd.%0D%0A" +
+        //         "%0A%0A" +
+        //         "Please download the documents from the following links:%0D%0A" +
+        //         mailAttachemnt +
+        //         "&subject=Insurance Policy against Covernote-" + $("#coverNoteNo").val();
 
     });
 

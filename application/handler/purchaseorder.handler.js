@@ -1,4 +1,4 @@
-﻿/*	
+/*	
 	Author: Shohel Iqbal
     Copyright: 01.2016
     Code fridged on: 
@@ -188,7 +188,7 @@ $(document).ready(function() {
     
     $("#supplier").on("select2:select", function (e) {
         var id = $("#supplier").val();
-        
+        console.log(id)
         $.getJSON("api/category?action=9&cid="+id, function (list) {
             $("#contractref").empty();
             $("#contractref").select2({
@@ -240,10 +240,10 @@ $(document).ready(function() {
 
 
     $("#poid1").on("select2:select", function (e) {
+        
         var id = $("#poid1").val();
 
         //SUPPLIER LOAD
-
         $.getJSON("api/purchaseorder?action=12&id="+id, function (list) {
             $("#supplier").empty();
             $("#supplier").select2({
@@ -253,6 +253,7 @@ $(document).ready(function() {
                 allowClear: true,
                 width: "100%"
             });
+
         });
 
         //PO INFO LOAD
@@ -269,15 +270,40 @@ $(document).ready(function() {
 
                 // PO info
                 // $('#podesc').val(podata['podesc']);
-                $('#povalue').val(commaSeperatedFormat(podata['poTotal']));
+                $('#povalue').val(commaSeperatedFormat(podata['POAmount']));
                 // $('#currency').val(podata['currency']);
                 $('#deliverydate').val(podata['needByDate']);
-                $('#podesc').val(podata['itemDesc']);
+                $('#actualPoDate').val(podata['poDate']);
+                $('#podesc').val(podata['poDesc']);
+                $('#dept').val(podata['PRUserDept']);
+                // $('#supplier').val(podata['supplierId']).change();
+                $('#supplier').val(podata['supplierId']).change();
+            
+                $.getJSON("api/category?action=9&cid="+$("#supplier").val(), function (list) {
+                    //alert('dsfd');
+                    $("#contractref").select2({
+                        data: list,
+                        minimumResultsForSearch: Infinity,
+                        placeholder: "Select Contract Ref",
+                        allowClear: false,
+                        width: "100%"
+                    });
+                    $('#contractref').val(podata['contractref']).change();
+                });
+                
+                $.get("api/company?action=5&id="+podata['supplierId'], function (data) {
+                    if($.trim(data)){
+                        var row = JSON.parse(data);
+                        $("#emailto").tokenfield('setTokens',row['emailTo']);
+                        $("#emailcc").tokenfield('setTokens',row['emailCc']);
+                        $("#supplier_address").val(row['address']);
+                    }
+                });
+                
                 // $('#emailto').tokenfield('setTokens',podata["emailto"]);
                 // $('#emailcc').tokenfield('setTokens',podata["emailcc"]);
 
                 // $('#installBy_' + podata['installbysupplier']).attr('checked','').parent().addClass('checked');
-
             }
         });
 
@@ -893,7 +919,7 @@ function poGrandTotal() {
 
         totalPrice = parseToCurrency($(this).find('input.lineTotal').val());
         grandTotal += totalPrice;
-        $("#grandTotal").val(+(grandTotal).toFixed(12));
+        $("#grandTotal").val(+(grandTotal).toFixed(2));
 
         if ($(this).find('input.chkLine').is(':checked')) {
             delivQty = parseToCurrency($(this).find('input.delivQty').val());
@@ -901,7 +927,7 @@ function poGrandTotal() {
             delivQty = 0;
         }
         totalDelivQty += delivQty;
-        $("#dlvQtyTotal").val(+(totalDelivQty).toFixed(12));
+        $("#dlvQtyTotal").val(+(totalDelivQty).toFixed(2));
         //alert(totalDelivQty);
 
         if ($(this).find('input.chkLine').is(':checked')) {
@@ -910,7 +936,7 @@ function poGrandTotal() {
             delivPrice = 0;
         }
         delivTotal += delivPrice;
-        $("#dlvGrandTotal").val(+(delivTotal).toFixed(12));
+        $("#dlvGrandTotal").val(+(delivTotal).toFixed(2));
         // $("#invAmount").val(commaSeperatedFormat(delivTotal));
         // $('#baseAmount').val(commaSeperatedFormat($("#dlvGrandTotal").val()));
         //calculateInvoiceAmount()
@@ -974,7 +1000,7 @@ function addPOLine(row) {
 
         $("#dtPOLines tbody:last").append('<tr>' +
             '<td class="text-center"><span class="checkbox-custom checkbox-default">' +
-            '<input type="checkbox" class="chkLine" id="chkLine_' + i + '" ' + addTick + ' >' +
+            '<input type="checkbox" class="chkLine" id="chkLine_' + i + '" ' + addTick + ' disabled>' +
             '<label for="chkLine_' + i + '"></label></span></td>' +
             '<td><input type="text" class="form-control input-sm text-center poLine" value="' + row["lineNo"] + '" readonly /></td>' +
             '<td><input type="text" class="form-control input-sm poItem" value="' + row["itemCode"] + '" readonly /></td>' +
@@ -984,7 +1010,7 @@ function addPOLine(row) {
             '<td><input type="text" class="form-control input-sm text-right unitPrice" value="' + row["unitPrice"] + '" readonly /></td>' +
             '<td class="poBg"><input type="text" class="form-control input-sm text-right poQty" value="' + row["poQty"] + '" readonly /></td>' +
             '<td class="poBg"><input type="text" class="form-control input-sm text-right lineTotal" value="' + row["poTotal"] + '" readonly /></td>' +
-            '<td class="delivBg"><input type="text" class="form-control input-sm text-right delivQty" value="' + voidDelivQty + '" title="' + row["delivQtyValid"] + '" /><input type="hidden" class="delivQtyValid" value="' + row["delivQtyValid"] + '" /> <input type="hidden" class="delivAmountValid" value="' + row["delivAmountValid"] + '" /> </td>' +
+            '<td class="delivBg"><input type="text" class="form-control input-sm text-right delivQty" value="' + voidDelivQty + '" title="' + row["delivQtyValid"] + '" readonly /><input type="hidden" class="delivQtyValid" value="' + row["delivQtyValid"] + '" /> <input type="hidden" class="delivAmountValid" value="' + row["delivAmountValid"] + '" /> </td>' +
             '<td class="delivBg"><input type="text" class="form-control input-sm text-right delivTotal" value="' + voidDelivAmount + '" title="' + voidDelivAmount + '" readonly /></td>' +
             /*'<td><input type="text" class="form-control input-sm text-right ldAmnt" name="ldAmnt[]" value="'+row["ldAmount"]+'" /></td>' +*/
             // '<td><button class="btn btn-pure btn-warning btn-xs icon wb-close delPO"></button></td>' +

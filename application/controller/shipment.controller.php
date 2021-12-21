@@ -12,7 +12,7 @@ require_once(LIBRARY_PATH . "/dal.php");
 require_once(LIBRARY_PATH . "/lib.php");
 require_once(LIBRARY_PATH . "/loginId.php");
 
-sendActionEmail(964);
+//sendActionEmail(964);
 
 if (!empty($_GET["action"]) || isset($_GET["action"]))
 {

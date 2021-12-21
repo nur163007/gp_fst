@@ -146,6 +146,8 @@ define("role_Warehouse",13);
 define("role_Management",14);
 define("role_PR_Users",15);
 define("role_cert_final_approver",16);
+define("role_Report_Viewer",17);
+define("role_LC_Report_Viewer",18);
 define("role_foreign_payment_team",19);
 define("role_foreign_strategy",20);
 define("role_public_regulatory_affairs",21);
@@ -153,6 +155,7 @@ define("role_insurance_company",22);
 define("role_bank_lc",23);
 define("role_head_of_treasury",24);
 define("role_bank_fx",25);
+define("role_cnf_agent",26);
 
 // Action constant---------------------------
 define("action_New_PO_Initiated",1);
@@ -260,6 +263,14 @@ define("action_TAC_Request_Rectified_by_Supplier",101);
 define("action_Ready_For_Submission",102);
 define("action_Rejected_by_PRA",103);
 
+//C&F PROCESS
+define("action_Request_for_CNF_Input",104);
+define("action_CNF_Input_Given",105);
+define("action_Accept_CNF_Inputs",106);
+define("action_Reject_CNF_Inputs",107);
+
+
+
 define("requisition_type",114);
 //--------FX Action----------------------------------------
 define("action_fx_request_for_lc", 201);        //0 pending
@@ -273,6 +284,7 @@ define("action_fx_rfq_end", 206);               //2 RFQ auto closed by system ac
 define("action_fx_rfq_sent_for_HOT_approval", 207);        //3 Selected bank(s) and submitted to HOT
 define("action_fx_rfq_accepted_by_hot", 208);   //4 Accepted by HOT
 define("action_fx_rfq_rejected_by_hot", 209);   //5 Rejected by HOT and pending
+define("action_ready_for_fx_request", 210);   //...
 // to FSO with rejection mark
 
 // Inshurance company action
@@ -280,6 +292,8 @@ define("action_Request_for_CN_To_IC",301);
 define("action_CN_Issued_by_IC",302);
 define("action_CN_Accepted_by_TFO",303);
 define("action_CN_Rejected_by_TFO",304);
+define("action_Requested_for_Ins_Policy_by_TFO",310);
+define("action_Ins_Policy_sent_by_IC",311);
 
 //LC PROCESS FOR TFO & BANK
 define("action_Draft_LC_Request_sent_to_Bank",401);
@@ -323,6 +337,13 @@ define("payment_GLC", 81);
 define("payment_SIC", 82);
 define("payment_SIAC", 83);
 define("payment_DFS", 84);
+
+// Company type
+define("company_type_OWNER", 117);
+define("company_type_BANK", 118);
+define("company_type_INSURANCE", 119);
+define("company_type_CNF", 120);
+define("company_type_SUPPLIER", 121);
 
 
 ?>

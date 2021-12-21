@@ -9,8 +9,9 @@ $(document).ready(function() {
 
     poid = $('#poid').val();
     $('#ponum').html(poid);
-
+    //alert(poid);
     $.get('api/purchaseorder?action=2&id=' + poid, function (data) {
+        
         if (!$.trim(data)) {
             $(".panel-body").empty();
             $(".panel-body").append(`<h4 class="well well-sm well-warning">No data found</h4>`);
@@ -69,17 +70,37 @@ $(document).ready(function() {
                     $('#basevalue').val(commaSeperatedFormat(podata['basevalue']));
 
                 }
+
+                $.get("api/category?action=6&id=27&tag=1", function (data) {
+                    $("#producttype").html(data);
+                    $("#producttype").select2({
+                        placeholder: "Select Product Type",
+                        width: "100%"
+                    });
+                    $("#producttype").val(podata['producttype']).change();
+                });
+
                 //alert('sdfd');
                 $.getJSON("application/library/country.txt", function (data) {
                     $("#origin").select2({
                         data: data,
                         placeholder: "Select origin"
                     });
-                    var v = podata['origin'].split(',');
-                    $('#origin').val(v).change();
+                    //alert(podata['origin']);
+                    if(podata['origin']!='undefined'){
+                        var v = podata['origin'].split(',');
+                        $('#origin').val(v).change();
+                    }
                 });
 
             } else {
+                $.get("api/category?action=6&id=27&tag=1", function (data) {
+                    $("#producttype").html(data);
+                    $("#producttype").select2({
+                        placeholder: "Select Product Type",
+                        width: "100%"
+                    });
+                });
                 $.getJSON("application/library/country.txt", function (data) {
                     $("#origin").select2({
                         data: data,
@@ -240,7 +261,7 @@ $(document).ready(function() {
             $('#povalue').val(commaSeperatedFormat(podata['poTotal']));
             // $('#currency').val(podata['currency']);
             $('#deliverydate').val(podata['needByDate']);
-            $('#podesc').val(podata['itemDesc']);
+            $('#podesc').val(podata['poDesc']);
             // $('#emailto').tokenfield('setTokens',podata["emailto"]);
             // $('#emailcc').tokenfield('setTokens',podata["emailcc"]);
 
@@ -453,6 +474,12 @@ function validate() {
     if ($("#pi_description").val() == "") {
         $("#pi_description").focus();
         alertify.error("Add description!");
+        return false;
+    }
+
+    if($("#producttype").val()==""){
+        alertify.error("Please select product type!");
+        $("#producttype").select2('open');
         return false;
     }
 
@@ -759,7 +786,7 @@ function poGrandTotal() {
 
         totalPrice = parseToCurrency($(this).find('input.lineTotal').val());
         grandTotal += totalPrice;
-        $("#grandTotal").val(+(grandTotal).toFixed(12));
+        $("#grandTotal").val(+(grandTotal).toFixed(2));
 
         if ($(this).find('input.chkLine').is(':checked')) {
             delivQty = parseToCurrency($(this).find('input.delivQty').val());
@@ -776,7 +803,7 @@ function poGrandTotal() {
             delivPrice = 0;
         }
         delivTotal += delivPrice;
-        $("#dlvGrandTotal").val(+(delivTotal).toFixed(12));
+        $("#dlvGrandTotal").val(+(delivTotal).toFixed(2));
         // $("#invAmount").val(commaSeperatedFormat(delivTotal));
         // $('#baseAmount').val(commaSeperatedFormat($("#dlvGrandTotal").val()));
         //calculateInvoiceAmount()

@@ -241,7 +241,11 @@ function GetInbox($my){
         $join = "LEFT ";
     }
 
-    if ($loginRole == role_bank_fx){
+    if ($loginRole == role_bank_fx ||
+        $loginRole == role_insurance_company ||
+        $loginRole == role_cnf_agent ||
+        $loginRole == role_bank_lc
+    ) {
         $sqlFXFloatBank = " AND l.PendingToCo = $user_company";
     }
 

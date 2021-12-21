@@ -5,14 +5,14 @@ function commentsLogScript(comments, aBuyer, aSupplier){
     var commentsLog = '';
     for(var i=0; i<comments.length; i++){
         if(comments[i]['fromgroup']!=_supplier){
-            if(commentsLog.length>0){commentsLog += '<hr />';}
+            /*if(commentsLog.length>0){commentsLog += '<hr />';}
             commentsLog += '<span class="comment-author">' + comments[i]['rolename'] + ': <span class="text-primary">' + comments[i]['username'] + '</span> <i class="icon wb-arrow-right"></i> '+ comments[i]['torole'] +'</span> <div class="comment-meta">'+comments[i]['msgon'] + '</div>';
             if (comments[i]['stage']) {
                 commentsLog += '<div class="comment-content"><span style="color: #F2A654">Stage: </span><span class="text-primary">' + comments[i]['stage'] + '</span></div>';
             }
-            commentsLog += '<div class="comment-content"><h5>' + comments[i]['title'] + '</h5></div>';
+            commentsLog += '<div class="comment-content"><h5>' + comments[i]['title'] + '</h5></div>';*/
             if (comments[i]['msg']!=null) {
-                commentsLog += '<div class="comment-content">' + htmlspecialchars_decode(comments[i]['msg']) + '</div>';
+                commentsLog += '<div class="comment-content">&bull;&nbsp;' + htmlspecialchars_decode(comments[i]['msg']) + '</div>';
             }
         }
     }
@@ -28,14 +28,14 @@ function commentsLogScript(comments, aBuyer, aSupplier){
         var commentsLog = '';
         for(var i=0; i<comments.length; i++){
             if(comments[i]['fromgroup']==_supplier){
-                if(commentsLog.length>0){commentsLog += '<hr />';}
+                /*if(commentsLog.length>0){commentsLog += '<hr />';}
                 commentsLog += '<span class="comment-author">' + comments[i]['rolename'] + ': <span class="text-primary">' + comments[i]['username'] + '</span> <i class="icon wb-arrow-right"></i> '+ comments[i]['torole'] +'</span> <div class="comment-meta">'+comments[i]['msgon'] + '</div>';
                 if (comments[i]['stage']) {
                     commentsLog += '<div class="comment-content"><span style="color: #F2A654">Stage: </span><span class="text-primary">' + comments[i]['stage'] + '</span></div>';
                 }
-                commentsLog += '<div class="comment-content"><h5>' + comments[i]['title'] + '</h5></div>';
+                commentsLog += '<div class="comment-content"><h5>' + comments[i]['title'] + '</h5></div>';*/
                 if(comments[i]['msg']!=null) {
-                    commentsLog += '<div class="comment-content">' + htmlspecialchars_decode(comments[i]['msg']) + '</div>';
+                    commentsLog += '<div class="comment-content">&bull;&nbsp;' + htmlspecialchars_decode(comments[i]['msg']) + '</div>';
                 }
             }
         }
@@ -48,6 +48,56 @@ function commentsLogScript(comments, aBuyer, aSupplier){
 }
 
 
+function commentsTFOLogScript(commentsTFO, Buyer, Supplier){
+    // Buyer's comments log
+    $(Buyer+'title').hide();
+    $(Buyer).hide();
+    var commentsLog = '';
+    for(var i=0; i<commentsTFO.length; i++){
+        if(commentsTFO[i]['fromgroup']!=_supplier){
+            /*if(commentsLog.length>0){commentsLog += '<hr />';}
+            commentsLog += '<span class="comment-author">' + commentsTFO[i]['rolename'] + ': <span class="text-primary">' + commentsTFO[i]['username'] + '</span> <i class="icon wb-arrow-right"></i> '+ commentsTFO[i]['torole'] +'</span> <div class="comment-meta">'+commentsTFO[i]['msgon'] + '</div>';
+            if (commentsTFO[i]['stage']) {
+                commentsLog += '<div class="comment-content"><span style="color: #F2A654">Stage: </span><span class="text-primary">' + commentsTFO[i]['stage'] + '</span></div>';
+            }
+            commentsLog += '<div class="comment-content"><h5>' + commentsTFO[i]['title'] + '33</h5></div>';*/
+            if (commentsTFO[i]['msg']!=null) {
+                commentsLog += '<div class="comment-content">' + htmlspecialchars_decode(commentsTFO[i]['msg']) + '</div>';
+            }
+        }
+    }
+    if(commentsLog!=''){
+        $('#buyersmsgTFO').html(commentsLog);
+        $('#buyerFeedback').show();
+        $('#buyersmsgTFO').show();
+    }
+    if(Supplier!=""){
+        // Supplier's comments log
+        $(Supplier+'title').hide();
+        $(Supplier).hide();
+        var commentsLog = '';
+        for(var i=0; i<commentsTFO.length; i++){
+            if(commentsTFO[i]['fromgroup']==_supplier){
+                /*if(commentsLog.length>0){commentsLog += '<hr />';}
+                commentsLog += '<span class="comment-author">' + commentsTFO[i]['rolename'] + ': <span class="text-primary">' + commentsTFO[i]['username'] + '</span> <i class="icon wb-arrow-right"></i> '+ commentsTFO[i]['torole'] +'</span> <div class="comment-meta">'+commentsTFO[i]['msgon'] + '</div>';
+                if (commentsTFO[i]['stage']) {
+                    commentsLog += '<div class="comment-content"><span style="color: #F2A654">Stage: </span><span class="text-primary">' + commentsTFO[i]['stage'] + '</span></div>';
+                }
+                commentsLog += '<div class="comment-content"><h5>' + commentsTFO[i]['title'] + '11</h5></div>';*/
+                if(commentsTFO[i]['msg']!=null) {
+                    commentsLog += '<div class="comment-content">' + htmlspecialchars_decode(commentsTFO[i]['msg']) + '</div>';
+                }
+            }
+        }
+        if(commentsLog!=''){
+            $('#suppliersmsgTFO').html(commentsLog);
+            $('#supplierFeedback').show();
+            $('#suppliersmsgTFO').show();
+        }
+    }
+}
+
+/*
 function commentsTFOLogScript(commentsTFO, Buyer, Supplier){
     // Buyer's comments log
     $(Buyer+'title').hide();
@@ -97,6 +147,7 @@ function commentsTFOLogScript(commentsTFO, Buyer, Supplier){
     }
 }
 
+*/
 
 function attachmentLogScript(attachments, elem, col, filter, filterType, mailattach) {
 

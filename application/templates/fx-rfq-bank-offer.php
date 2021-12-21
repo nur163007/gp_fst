@@ -48,18 +48,18 @@ $actionLog = GetActionRef($_GET['ref']);
                                     <label class="control-label text-left" id="fx_req_id"><?php if(!empty($_GET['po'])){ echo $_GET['po']; } ?></b></label>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label class="col-sm-6 control-label text-right">Fx Value :</label>
-                                <div class="col-sm-6">
-                                    <label class="control-label text-left" id="fx_value"><img src="assets/images/busy.gif" /></b></label>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-6 control-label text-right">Value Date :</label>
-                                <div class="col-sm-6">
-                                    <label class="control-label text-left" id="fx_date"><img src="assets/images/busy.gif" /></b></label>
-                                </div>
-                            </div>
+<!--                            <div class="form-group">-->
+<!--                                <label class="col-sm-6 control-label text-right">Fx Value :</label>-->
+<!--                                <div class="col-sm-6">-->
+<!--                                    <label class="control-label text-left" id="fx_value"><img src="assets/images/busy.gif" /></b></label>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="form-group">-->
+<!--                                <label class="col-sm-6 control-label text-right">Value Date :</label>-->
+<!--                                <div class="col-sm-6">-->
+<!--                                    <label class="control-label text-left" id="fx_date"><img src="assets/images/busy.gif" /></b></label>-->
+<!--                                </div>-->
+<!--                            </div>-->
                             <div class="form-group">
                                 <label class="col-sm-6 control-label text-right">Currency :</label>
                                 <div class="col-sm-6">
@@ -85,7 +85,7 @@ $actionLog = GetActionRef($_GET['ref']);
                                 <div class="form-group">
                                     <label class="col-sm-5 control-label text-right margin-top-5">Offered Volume Amount :</label>
                                     <div class="col-sm-7 text-left margin-bottom-20">
-                                        <input type="number" class="form-control" id="OfferedVolumeAmount" name="OfferedVolumeAmount">
+                                        <input type="text" class="form-control curnum" id="OfferedVolumeAmount" name="OfferedVolumeAmount" value="1,000,000,000.00">
                                     </div>
                                 </div>
                                 <div class="form-group">

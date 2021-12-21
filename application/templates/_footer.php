@@ -63,6 +63,7 @@
     <script src="application/handler/notification.handler.js"></script>
     <?php }?>
     <script src="application/handler/attachment.handler.js?v=2.0.4"></script>
+    <script src="application/handler/polines.handler.js?v=1.0.0"></script>
     <script src="assets/vendor/datatables/jquery.dataTables.min.js"></script>
     <script src="assets/vendor/datatables-bootstrap/dataTables.bootstrap.js"></script>
 

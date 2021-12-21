@@ -94,8 +94,8 @@ $(document).ready(function() {
         $("#cnfAgent").change(function (e) {
 
             var id = $("#cnfAgent").val();
-            //alert('api/bankinsurance?action=1&id='+id);
-            $.get('api/bankinsurance?action=1&id=' + id, function (data) {
+            //alert('api/company?action=1&id='+id);
+            $.get('api/company?action=1&id=' + id, function (data) {
 
                 if ($.trim(data)) {
                     //alert(data);
@@ -113,7 +113,7 @@ $(document).ready(function() {
         });
 
 
-        $.getJSON("api/bankinsurance?action=4&type=cnf", function (list) {
+        $.getJSON("api/company?action=4&type=120", function (list) {
             $("#cnfAgent").select2({
                 data: list,
                 placeholder: "select C&F agent",

@@ -507,16 +507,16 @@ $actionLog = GetActionRef($_GET['ref']);
                                             <div class="form-group">
                                                 <label class="col-sm-4 control-label">LC Request for:</label>
                                                 <div class="col-sm-8">
-                                                    <div class="input-group margin-top-10">
-                                                        <input type="radio" name="lc" id="draftLC" value="0" />  &nbsp;<label for="draftLC">Draft</label> &nbsp;&nbsp;
-                                                        <input type="radio" name="lc" id="finalLC" value="1" /> &nbsp;<label for="finalLC">Final</label>
-                                                    </div>
+                                                    <ul class="list-unstyled list-inline ">
+                                                        <li><input type="radio" id="draftLC" name="lcRequestType" value="0" data-plugin="iCheck" data-radio-class="iradio_flat-red" />&nbsp;Draft</li>
+                                                        <li><input type="radio" id="finalLC" name="lcRequestType" value="1" data-plugin="iCheck" data-radio-class="iradio_flat-blue" />&nbsp;Final</li>
+                                                    </ul>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label class="col-sm-4 control-label"></label>
                                                 <div class="col-sm-8">
-                                                    <button type="button" class="btn btn-primary margin-bottom-15" id="btnLCToBank"><i class="fas fa-arrow-right font-weight-900" aria-hidden="true"></i> Send LC Request to Bank</button>
+                                                    <button type="button" class="btn btn-primary margin-bottom-15" id="btnLCRequestToBank"><i class="fas fa-arrow-right font-weight-900" aria-hidden="true"></i> Send LC Request to Bank</button>
                                                 </div>
                                             </div>
 

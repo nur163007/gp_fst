@@ -110,6 +110,7 @@ const ACTION_TAC_REJECTED_BY_BUYER = 98;
 const ACTION_TAC_APPROVED_BY_CPO = 99;
 const ACTION_TAC_REJECTED_BY_CPO = 100;
 const ACTION_TAC_REQUEST_RECTIFIED_BY_SUPPLIER = 101;
+const ACTION_REQUEST_FOR_CNF_INPUT = 104;
 
 const ACTION_PO_EDITED_BY_BUYER = 149;
 const ACTION_CLOSE_PO = 150;
@@ -124,7 +125,9 @@ const ACTION_COVER_NOTE_ACCEPTED_BY_TFO = 303;
 
 const ACTION_DRAFT_LC_REQUEST_SENT_TO_BANK = 401;
 const ACTION_FINAL_LC_REQUEST_SENT_TO_BANK = 402;
+const ACTION_FEEDBACK_GIVEN_BY_BUYER = 407;
 const ACTION_FINAL_LC_COPY_SENT_TO_GP = 404;
+const ACTION_BUYER_SUPPLIER_FEEDBACK_ACCEPTED = 409;
 // User Role
 const const_role_Admin = 1;
 const const_role_Buyer = 2;
@@ -142,8 +145,17 @@ const const_role_Warehouse = 13;
 const const_role_Management = 14;
 const const_role_PR_Users = 15;
 const const_role_cert_final_approver = 16;
-const role_public_regulatory_affairs = 21;
+
+const const_role_Report_Viewer = 17;
+const const_role_LC_Report_Viewer = 18;
+const const_role_foreign_payment_team = 19;
+const const_role_foreign_strategy = 20;
+const const_role_public_regulatory_affairs = 21;
+const const_role_insurance_company = 22;
 const const_role_lc_bank = 23;
+const const_role_head_of_treasury = 24;
+const const_role_bank_fx = 25;
+const const_role_cnf_agent = 26;
 
 // Report constraint
 const report_buyer_wise_report = 1;
@@ -168,3 +180,4 @@ const docref_LC_amendment_instruction_letter_ref = "Finance/Trade Operation/LC A
 const docref_LC_endorsement_letter_ref = "Finance/Trade Operation/LC End/";
 const docref_custom_duty_ctg_letter_ref = "Finance/Trade Operation/CD-CTG/";
 const docref_custom_duty_dhk_letter_ref = "Finance/Trade Operation/CD-DHK/";
+const docref_custom_pra_letter_ref = "No. GP/RO/BTRC/APP/";

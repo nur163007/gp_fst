@@ -186,8 +186,8 @@ $(document).ready(function(){
                         $('#insuranceNew').val($('#insurance :selected').text());
                     });
                 }
-                
-                $.getJSON("api/bankinsurance?action=4&type=bank", function (list) {
+
+                $.getJSON("api/company?action=4&type=118", function (list) {
                     $("#bank").select2({
                         data: list,
                         placeholder: "Select a Bank",
@@ -201,15 +201,21 @@ $(document).ready(function(){
                     }
                 });
                 
-                $.getJSON("api/bankinsurance?action=4&type=insurance", function (list) {
+                $.getJSON("api/company?action=4&type=119", function (list) {
+                    if(podata['shipmode']=='E-Delivery'){
+                        $('#insurance').html('').select2({data: [{id: '0', text: 'NA'}]});
+                    }
                     $("#insurance").select2({
                         data: list,
                         placeholder: "Select a Insurance",
                         allowClear: false,
                         width: "100%"
                     });
-                    $('#insurance').val(lcinfo['insurance']).change();
-                    
+                    if(podata['shipmode']=='E-Delivery'){
+                        $('#insurance').val(0).change();
+                    } else {
+                        $('#insurance').val(lcinfo['insurance']).change();
+                    }
                     if(u == const_role_LC_Approvar_5.toString()){
                         $('#insuranceOld').val($('#insurance :selected').text());
                     }

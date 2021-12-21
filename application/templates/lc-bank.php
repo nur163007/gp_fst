@@ -5,6 +5,7 @@ require_once(LIBRARY_PATH . "/dal.php");
 require_once(LIBRARY_PATH . "/lib.php");
 //$postatus = POStatus($_GET['po']);
 $actionLog = GetActionRef($_GET['ref']);
+//echo json_encode($actionLog);
 ?>
 <!-- Page -->
 <div class="page bg-blue-100 animsition">
@@ -39,37 +40,38 @@ $actionLog = GetActionRef($_GET['ref']);
                                         <input name="pono" id="pono" type="hidden" value="<?php if(!empty($_GET['po'])){ echo $_GET['po']; } ?>" />
                                         <input name="usertype" id="usertype" type="hidden" value="<?php echo $_SESSION[session_prefix.'wclogin_role']; ?>" />
                                         <input name="refId1" id="refId1" type="hidden" value="<?php if(!empty($_GET['ref'])){ echo $_GET['ref']; } ?>" />
+                                        <input name="actionId" id="actionId" type="hidden" value="<?php $actionLog['ActionID']; ?>" />
                                         <input name="userAction" id="userAction" type="hidden" value="" />
                                         <div id="PO_submit_error" style="display:none;"></div>
                                         <div class="col-xlg-6 col-md-6">
                                             <h4 class="well well-sm example-title">LC Information</h4>
                                             <div class="form-group">
-                                                <label class="col-sm-5 control-label">PO No:</label>
-                                                <div class="col-sm-7">
+                                                <label class="col-sm-4 control-label">PO No:</label>
+                                                <div class="col-sm-8">
                                                     <label class="control-label"><b id="ponum"><img src="assets/images/busy.gif" /></a></b></label>
                                                 </div>
-                                                <label class="col-sm-5 control-label">PI no:</label>
-                                                <div class="col-sm-7">
+                                                <label class="col-sm-4 control-label">PI no:</label>
+                                                <div class="col-sm-8">
                                                     <label class="control-label"><b id="pi_num"><img src="assets/images/busy.gif" /></b></label>
                                                 </div>
-                                                <label class="col-sm-5 control-label">Insurance Bank:</label>
-                                                <div class="col-sm-7">
+                                                <label class="col-sm-4 control-label">Insurance Bank:</label>
+                                                <div class="col-sm-8">
                                                     <label class="control-label" id="insurancebank"><img src="assets/images/busy.gif" /></label>
                                                 </div>
-                                                <label class="col-sm-5 control-label">Insurance Value:</label>
-                                                <div class="col-sm-7">
+                                                <label class="col-sm-4 control-label">Insurance Value:</label>
+                                                <div class="col-sm-8">
                                                     <label class="control-label" id="icvalue"><img src="assets/images/busy.gif" /></label>
                                                 </div>
-                                                <label class="col-sm-5 control-label">LC Description:</label>
-                                                <div class="col-sm-7">
+                                                <label class="col-sm-4 control-label">LC Description:</label>
+                                                <div class="col-sm-8">
                                                     <label class="control-label text-left" id="lcdesc"><img src="assets/images/busy.gif" /></label>
                                                 </div>
-                                                <label class="col-sm-5 control-label">Supplier:</label>
-                                                <div class="col-sm-7">
+                                                <label class="col-sm-4 control-label">Supplier:</label>
+                                                <div class="col-sm-8">
                                                     <label class="control-label"><b id="supplier"><img src="assets/images/busy.gif" /></b></label>
                                                 </div>
-                                                <label class="col-sm-5 control-label">Shipmode:</label>
-                                                <div class="col-sm-7">
+                                                <label class="col-sm-4 control-label">Shipmode:</label>
+                                                <div class="col-sm-8">
                                                     <label class="control-label"><b id="shipmode"><img src="assets/images/busy.gif" /></b></label>
                                                 </div>
 
@@ -96,10 +98,14 @@ $actionLog = GetActionRef($_GET['ref']);
                                                         <div class="col-xlg-12 col-md-12">
 
                                                             <?php if ($actionLog['ActionID']==action_Final_LC_Request_sent_to_Bank){?>
-                                                                <h4 class="well well-sm example-title" id="buyerFeedback">Buyers Feedback</h4>
-                                                                <div id="buyersmsg"></div>
-                                                                <h4 class="well well-sm example-title" id="supplierFeedback">Suppliers Feedback</h4>
-                                                                <div id="suppliersmsg"></div>
+                                                                <h4 class="well well-sm example-title" id="buyerFeedback">Amendment on Draft LC</h4>
+                                                                <div class="row">
+                                                                    <div class="col-sm-12 padding-left-50">
+                                                                        <div id="buyersmsg"></div>
+                                                                        <!--<h4 class="well well-sm example-title" id="supplierFeedback">Suppliers Feedback</h4>-->
+                                                                        <div id="suppliersmsg"></div>
+                                                                    </div>
+                                                                </div><br>
 
                                                                 <h4 class="well well-sm example-title">LC Information</h4>
 
@@ -146,13 +152,13 @@ $actionLog = GetActionRef($_GET['ref']);
                                                                         <input type="text" class="form-control" name="attachLC" id="attachLC" readonly placeholder=".pdf, .docx, .jpg, .png" />
                                                                         <input type="hidden" class="form-control" name="attachcnhidden" id="attachcnhidden"  />
                                                                         <span class="input-group-btn">
-                                                                <button type="button" id="btnUploadLC" class="btn btn-outline"><i class="icon wb-upload" aria-hidden="true"></i></button>
-                                                            </span>
+                                                                            <button type="button" id="btnUploadLC" class="btn btn-outline"><i class="icon wb-upload" aria-hidden="true"></i></button>
+                                                                        </span>
                                                                     </div>
                                                                 </div>
                                                             </div>
 
-                                                            <?php if ($actionLog['ActionID']==action_Draft_LC_Request_sent_to_Bank){?>
+                                                            <?php if ($actionLog['ActionID']==action_Final_LC_Request_sent_to_Bank){?>
                                                                 <div class="form-group">
                                                                     <label class="col-sm-4 control-label">Bank Received Copy:</label>
                                                                     <div class="col-sm-8">
@@ -160,8 +166,8 @@ $actionLog = GetActionRef($_GET['ref']);
                                                                             <input type="text" class="form-control" name="attachBRC" id="attachBRC" readonly placeholder=".pdf, .docx, .jpg, .png" />
                                                                             <input type="hidden" class="form-control" name="attachcnhiddenBRC" id="attachcnhiddenBRC"  />
                                                                             <span class="input-group-btn">
-                                                                <button type="button" id="btnUploadBRC" class="btn btn-outline"><i class="icon wb-upload" aria-hidden="true"></i></button>
-                                                            </span>
+                                                                                <button type="button" id="btnUploadBRC" class="btn btn-outline"><i class="icon wb-upload" aria-hidden="true"></i></button>
+                                                                            </span>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -173,8 +179,8 @@ $actionLog = GetActionRef($_GET['ref']);
                                                                             <input type="text" class="form-control" name="attachBCA" id="attachBCA" readonly placeholder=".pdf, .docx, .jpg, .png" />
                                                                             <input type="hidden" class="form-control" name="attachcnhiddenBCA" id="attachcnhiddenBCA"  />
                                                                             <span class="input-group-btn">
-                                                                <button type="button" id="btnUploadBCA" class="btn btn-outline"><i class="icon wb-upload" aria-hidden="true"></i></button>
-                                                            </span>
+                                                                                <button type="button" id="btnUploadBCA" class="btn btn-outline"><i class="icon wb-upload" aria-hidden="true"></i></button>
+                                                                            </span>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -217,15 +223,18 @@ $actionLog = GetActionRef($_GET['ref']);
                                 </div>
                                 <div class="model-footer text-right">
                                     <label class="wc-error pull-left" id="form_error"></label>
-                                    <?php if($_SESSION[session_prefix.'wclogin_role']==role_bank_lc){?>
-                                        <button type="button" class="btn btn-primary" id="btnLCShareToTFO"><i class="icon fa-save" aria-hidden="true"></i> Share LC Copy To TFO</button>
-                                    <?php }
+                                    <?php if($_SESSION[session_prefix.'wclogin_role']==role_bank_lc){
+                                        if($actionLog['ActionID']==action_Draft_LC_Request_sent_to_Bank){?>
+                                            <button type="button" class="btn btn-primary" id="btnDraftLCShareToTFO"><i class="icon fa-save" aria-hidden="true"></i> Share Draft LC to GP</button>
+                                            <?php } else { ?>
+                                        <button type="button" class="btn btn-primary" id="btnFinalLCShareToTFO"><i class="icon fa-save" aria-hidden="true"></i> Share Final LC to GP</button>
+                                    <?php }}
                                     elseif ($_SESSION[session_prefix.'wclogin_role']==role_LC_Operation){
                                         if ($actionLog['ActionID']==action_Draft_LC_Copy_Sent_to_GP || $actionLog['ActionID']==action_Final_LC_Copy_Sent_to_GP ){?>
                                             <button type="button" class="btn btn-primary" id="btnLCShareBuyerSupplier"><i class="icon fa-save" aria-hidden="true"></i> Share LC Copy to Buyer & Supplier</button>
                                         <?php  }
                                         elseif ($actionLog['ActionID']==action_Draft_LC_feedback_given_by_buyer || $actionLog['ActionID']==action_Draft_LC_feedback_given_by_supplier ){?>
-                                            <button type="button" class="btn btn-primary" id="btnFinalLCtoBank"><i class="icon fa-save" aria-hidden="true"></i> Buyer & Supplier's Feedback Accept</button>
+                                            <button type="button" class="btn btn-primary" id="btnFinalLCtoBank"><i class="icon fa-save" aria-hidden="true"></i> Request for Final LC</button>
                                         <?php }?>
 
                                     <?php }

@@ -42,6 +42,8 @@ if (!empty($_GET["action"]) || isset($_GET["action"]))
 
 // Submit new FX
 if (!empty($_POST)){
+//    var_dump($_POST);
+//    exit();
     echo submitFX();
 }
 
@@ -65,7 +67,7 @@ function submitFX(){
     if ($fxId == ""){
 
         // insert new fx
-        $query = "INSERT INTO `fx_request` SET 
+        $query = "INSERT INTO `fx_request_primary` SET 
             `supplier_id` = $supplier, 
             `nature_of_service` = $nos,
             `requisition_type` = $req_type,
@@ -84,7 +86,7 @@ function submitFX(){
     }
     else{
         // updated exist fx
-        $query = "UPDATE `fx_request` SET 
+        $query = "UPDATE `fx_request_primary` SET 
             `supplier_id` = $supplier, 
             `nature_of_service` = $nos,
             `requisition_type` = $req_type,
@@ -132,7 +134,7 @@ function GetAllFxReq()
         $objdal = new dal();
         $strQuery = "SELECT 
                    fx.`id`, c.`name` AS supplier_name, cn.`name` AS nature_of_service, wc.`name` as currency, FORMAT(fx.`value`, 2) AS fx_value,DATE_FORMAT(fx.`value_date`, '%d-%M-%Y')AS `value_date`,u.`firstname` as created_by,fx.`status`
-			        FROM `fx_request` fx
+			        FROM `fx_request_primary` fx
 			        LEFT JOIN `wc_t_category` wc ON fx.`currency` = wc.`id` 
 			        LEFT JOIN `wc_t_users` u ON fx.`created_by` = u.`id`
 			        LEFT JOIN `wc_t_company` c ON fx.`supplier_id` = c.`id`
@@ -170,7 +172,7 @@ function GetFx($id)
     $objdal = new dal();
     $query = "SELECT 
 			      `id`, `supplier_id`,`nature_of_service`,`currency`, FORMAT(`value`, 2) AS fx_value,DATE_FORMAT(`value_date`, '%d-%M-%Y')AS `value_date`,`remarks`,`attachment`
-			        FROM `fx_request`
+			        FROM `fx_request_primary`
                  WHERE 
                     `id` = $id;";
 
@@ -193,7 +195,7 @@ function DeleteFx($id)
     global $loginRole;
     if ($loginRole == 1) {
         $objdal = new dal();
-        $query = "UPDATE `fx_request` SET `status`=-1  WHERE `id` = $id;";
+        $query = "UPDATE `fx_request_primary` SET `status`=-1  WHERE `id` = $id;";
         $objdal->update($query);
         unset($objdal);
         return 1;

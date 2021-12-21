@@ -39,7 +39,7 @@ function getPOLines($id){
      * Query for Delivered PO Lines
      * **********************************/
     $sql = "SELECT 
-            d.`id`, d.`poNo`, d.`poDate`, d.`needByDate`, d.`itemCode`, REPLACE(d.`itemDesc`, CHAR(194), '') AS `itemDesc`, 
+            d.`id`, d.`poNo`, d.`poDate`, d.`needByDate`, d.`itemCode`, REPLACE(d.`poDesc`, CHAR(194), '') AS `poDesc`, REPLACE(d.`itemDesc`, CHAR(194), '') AS `itemDesc`, 
             d.`currency`, d.`lineNo`, d.`uom`, d.`unitPrice`, d.`poQty`, AVG(d.`poTotal`) `poTotal`,
             IFNULL(d.`poDate`, '') AS `poDate`,l.`reqId`,l.`status`,
             SUM(IFNULL(IF(l.`status` = 0, l.`delivQty`, 0), 0)) AS `delivQty`,
@@ -67,13 +67,13 @@ function getPOLines($id){
 
     $sql = "SELECT * FROM 
         (SELECT 
-            d.`id`, d.`poNo`, d.`poDate`, d.`needByDate`, d.`itemCode`, REPLACE(d.`itemDesc`, CHAR(194), '') AS `itemDesc`, 
-            d.`currency`, d.`lineNo`, d.`uom`, d.`unitPrice`, d.`poQty`, AVG(d.`poTotal`) AS `poTotal`,
+            d.`id`, d.`poNo`, d.`poDate`, d.`needByDate`, d.`itemCode`, REPLACE(d.`poDesc`, CHAR(194), '') AS `poDesc`, REPLACE(d.`itemDesc`, CHAR(194), '') AS `itemDesc`, 
+            d.`currency`, d.`lineNo`, d.`uom`, d.`unitPrice`, d.`poQty`, CAST((d.`unitPrice` * d.`poQty`) AS DECIMAL(11,2)) `poTotal`,
             IFNULL(d.`projCode`, '') AS `projCode`, l.`reqId`, l.`status`,
             SUM(IFNULL(IF(l.`status` = 0, l.`delivQty`, 0), 0)) AS `delivQty`,
             SUM(IFNULL(IF(l.`status` = 0, l.`delivTotal`, 0), 0)) AS `delivTotal`,
             (d.poQty-SUM(IFNULL(IF(l.`status` = 0, l.`delivQty`, 0),0))) AS `delivQtyValid`, 
-            ((d.poQty-SUM(IFNULL(IF(l.`status` = 0, l.`delivQty`, 0), 0))) * d.unitPrice) AS `delivAmountValid`
+            CAST(((d.poQty-SUM(IFNULL(IF(l.`status` = 0, l.`delivQty`, 0), 0))) * d.unitPrice) AS DECIMAL(11,2)) AS `delivAmountValid`
         FROM
             `wc_t_po_dump` d left join `wc_t_po_line` l on (d.`poNo` = l.`poNo` and d.`lineNo` = l.`lineNo`)
         WHERE

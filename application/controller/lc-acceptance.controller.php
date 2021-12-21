@@ -207,11 +207,12 @@ function submitSchedule(){
 	$res["message"] = 'FAILED!';
 	//------------------------------------------------------------------------------
     $objdal = new dal();
-    
+    //echo 1;
     // First clear all previous schedule if any under this po
     $query = "DELETE FROM wc_t_shipment_ETA WHERE pono = '$pono' AND lcNo = '$lcno';";
+
     $objdal->delete($query);
-    
+    //echo 2;
     $shipmentNumber = 0;
     for($i=0; $i<count($_POST['shipmentSchedule']); $i++){
         

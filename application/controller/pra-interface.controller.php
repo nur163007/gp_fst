@@ -34,6 +34,12 @@ if (!empty($_GET["action"]) || isset($_GET["action"]))
         case 6:
             echo GetAttach($_GET["cref"]);
             break;
+        case 7:
+            echo GetPolineData($_GET["ref"]);
+            break;
+        case 8:
+            echo GetLetterSL($_GET["ref"]);
+            break;
         default:
             break;
     }
@@ -451,6 +457,55 @@ function GetAttach($cref){
 
         $json = json_encode($rows);
         echo $json;
+    }
+}
+
+function GetPolineData($ref){
+//    var_dump($ref);
+//    exit();
+    $objdal = new dal();
+    if ($ref){
+        $query = "SELECT pl.`poNo`, pl.`itemDesc`,pl.`poQty`,pl.`poTotal`,po.`user_justification` as `justification`,po.`pinum`,po.`pidate`,co.`name` as `supplier`,cu.`name` as `currency`
+                     from `ca_activity_table` ca
+                     LEFT JOIN `wc_t_po_line` pl ON ca.`po_no` = pl.`poNo` 
+                     LEFT JOIN `wc_t_po` po ON pl.`poNo` = po.`poid` 
+                     LEFT JOIN `wc_t_company` co ON po.`supplier` = co.`id` 
+                     LEFT JOIN `wc_t_category` cu ON po.`currency` = cu.`id` 
+                    where ca.btrc_division = $ref and ca.`status` = 1;";
+        $objdal->read($query);
+
+        $rows = array();
+        if (!empty($objdal->data)) {
+            foreach ($objdal->data as $row) {
+                $rows[] = $row;
+            }
+        }
+
+        unset($objdal->data);
+
+        $json = json_encode($rows);
+        echo $json;
+    }
+}
+
+function GetLetterSL($ref){
+//    var_dump($ref);
+//    exit();
+    $objdal = new dal();
+    if ($ref){
+        $query = "SELECT COUNT(`ca_ref`) as `SL` FROM ca_activity_table
+                WHERE
+                `btrc_division` = $ref and status=1;";
+        $objdal->read($query);
+
+        $serial = 1;
+        $objdal->read($query);
+        if (!empty($objdal->data)) {
+            $res = $objdal->data[0];
+            extract($res);
+            $serial = $SL;
+        }
+        return $serial;
     }
 }
 ?>

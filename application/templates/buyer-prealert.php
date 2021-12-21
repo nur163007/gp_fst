@@ -5,7 +5,8 @@ require_once(LIBRARY_PATH . "/dal.php");
 require_once(LIBRARY_PATH . "/lib.php");
 //$postatus = POStatus($_GET['po']);
 $actionLog = GetActionRef($_GET['ref']);
-$isShipDocAccepted = checkStepOver($_GET['po'], action_Ship_Doc_Accepted_Buyer_Pending_WH, $_GET['ship'])
+$isShipDocAccepted = checkStepOver($_GET['po'], action_Ship_Doc_Accepted_Buyer_Pending_WH, $_GET['ship']);
+//echo 'testres'.$isShipDocAccepted;
 ?>
 <!-- Page -->
 <div class="page bg-blue-100 animsition">

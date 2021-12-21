@@ -41,6 +41,9 @@ function submitPI()
     $pinum = replaceTextRegex($_POST['pinum']);
     $pivalue = htmlspecialchars($_POST['pivalue'],ENT_QUOTES, "ISO-8859-1");
     $pivalue = str_replace(",", "", $pivalue);
+
+    $producttype = htmlspecialchars($_POST['producttype'],ENT_QUOTES, "ISO-8859-1");
+
     $shipmode = htmlspecialchars($_POST['shipmode'],ENT_QUOTES, "ISO-8859-1");
     $hscode = htmlspecialchars(replaceTextRegex($_POST['hscode']),ENT_QUOTES, "ISO-8859-1");
     
@@ -75,6 +78,7 @@ function submitPI()
 	//---To protect MySQL injection for Security purpose----------------------------
     $poid = stripslashes($poid);
     $pivalue = stripslashes($pivalue);
+    $producttype = stripslashes($producttype);
     $shipmode = stripslashes($shipmode);
     $hscode = stripslashes($hscode);
     if($postatus>=action_Requested_for_Final_PI){
@@ -91,6 +95,7 @@ function submitPI()
 	
     $poid = $objdal->real_escape_string($poid);
     $pivalue = $objdal->real_escape_string($pivalue);
+    $producttype = $objdal->real_escape_string($producttype);
     $pidesc = $objdal->real_escape_string($_POST['pi_description']);
     $shipmode = $objdal->real_escape_string($shipmode);
     $hscode = $objdal->real_escape_string($hscode);    
@@ -129,7 +134,8 @@ function submitPI()
         `productiondays` = $productiondays,
         `modifiedby` = $user_id,
         `modifiedfrom` = '$ip',
-        `pi_description` = '$pidesc'
+        `pi_description` = '$pidesc',
+        `producttype` = $producttype
         WHERE `poid` = '$poid';";
     //echo($query);
     $objdal->update($query, "Failed to update PO data");

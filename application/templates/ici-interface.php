@@ -39,37 +39,36 @@ $actionLog = GetActionRef($_GET['ref']);
                                             <input name="pono" id="pono" type="hidden" value="<?php if(!empty($_GET['po'])){ echo $_GET['po']; } ?>" />
                                             <input name="usertype" id="usertype" type="hidden" value="<?php echo $_SESSION[session_prefix.'wclogin_role']; ?>" />
                                             <input name="refId1" id="refId1" type="hidden" value="<?php if(!empty($_GET['ref'])){ echo $_GET['ref']; } ?>" />
-                                            <input name="userAction" id="userAction" type="hidden" value="" />
                                             <div id="PO_submit_error" style="display:none;"></div>
                                         <div class="col-xlg-6 col-md-6">
                                             <h4 class="well well-sm example-title">LC Information</h4>
                                             <div class="form-group">
-                                                <label class="col-sm-5 control-label">PO No:</label>
-                                                <div class="col-sm-7">
+                                                <label class="col-sm-4 control-label">PO No:</label>
+                                                <div class="col-sm-8">
                                                     <label class="control-label"><b id="ponum"><img src="assets/images/busy.gif" /></a></b></label>
                                                 </div>
-                                                <label class="col-sm-5 control-label">PI no:</label>
-                                                <div class="col-sm-7">
+                                                <label class="col-sm-4 control-label">PI no:</label>
+                                                <div class="col-sm-8">
                                                     <label class="control-label"><b id="pi_num"><img src="assets/images/busy.gif" /></b></label>
                                                 </div>
-                                                <label class="col-sm-5 control-label">Insurance Bank:</label>
-                                                <div class="col-sm-7">
+                                                <label class="col-sm-4 control-label">LC Bank:</label>
+                                                <div class="col-sm-8">
                                                     <label class="control-label" id="insurancebank"><img src="assets/images/busy.gif" /></label>
                                                 </div>
-                                                <label class="col-sm-5 control-label">Insurance Value:</label>
-                                                <div class="col-sm-7">
+                                                <label class="col-sm-4 control-label">Insurance Value:</label>
+                                                <div class="col-sm-8">
                                                     <label class="control-label" id="icvalue"><img src="assets/images/busy.gif" /></label>
                                                 </div>
-                                                <label class="col-sm-5 control-label">LC Description:</label>
-                                                <div class="col-sm-7">
+                                                <label class="col-sm-4 control-label">LC Description:</label>
+                                                <div class="col-sm-8">
                                                     <label class="control-label text-left" id="lcdesc"><img src="assets/images/busy.gif" /></label>
                                                 </div>
-                                                <label class="col-sm-5 control-label">Supplier:</label>
-                                                <div class="col-sm-7">
+                                                <label class="col-sm-4 control-label">Supplier:</label>
+                                                <div class="col-sm-8">
                                                     <label class="control-label"><b id="supplier"><img src="assets/images/busy.gif" /></b></label>
                                                 </div>
-                                                <label class="col-sm-5 control-label">Shipmode:</label>
-                                                 <div class="col-sm-7">
+                                                <label class="col-sm-4 control-label">Shipmode:</label>
+                                                 <div class="col-sm-8">
                                                   <label class="control-label"><b id="shipmode"><img src="assets/images/busy.gif" /></b></label>
                                                 </div>
 
@@ -89,6 +88,7 @@ $actionLog = GetActionRef($_GET['ref']);
                                                         <div class="modal-body">
                                                             <input type="hidden" id="po" name="po" value="<?php if(!empty($_GET['po'])){ echo $_GET['po']; } ?>" />
                                                             <input name="refId1" id="refId1" type="hidden" value="<?php if(!empty($_GET['ref'])){ echo $_GET['ref']; } ?>" />
+                                                            <input name="userAction" id="userAction" type="hidden" value="" />
                                                             <div class="form-group">
                                                                 <label class="col-sm-4 control-label">CN Number: </label>
                                                                 <div class="col-sm-8">
@@ -114,12 +114,12 @@ $actionLog = GetActionRef($_GET['ref']);
                                                                     <input type="text" class="form-control" id="pay_order_amount" name="pay_order_amount" placeholder="Enter pay order amount"/>
                                                                 </div>
                                                             </div>
-                                                            <div class="form-group">
+                                                            <!--<div class="form-group">
                                                                 <label class="col-sm-4 control-label">Pay Order Charge:</label>
                                                                 <div class="col-sm-8">
                                                                     <input type="text" class="form-control" id="pay_order_charge" name="pay_order_charge" placeholder="Enter pay order charge"/>
                                                                 </div>
-                                                            </div>
+                                                            </div>-->
                                                             <div class="row row-lg">
                                                                 <div class="col-xlg-12 col-md-12">
                                                                     <h4 class="well well-sm example-title">Attachments</h4>
@@ -128,23 +128,26 @@ $actionLog = GetActionRef($_GET['ref']);
                                                                         <div class="col-sm-8">
                                                                             <div class="input-group">
                                                                                 <input type="text" class="form-control" name="attachcn" id="attachcn" readonly placeholder=".pdf, .docx, .jpg, .png" />
-                                                                                <input type="hidden" class="form-control" name="attachcnhidden" id="attachcnhidden"  />
+                                                                                <input type="hidden" class="form-control" name="attachcnOld" id="attachcnOld"  />
                                                                                 <span class="input-group-btn">
-                                                                <button type="button" id="btnUploadCn" class="btn btn-outline"><i class="icon wb-upload" aria-hidden="true"></i></button>
-                                                            </span>
-                                                                                                </div>
+                                                                                    <button type="button" id="btnUploadCn" class="btn btn-outline"><i class="icon wb-upload" aria-hidden="true"></i></button>
+                                                                                </span>
+                                                                            </div>
+                                                                            <span id="attachInsCoverNoteLink"></span>
                                                                         </div>
+
                                                                     </div>
                                                                     <div class="form-group">
                                                                         <label class="col-sm-4 control-label">Pay Order Receive Copy:</label>
                                                                         <div class="col-sm-8">
                                                                             <div class="input-group">
                                                                                 <input type="text" class="form-control" name="attachporc" id="attachporc" readonly placeholder=".pdf, .docx, .jpg, .png" />
-                                                                                <input type="hidden" class="form-control" name="attachporchidden" id="attachporchidden"  />
+                                                                                <input type="hidden" class="form-control" name="attachporcOLD" id="attachporcOLD"  />
                                                                                 <span class="input-group-btn">
-                                                                    <button type="button" id="btnUploadPorc" class="btn btn-outline"><i class="icon wb-upload" aria-hidden="true"></i></button>
-                                                                </span>
+                                                                                    <button type="button" id="btnUploadPorc" class="btn btn-outline"><i class="icon wb-upload" aria-hidden="true"></i></button>
+                                                                                </span>
                                                                             </div>
+                                                                            <span id="attachInsPORC"></span>
                                                                         </div>
                                                                     </div>
                                                                     <div class="form-group">
@@ -152,11 +155,12 @@ $actionLog = GetActionRef($_GET['ref']);
                                                                         <div class="col-sm-8">
                                                                             <div class="input-group">
                                                                                 <input type="text" class="form-control" name="attachother" id="attachother" readonly placeholder="incase of multiple file use .zip" />
-                                                                                <input type="hidden" class="form-control" name="attachotherhidden" id="attachotherhidden"  />
+                                                                                <input type="hidden" class="form-control" name="attachotherOLD" id="attachotherOLD"  />
                                                                                 <span class="input-group-btn">
-                                                                        <button type="button" id="btnUploadOther" class="btn btn-outline"><i class="icon wb-upload" aria-hidden="true"></i></button>
-                                                                    </span>
+                                                                                <button type="button" id="btnUploadOther" class="btn btn-outline"><i class="icon wb-upload" aria-hidden="true"></i></button>
+                                                                                </span>
                                                                             </div>
+                                                                            <span id="attachInsIOD"></span>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -164,8 +168,9 @@ $actionLog = GetActionRef($_GET['ref']);
                                                             </div>
                                                             <div class="model-footer text-right">
                                                                 <label class="wc-error pull-left" id="form_error"></label>
-                                                                <button type="button" class="btn btn-primary" id="btnCnRequest" >Submit</button>
-                                                                <button type="button" class="btn btn-default btn-outline" data-dismiss="modal" aria-label="Close" onclick="ResetForm()">Reset</button>
+                                                                <button type="button" class="btn btn-primary" id="btnSendCNToGP" >Send Cover Note to GP</button>
+                                                                <button type="button" class="btn btn-primary" id="btnCloseCNRequest" >Close Request</button>
+                                                                <button type="button" class="btn btn-default btn-outline" data-dismiss="modal" aria-label="Close" onclick="CancelForm()">Cancel</button>
                                                             </div>
                                                         </div>
 

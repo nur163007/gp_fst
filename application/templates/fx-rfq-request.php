@@ -45,24 +45,24 @@ $actionLog = GetActionRef($_GET['ref']);
                                 <label class="control-label text-primary text-left" id="rfqId"><img src="assets/images/busy.gif" /></b></label>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="col-sm-4 control-label text-right">Supplier Name :</label>
-                            <div class="col-sm-8">
-                                <label class="control-label text-left" id="supplier_id"><img src="assets/images/busy.gif" /></b></label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-4 control-label text-right">Nature of Service :</label>
-                            <div class="col-sm-8">
-                                <label class="control-label text-left" id="nature_of_service"><img src="assets/images/busy.gif" /></b></label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-4 control-label text-right">Requisition Type :</label>
-                            <div class="col-sm-8">
-                                <label class="control-label text-left" id="requisition_type"><img src="assets/images/busy.gif" /></b></label>
-                            </div>
-                        </div>
+<!--                        <div class="form-group">-->
+<!--                            <label class="col-sm-4 control-label text-right">Supplier Name :</label>-->
+<!--                            <div class="col-sm-8">-->
+<!--                                <label class="control-label text-left" id="supplier_id"><img src="assets/images/busy.gif" /></b></label>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <div class="form-group">-->
+<!--                            <label class="col-sm-4 control-label text-right">Nature of Service :</label>-->
+<!--                            <div class="col-sm-8">-->
+<!--                                <label class="control-label text-left" id="nature_of_service"><img src="assets/images/busy.gif" /></b></label>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <div class="form-group">-->
+<!--                            <label class="col-sm-4 control-label text-right">Requisition Type :</label>-->
+<!--                            <div class="col-sm-8">-->
+<!--                                <label class="control-label text-left" id="requisition_type"><img src="assets/images/busy.gif" /></b></label>-->
+<!--                            </div>-->
+<!--                        </div>-->
                         <div class="form-group">
                             <label class="col-sm-4 control-label text-right">Currency :</label>
                             <div class="col-sm-8">
@@ -75,29 +75,29 @@ $actionLog = GetActionRef($_GET['ref']);
                                 <label class="control-label text-left" id="fx_value"><img src="assets/images/busy.gif" /></b></label>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="col-sm-4 control-label text-right">Value Date :</label>
-                            <div class="col-sm-8">
-                                <label class="control-label text-left" id="value_date"><img src="assets/images/busy.gif" /></b></label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-4 control-label text-right">Remarks :</label>
-                            <div class="col-sm-8">
-                                <label class="control-label text-left" id="remarks"><img src="assets/images/busy.gif" /></b></label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-4 control-label text-right">Attachments :</label>
-                            <div class="col-sm-8">
-                                <label class="control-label text-left" id="attachment"><img src="assets/images/busy.gif" /></b></label>
-                            </div>
-                        </div>
+<!--                        <div class="form-group">-->
+<!--                            <label class="col-sm-4 control-label text-right">Value Date :</label>-->
+<!--                            <div class="col-sm-8">-->
+<!--                                <label class="control-label text-left" id="value_date"><img src="assets/images/busy.gif" /></b></label>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <div class="form-group">-->
+<!--                            <label class="col-sm-4 control-label text-right">Remarks :</label>-->
+<!--                            <div class="col-sm-8">-->
+<!--                                <label class="control-label text-left" id="remarks"><img src="assets/images/busy.gif" /></b></label>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <div class="form-group">-->
+<!--                            <label class="col-sm-4 control-label text-right">Attachments :</label>-->
+<!--                            <div class="col-sm-8">-->
+<!--                                <label class="control-label text-left" id="attachment"><img src="assets/images/busy.gif" /></b></label>-->
+<!--                            </div>-->
+<!--                        </div>-->
                     </div>
                     <div class="col-sm-6">
                         <div class="row">
                             <div class="form-group">
-                                <label class="col-sm-4 control-label"> Cutt-Off Time :</label>
+                                <label class="col-sm-4 control-label"> Cut-Off Time :</label>
                                 <div class="col-sm-8">
                                     <div class="input-group">
 <!--                                        <span class="input-group-addon">-->

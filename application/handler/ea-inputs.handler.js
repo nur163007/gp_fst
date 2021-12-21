@@ -120,7 +120,13 @@ $(document).ready(function() {
                 }
 
                 // EA Inputs ------------------------------------------------------
-
+                $.get('api/purchaseorder?action=4&po='+poid+'&step='+ACTION_REQUEST_FOR_CNF_INPUT, function(r){
+                    if(r==1){
+                        // alert(1);
+                        $("#btnPreAlerttoCNF").attr('disabled',true);
+                        // $("#btnViewIC").removeAttr("disabled");
+                    }
+                });
                 // Basic Inputs
 
                 if (ship['docReceiveByEA'] != null) {
@@ -172,7 +178,7 @@ $(document).ready(function() {
                     restrictRejection();
                 }
 
-                $.getJSON("api/bankinsurance?action=4&type=cnf", function (list) {
+                $.getJSON("api/company?action=4&type=120", function (list) {
                     $("#cNfAgentName").select2({
                         data: list,
                         placeholder: "select C & F agent",
@@ -464,6 +470,48 @@ $(document).ready(function() {
         } else {
             saveBasicInputs();
         }
+    });
+
+    //SEND PRE ALERT TO C&F
+
+    $("#btnPreAlerttoCNF").click(function (e) {
+        if($("#cNfAgentName").val()==""){
+            alertify.error("Please select C&F agent!");
+            return false;
+        }
+        e.preventDefault();
+        $("#btnPreAlerttoCNF").prop('disabled', true);
+        alertify.confirm('Are you sure you want to reject Shipment Documents?', function (e) {
+        $.ajax({
+            type: "POST",
+            url: "api/ea-inputs",
+            data: $("#formEAinputs, #formBasicInputs").serialize() + "&userAction=8",
+            cache: false,
+            success: function (response) {
+                $("#btnPreAlerttoCNF").prop('disabled', false);
+                // alertify.alert(response);
+                try {
+                    var res = JSON.parse(response);
+                    if (res['status'] == 1) {
+                        alertify.success(res['message']);
+                        window.location.href = _dashboardURL;
+                        return true;
+                    } else {
+                        alertify.error("FAILED to update CDVAT inputs!");
+                        return false;
+                    }
+                } catch (e) {
+                    console.log(e);
+                    alertify.error(response + ' Failed to process the request.');
+                    return false;
+                }
+            },
+            error: function (xhr, textStatus, error) {
+                alertify.error(textStatus + ": " + xhr.status + " " + error);
+            }
+        });
+
+        });
     });
 
     $("#btnSubmitCDVATInputs").click(function (e) {

@@ -81,7 +81,7 @@ if (!empty($_POST)){
             break;
         case 9:
             if(!empty($_POST["pono"]) || isset($_POST["pono"])){
-                echo submitLCtoBank();
+                echo submitLCRequestToBank();
             }
             break;
         case 10:
@@ -613,10 +613,12 @@ function GetLCList()
 function GetBankCo($bankId, $po)
 {
 	$objdal = new dal();
-	$query = "SELECT `name`, `address`,
-         (SELECT `name` FROM `wc_t_company` WHERE `id`=(select `supplier` from `wc_t_po` where `poid` = '$po')) `coname`,
-         (SELECT `address` FROM `wc_t_company` WHERE `id`=(select `supplier` from `wc_t_po` where `poid` = '$po')) `coaddress`
-        FROM `wc_t_bank_insurance` WHERE `id` = $bankId;";
+	$query = "select co2.`name`, co2.`address`, co1.`name` as `coname`, co1.`address` as `coaddress` 
+                from `wc_t_po` po 
+                    inner join `wc_t_company` co1 on po.`supplier` = co1.`id`
+                    inner join `wc_t_lc` lc on lc.`pono` = po.`poid`
+                    inner join `wc_t_company` co2 on co2.`id` = lc.`lcissuerbank`
+                where po.`poid` = '$po';";
 	//echo $query;
     $objdal->read($query);
 	if(!empty($objdal->data)){
@@ -648,6 +650,9 @@ function SubmitCN()
 
     $objdal=new dal();
 
+    $query = "UPDATE `wc_t_lc` set `xeBDT` = ".$_POST["xr2"].", `xeUSD` = ".$_POST["xr1"]." WHERE `pono` = '$pono';";
+    $objdal->update($query);
+
     $query = "INSERT INTO `cn_request` (`po_no`,`ic_id`) VALUES ('$pono',$insurance)";
     //echo $query;
     $objdal->insert($query);
@@ -657,6 +662,7 @@ function SubmitCN()
         'refid' => $refId,
         'pono' => "'".$pono."'",
         'actionid' => action_Request_for_CN_To_IC,
+        'pendingtoco' => $insurance,
         'msg' => "'Cover Note Request sent against PO# ".$pono."'",
     );
     UpdateAction($action);
@@ -773,37 +779,41 @@ function RejectCN(){
 
 //LC SENT TO BANK
 
-function SubmitLCtoBank()
+function submitLCRequestToBank()
 {
     global $user_id;
     global $loginRole;
 
     $refId = decryptId($_POST["refId1"]);
     $pono = htmlspecialchars($_POST['pono'],ENT_QUOTES, "ISO-8859-1");
-    $lcType = htmlspecialchars($_POST['lc'],ENT_QUOTES, "ISO-8859-1");
+    $lcRequestType = htmlspecialchars($_POST['lcRequestType'],ENT_QUOTES, "ISO-8859-1");
     $attachLCOpenRequest = htmlspecialchars($_POST['attachLCOpenRequest'],ENT_QUOTES, "ISO-8859-1");
     $attachLCOpenRequestOld = htmlspecialchars($_POST['attachLCOpenRequestOld'],ENT_QUOTES, "ISO-8859-1");
     $lcno = htmlspecialchars($_POST['lcno'],ENT_QUOTES, "ISO-8859-1");
+    $lcissuerbank = htmlspecialchars($_POST['lcissuerbank'],ENT_QUOTES, "ISO-8859-1");
     $ip = htmlspecialchars($_SERVER['REMOTE_ADDR'],ENT_QUOTES, "ISO-8859-1");
 
     $objdal=new dal();
 
 // Action Log --------------------------------//
-    if ($lcType == 0){
+
+    if ($lcRequestType == 0){
+        // Draft LC request
         $action = array(
             'refid' => $refId,
             'pono' => "'".$pono."'",
-            'status' => 1,
             'actionid' => action_Draft_LC_Request_sent_to_Bank,
+            'pendingtoco' => $lcissuerbank,
             'msg' => "'Draft LC attachment sent to Bank against PO# ".$pono."'",
         );
     }
-    elseif ($lcType==1){
+    elseif ($lcRequestType==1){
+        // Final LC request
         $action = array(
             'refid' => $refId,
             'pono' => "'".$pono."'",
-            'status' => 1,
             'actionid' => action_Final_LC_Request_sent_to_Bank,
+            'pendingtoco' => $lcissuerbank,
             'msg' => "'Final LC attachment sent to Bank against PO# ".$pono."'",
         );
     }

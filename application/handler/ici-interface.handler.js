@@ -2,41 +2,111 @@
 var poid = $('#pono').val();
 var podata, comments, attach;
 $(document).ready(function() {
-if(poid){
+    if (poid) {
 
-    $.get('api/ici-interface?action=1&id='+poid, function (data) {
+        $.get('api/ici-interface?action=1&id=' + poid, function (data) {
 
-        if(!$.trim(data)){
-            $(".panel-body").empty();
-            $(".panel-body").append(`<h4 class="well well-sm well-warning">No data found</h4>`);
-        }else {
+            if (!$.trim(data)) {
+                $(".panel-body").empty();
+                $(".panel-body").append(`<h4 class="well well-sm well-warning">No data found</h4>`);
+            } else {
 
-            var row = JSON.parse(data);
-            podata = row[0][0];
-            attach = row[1];
+                var row = JSON.parse(data);
+                podata = row[0][0];
+                attach = row[1];
 
-            // PO info
-            $('#ponum').html(poid);
-            $('#insurancebank').html(podata['insurancebank']);
-            $('#icvalue').html(commaSeperatedFormat(podata['povalue'])+' '+podata['curname']);
-            $('#lcdesc').html(podata['lcdesc']);
-            $('#supplier').html(podata['supname']);
-            $('#pi_num').html(podata['pinum']);
-            $('#shipmode').html(podata['shipmode'].toUpperCase());
+                // PO info
+                $('#ponum').html(poid);
+                $('#insurancebank').html(podata['insurancebank']);
+                $('#icvalue').html(commaSeperatedFormat(podata['povalue']) + ' ' + podata['curname']);
+                $('#lcdesc').html(podata['lcdesc']);
+                $('#supplier').html(podata['supname']);
+                $('#pi_num').html(podata['pinum']);
+                $('#shipmode').html(podata['shipmode'].toUpperCase());
 
-            //alert(attach.length);
-            attachmentLogScript(attach, '#usersAttachments');
+                $("#cn_number").val(podata['cn_no']);
+                $('#cn_date').datepicker('setDate', new Date(podata['cn_date']));
+                $('#cn_date').datepicker('update');
+                // $("#pay_order_amount").val(podata['pay_order_amount']);
+                payOrderAmount = parseToCurrency(podata['pay_order_amount']),
+                $("#pay_order_amount").val(commaSeperatedFormat(payOrderAmount.toFixed(2)));
 
-        }
-    });
-}
+                if (podata["attachCNCopy"] != null) {
+                    $("#attachcnOld").val(podata["attachCNCopy"]);
+                    $("#attachInsCoverNoteLink").html(attachmentLink(podata["attachCNCopy"]));
+                    // $("#attachLCOpenRequest").val(lcinfo["attachLCORequest"]);
+                }
+                if (podata["attachPORC"] != null) {
+                    $("#attachporcOLD").val(podata["attachPORC"]);
+                    $("#attachInsPORC").html(attachmentLink(podata["attachPORC"]));
+                    // $("#attachLCOpenRequest").val(lcinfo["attachLCORequest"]);
+                }
+                if (podata["attachIOD"] != null) {
+                    $("#attachotherOLD").val(podata["attachIOD"]);
+                    $("#attachInsIOD").html(attachmentLink(podata["attachIOD"]));
+                    // $("#attachLCOpenRequest").val(lcinfo["attachLCORequest"]);
+                }
+                //alert(attach.length);
+                attachmentLogScript(attach, '#usersAttachments');
+
+            }
+        });
+    }
 
     $(function () {
-        $("#btnCnRequest").click(function (e) {
+        $("#btnSendCNToGP").click(function (e) {
+            // alert('clicked');
+            $('#userAction').val('1');
+
+            e.preventDefault();
+            if (validate() === true) {
+                // alertify.confirm('Are you sure you want submit?', function () {
+                    $.ajax({
+                        type: "POST",
+                        url: "api/ici-interface",
+                        data: $('#form-cn-request').serialize(),
+                        cache: false,
+                        success: function (response) {
+                            // alert(response);
+                            try {
+                                var res = JSON.parse(response);
+                                console.log(res)
+                                if (res["status"] == 1) {
+                                    ResetForm();
+                                    alertify.success(res['message']);
+                                    // window.location.href = _dashboardURL;
+                                    location.reload();
+                                } else {
+                                    //$("#SendPO_btn").show();
+                                    alertify.error(res['message']);
+                                    return false;
+                                }
+                            } catch (e) {
+                                console.log(e);
+                                alertify.error(response + ' Failed to process the request.');
+                                return false;
+                            }
+                        },
+                        error: function (xhr, textStatus, error) {
+                            alertify.error(textStatus + ": " + xhr.status + " " + error);
+                        }
+                    });
+
+                // });
+
+            } else {
+                return false;
+            }
+        });
+    });
+
+    $(function () {
+        $("#btnCloseCNRequest").click(function (e) {
+            $("#userAction").val(2);
             // alert('clicked');
             e.preventDefault();
             if (validate() === true) {
-                alertify.confirm('Are you sure you want submit?', function () {
+                alertify.confirm('Are you sure you want submit to GP?', function () {
                     $.ajax({
                         type: "POST",
                         url: "api/ici-interface",
@@ -67,17 +137,20 @@ if(poid){
                         }
                     });
 
-                    });
+                });
 
-            }else{
+            } else {
                 return false;
             }
         });
     });
 
 
-
 });
+
+function CancelForm(){
+    window.location.href = _dashboardURL;
+}
 
 function ResetForm() {
 
@@ -108,32 +181,39 @@ function validate() {
         alertify.error("Pay Order Amount is required!");
         return false;
     }
-    if ($("#pay_order_charge").val() == "") {
-        $("#pay_order_charge").focus();
-        alertify.error("Pay Order charge is required!");
-        return false;
-    }
-    if ($("#attachcn").val() == "") {
+    if ($("#attachcn").val() == "" && $("#attachcnOld").val() == "") {
         $("#attachcn").focus();
         alertify.error("Attach CN Documents!");
         return false;
     } else {
-        if (!validAttachment($("#attachcn").val())) {
-            alertify.error('Invalid File Format.');
-            return false;
+        if($("#attachcn").val()!="") {
+            if (!validAttachment($("#attachcn").val())) {
+                alertify.error('Invalid File Format.');
+                return false;
+            }
         }
     }
-    if ($("#attachporc").val() == "") {
-        $("#attachporc").focus();
-        alertify.error("Attach PORC Documents!");
-        return false;
+    if ($("#userAction").val() == "2") {
+        if ($("#attachporc").val() == "" && $("#attachporcOLD").val() == "") {
+            $("#attachporc").focus();
+            alertify.error("Attach PORC Documents!");
+            return false;
+        } else {
+            if($("#attachporc").val()!="") {
+                if (!validAttachment($("#attachporc").val())) {
+                    alertify.error('Invalid File Format.');
+                    return false;
+                }
+            }
+        }
     } else {
-        if (!validAttachment($("#attachporc").val())) {
-            alertify.error('Invalid File Format.');
-            return false;
+        if ($("#attachporc").val() != "") {
+            if (!validAttachment($("#attachporc").val())) {
+                alertify.error('Invalid File Format.');
+                return false;
+            }
         }
     }
-
     return true
 }
 

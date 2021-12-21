@@ -131,6 +131,7 @@ $("#btnFxRfqRequest").click(function (e) {
 
 })
 
+/*
 $("#inlineRadio1").click(function () {
     var dtable = $('#dtMyInbox').dataTable();
     dtable.api().ajax.url("api/bank-dashboard?action=1").load();
@@ -138,4 +139,4 @@ $("#inlineRadio1").click(function () {
 $("#inlineRadio2").click(function () {
     var dtable = $('#dtMyInbox').dataTable();
     dtable.api().ajax.url("api/bank-dashboard?action=3").load();
-})
+})*/

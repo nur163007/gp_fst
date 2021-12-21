@@ -273,7 +273,7 @@ function GetOptionListByCompany($id)
     if(!empty($objdal->data)){
         $res = $objdal->data[0];
         extract($res);
-    }    
+    }
     
     unset($objdal->data);
     

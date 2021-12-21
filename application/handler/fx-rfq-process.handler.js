@@ -5,7 +5,7 @@ $(document).ready(function () {
     $('#hdnFxRequestId').val(fxRequestId);
     $('#fxReqIdMsg').val(fxRequestId);
 
-    $('#BankData').dataTable({
+/*    $('#BankData').dataTable({
         "ajax": "api/fx-request?action=4&id=" + fxRequestId,
         "columns": [
             {"data": "Id", "visible": true},
@@ -15,14 +15,24 @@ $(document).ready(function () {
             {"data": "value_date"},
             {"data": "value"},
             {"data": "remarks"},
-            {"data": "PotentialLoss"},
+            // {"data": "PotentialLoss"},
+            {
+                "data": null,
+                "sortable": false,
+                "class": "text-center",
+                "render": function (data, type, full) {
+                    return '<input type="text" class="form-control" id="PotentialLoss" name="hdnPotentialLoss[]" readonly >' +
+                        '<input type="hidden" id="hdnminFXrate" name="hdnminFXrate[]" value="' + full['minRate'] + '">' +
+                        '<input type="hidden" id="hdnFXrate" name="hdnFXrate[]" value="' + full['FxRate'] + '">';
+                }
+            },
             {
                 "data": null,
                 "sortable": false,
                 "class": "text-center",
                 "render": function (data, type, full) {
                     return '<input type="hidden" id="hdnFxRfqRowId" name="hdnFxRfqRowId[]" value="' + full['Id'] + '">' +
-                        '<input type="number" class="form-control" id="DealAmount" name="DealAmount[]" placeholder="0" value="' + full['DealAmount'] + '" style="width: 100px">';
+                        '<input type="number" class="form-control DealAmount" id="DealAmount" name="DealAmount[]"  style="width: 100px">';
                 }
             },
             {
@@ -48,7 +58,66 @@ $(document).ready(function () {
         "bProcessing": true,
         "bStateSave": false,
         "autoWidth": false
-    });
+    });*/
+
+    Bankdata();
+    function Bankdata() {
+
+        $.ajax({
+            type:"GET",
+            dataType:"json",
+            url: "api/fx-request?action=4&id=" + fxRequestId,
+            success:function (response) {
+                // console.log((response))
+                var get_data ="";
+                var selectCheck = "";
+                var role = $("#userrole").val();
+                var disabledCheck = "", readonlyText = "";
+                if (role == 24){
+                    disabledCheck = "disabled", readonlyText = "readonly";
+                }
+
+                for (let i = 0; i < response.length; ++i) {
+
+                    var selectCh= response[i].Selected;
+
+                        if (selectCh == 0){
+                            selectCheck =  '<td>' +'<input type="hidden" id="SelectCheckbox" value="0" name="SelectCheckbox_' +response[i].Id+ '" >' +
+                                '<input class="form-check-input" type="checkbox" value="1" id="SelectCheckbox'+i+'" name="SelectCheckbox_' +response[i].Id+ '" '+disabledCheck+'> </td>';
+                        }
+                        else {
+                            selectCheck =  '<td>' +'<input type="hidden" id="SelectCheckbox" value="0" name="SelectCheckbox_' +response[i].Id+ '" >' +
+                                '<input class="form-check-input" type="checkbox" value="0" id="SelectCheckbox'+i+'" name="SelectCheckbox_' +response[i].Id+ '" checked '+disabledCheck+'> </td>';
+                        }
+
+
+                    get_data +='<tr>'+
+                        '<td>' +response[i].Id+ '</td>'+
+                        '<td>' +response[i].BankName+ '</td>'+
+                        '<td>' +response[i].FxRate+ '</td>'+
+                        '<td>' +response[i].OfferedVolumeAmount+ '</td>'+
+                        '<td>' +response[i].value_date+ '</td>'+
+                        '<td>' +response[i].value+ '</td>'+
+                        '<td>' +response[i].remarks+ '</td>'+
+                        '<td>' +'<input type="text" class="form-control" id="PotentialLoss_'+i+'" value="' +response[i].PotentialLoss+ '" readonly >' +
+                        '       <input type="hidden" id="hdnminFXrate_'+i+'"  value="' +response[i].minRate+ '">' +
+                        '       <input type="hidden" id="hdnFXrate_'+i+'"  value="' +response[i].FxRate+ '"></td>'+
+                        '<td>' +'<input type="hidden" id="hdnFxRfqRowId_'+i+'" name="hdnFxRfqRowId[]" value="' +response[i].Id+ '">' +
+                        '      <input type="number" class="form-control DealAmount" value="' +response[i].DealAmount+ '" id="DealAmount_'+i+'" indexI="'+i+'" '+readonlyText+' name="DealAmount[]" onkeyup="potentialLoss(this)"></td>'+
+                        selectCheck
+                        // '<td>' +'<input type="hidden" id="SelectCheckbox" value="0" name="SelectCheckbox_' +response[i].Id+ '" >' +
+                        // '      <input class="form-check-input" type="checkbox" value="1" id="SelectCheckbox'+i+'" name="SelectCheckbox_' +response[i].Id+ '"></td>'+
+                        '</tr>';
+                }
+                $("#BankTable").html(get_data);
+            },
+            error:function (err) {
+                console.log(err);
+            }
+        });
+
+    }
+
 
     $.get('api/fx-request', function (response) {
         if (response == '')
@@ -77,6 +146,12 @@ $(document).ready(function () {
     GetCoversation(fxRequestId);
     // GetApprovalLog ID
     GetApprovalLog(fxRequestId);
+
+    // $(document).on('keyup', '.DealAmount', function (e) {
+    //     alert(this.attr('Id'));
+    //     potentialLoss(this);
+    //     // calculateInvoiceAmount($("#poNo").val());
+    // });
 
 });
 
@@ -316,3 +391,19 @@ $("#btnOpenRfqforEdit").click(function (e) {
         }
     });
 });
+
+
+function potentialLoss(elm) {
+    var id = $(elm).attr('indexI');
+    //alert(id);
+    var fxRate, minFXrate, dealamount, totalPotential;
+
+    fxRate = parseToCurrency($("#hdnFXrate_"+id).val());
+    minFXrate = parseToCurrency($("#hdnminFXrate_"+id).val());
+    dealamount = parseToCurrency($("#DealAmount_"+id).val());
+
+    totalPotential = ((fxRate - minFXrate)*dealamount);
+
+    $("#PotentialLoss_"+id).val(totalPotential);
+
+}

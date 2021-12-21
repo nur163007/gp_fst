@@ -107,7 +107,7 @@ $actionLog = GetActionRef($_GET['ref']);
                             </div>                        
                             
                         </div>
-                        
+
                         <div class="col-xlg-6 col-md-6">
                             <div id="usersAttachments" class="small">
                     
@@ -115,7 +115,61 @@ $actionLog = GetActionRef($_GET['ref']);
                         </div>
                         
                     </div>
-                    
+
+                    <hr />
+
+                    <div class="row row-lg">
+                        <div class="col-xlg-12 col-md-12 margin-bottom-20">
+                            <h4 class="well well-sm example-title" style="background-color: #BFEDD8;">PO Lines</h4>
+                            <table class="table table-bordered table-striped table-highlight order margin-0 small" id="dtPOLinesDelivered">
+                                <thead>
+                                <tr>
+                                    <th style="width:5%" class="text-center" rowspan="2">Line #</th>
+                                    <th style="width:10%" class="text-center" rowspan="2">Item</th>
+                                    <th style="width:24%" class="text-center" rowspan="2">Item Description</th>
+                                    <th style="width:10%" class="text-center" rowspan="2">Delivery Date</th>
+                                    <th style="width:5%" class="text-center" rowspan="2">UOM</th>
+                                    <th style="width:10%" class="text-center" rowspan="2">Unit Price</th>
+                                    <th style="width:10%" class="text-center poBg" colspan="2">PO</th>
+                                    <th style="width:5%" class="text-center delivBg" colspan="2">Delivered</th>
+                                    <!--<th style="width:5%" class="text-center" rowspan="2">LD</th>-->
+                                </tr>
+                                <tr>
+                                    <th style="width:5%" class="text-center poBg">Qty.</th>
+                                    <th style="width:10%" class="text-center poBg">Total Price</th>
+                                    <th style="width:5%" class="text-cente delivBg">Qty.</th>
+                                    <th style="width:10%" class="text-center delivBg">Total Price</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td class="text-center"></td>
+                                    <td class="text-left"></td>
+                                    <td class="text-left"></td>
+                                    <td class="text-left"></td>
+                                    <td class="text-left"></td>
+                                    <td class="text-right"></td>
+                                    <td class="text-right poBg"></td>
+                                    <td class="text-right poBg"></td>
+                                    <td class="text-right delivBg"></td>
+                                    <td class="text-right delivBg"></td>
+                                    <!--<td class="text-right"></td>-->
+                                </tr>
+                                </tbody>
+                                <tfoot>
+                                <tr style="font-weight: bolder;">
+                                    <th colspan="6" class="text-right padding-top-15" style="font-weight: bold; font-size: inherit">Total: </th>
+                                    <th class="text-center poBg padding-top-15" id="poQtyTotal" style="font-weight: bold; font-size: inherit"></th>
+                                    <th class="text-right poBg padding-top-15" id="grandTotal" style="font-weight: bold; font-size: inherit"></th>
+                                    <th class="text-center delivBg padding-top-15" id="dlvQtyTotal" style="font-weight: bold; font-size: inherit"></th>
+                                    <th class="text-right delivBg padding-top-15" id="dlvGrandTotal" style="font-weight: bold; font-size: inherit"></th>
+                                    <!--<th class="text-right" id="ldAmntTotal"></th>-->
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+
                     <hr />
                     
                     <div class="row row-lg" id="shipmentInputesRow">

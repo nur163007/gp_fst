@@ -42,6 +42,9 @@ if (!empty($_POST)){
             case 7:
                 echo mailForIPCNumber();
                 break;
+            case 8:
+                echo preAlertToCNF();
+                break;
             default:
                 break;
         }
@@ -661,5 +664,43 @@ function mailForIPCNumber(){
 
 }
 
+function preAlertToCNF(){
+
+    global $user_id;
+    global $loginRole;
+    $objdal = new dal();
+    $refId = decryptId($_POST["refId"]);
+    if(!is_numeric($refId)){
+        $res["status"] = 0;
+        $res["message"] = 'Invalid reference code.';
+        return json_encode($res);
+    }
+
+    $pono = htmlspecialchars($_POST['pono'],ENT_QUOTES, "ISO-8859-1");
+    $shipno = htmlspecialchars($_POST['shipno'],ENT_QUOTES, "ISO-8859-1");
+    $cNfAgentName = htmlspecialchars($_POST['cNfAgentName'],ENT_QUOTES, "ISO-8859-1");
+
+    $query = "UPDATE `wc_t_shipment` set `cnfAgent` = $cNfAgentName WHERE `pono` = '$pono' and `shipNo` = $shipno;";
+    $objdal->update($query);
+
+    $query = "INSERT INTO `cnf_inputs` (`poid`,`shipno`) VALUES ('$pono','$shipno');";
+    $objdal->insert($query);
+    // Action Log --------------------------------//
+    $action = array(
+        'refid' => $refId,
+        'pono' => "'" . $pono . "'",
+        'shipno' => $shipno,
+        'actionid' => action_Request_for_CNF_Input,
+        'pendingtoco' => $cNfAgentName,
+        'msg' => "'Pre alert sent for PO# " . $pono . "'",
+    );
+    UpdateAction($action);
+    // End Action Log -----------------------------
+
+    $res["status"] = 1;
+    $res["message"] = 'Pre alert sent to CNF successfully';
+    return json_encode($res);
+
+}
 ?>
 

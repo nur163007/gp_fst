@@ -1984,6 +1984,88 @@ if(isset($_REQUEST['q'])) {
             $page_specific_jsfunc = array('');
             break;
 
+        case "cnf-inputs":
+            $page_specific_js = array(
+                '<script src="assets/vendor/bootstrap-datepicker/bootstrap-datepicker.js"></script>',
+                '<script src="assets/vendor/daterangepicker/moment.js"></script>',
+                '<script src="assets/vendor/daterangepicker/daterangepicker.js"></script>',
+                '<script src="assets/vendor/select2/select2.min.js"></script>',
+                '<script src="assets/vendor/bootstrap-select/bootstrap-select.js"></script>',
+                '<script src="assets/vendor/datatables/jquery.dataTables.min.js"></script>',
+                '<script src="assets/vendor/datatables-bootstrap/dataTables.bootstrap.js"></script>',
+                '<script src="assets/vendor/datatables/dataTables.buttons.min.js"></script>',
+                '<script src="assets/vendor/datatables/dataTables.fixedColumns.min.js"></script>',
+                '<script src="assets/vendor/jszip/jszip.min.js"></script>',
+                '<script src="assets/vendor/datatables/buttons.html5.min.js"></script>',
+            );
+            $page_specific_js1 = array(
+                '<script src="assets/js/components/bootstrap-datepicker.js"></script>',
+                '<script src="assets/js/components/select2.js"></script>',
+                '<script src="assets/js/components/bootstrap-select.js"></script>',
+                '<script src="assets/js/components/icheck.js"></script>',
+                '<script src="assets/js/components/asspinner.js"></script>',
+                '<script src="assets/js/fupload/ajaxupload.js" type="text/javascript"></script>',
+                '<script src="assets/js/fupload/jquery.ajax_upload.0.6.min.js" type="text/javascript"></script>',
+                '<script src="application/handler/cnf-inputs.handler.js?v=' . $jsVersion . '"></script>'
+            );
+            $page_specific_jsfunc = array('');
+            break;
+
+            case "fx_request_primary":
+            $page_specific_js = array(
+                '<script src="assets/vendor/bootstrap-datepicker/bootstrap-datepicker.js"></script>',
+                '<script src="assets/vendor/daterangepicker/moment.js"></script>',
+                '<script src="assets/vendor/daterangepicker/daterangepicker.js"></script>',
+                '<script src="assets/vendor/select2/select2.min.js"></script>',
+                '<script src="assets/vendor/bootstrap-select/bootstrap-select.js"></script>',
+                '<script src="assets/vendor/datatables/jquery.dataTables.min.js"></script>',
+                '<script src="assets/vendor/datatables-bootstrap/dataTables.bootstrap.js"></script>',
+                '<script src="assets/vendor/datatables/dataTables.buttons.min.js"></script>',
+                '<script src="assets/vendor/datatables/dataTables.fixedColumns.min.js"></script>',
+                '<script src="assets/vendor/jszip/jszip.min.js"></script>',
+                '<script src="assets/vendor/datatables/buttons.html5.min.js"></script>',
+            );
+            $page_specific_js1 = array(
+                '<script src="assets/js/components/bootstrap-datepicker.js"></script>',
+                '<script src="assets/js/components/select2.js"></script>',
+                '<script src="assets/js/components/bootstrap-select.js"></script>',
+                '<script src="assets/js/components/icheck.js"></script>',
+                '<script src="assets/js/components/asspinner.js"></script>',
+                '<script src="assets/js/fupload/ajaxupload.js" type="text/javascript"></script>',
+                '<script src="assets/js/fupload/jquery.ajax_upload.0.6.min.js" type="text/javascript"></script>',
+                '<script src="application/handler/fx_request_primary.handler.js?v=' . $jsVersion . '"></script>'
+            );
+            $page_specific_jsfunc = array('');
+            break;
+
+        case "ins-policy-share":
+            $page_specific_js = array(
+                '<script src="assets/vendor/bootstrap-datepicker/bootstrap-datepicker.js"></script>',
+                '<script src="assets/vendor/daterangepicker/moment.js"></script>',
+                '<script src="assets/vendor/daterangepicker/daterangepicker.js"></script>',
+                '<script src="assets/vendor/select2/select2.min.js"></script>',
+                '<script src="assets/vendor/bootstrap-select/bootstrap-select.js"></script>',
+                '<script src="assets/vendor/datatables/jquery.dataTables.min.js"></script>',
+                '<script src="assets/vendor/datatables-bootstrap/dataTables.bootstrap.js"></script>',
+                '<script src="assets/vendor/datatables/dataTables.buttons.min.js"></script>',
+                '<script src="assets/vendor/datatables/dataTables.fixedColumns.min.js"></script>',
+                '<script src="assets/vendor/jszip/jszip.min.js"></script>',
+                '<script src="assets/vendor/datatables/buttons.html5.min.js"></script>',
+            );
+            $page_specific_js1 = array(
+                '<script src="assets/js/components/bootstrap-datepicker.js"></script>',
+                '<script src="assets/js/components/select2.js"></script>',
+                '<script src="assets/js/components/bootstrap-select.js"></script>',
+                '<script src="assets/js/components/icheck.js"></script>',
+                '<script src="assets/js/components/asspinner.js"></script>',
+                '<script src="assets/js/fupload/ajaxupload.js" type="text/javascript"></script>',
+                '<script src="assets/js/fupload/jquery.ajax_upload.0.6.min.js" type="text/javascript"></script>',
+                '<script src="application/handler/ins-policy-share.handler.js?v=' . $jsVersion . '"></script>'
+            );
+            $page_specific_jsfunc = array('');
+
+            break;
+
         default:
             $page_specific_js = array();
             $page_specific_js1 = array();

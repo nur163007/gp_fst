@@ -18,26 +18,80 @@ if (!empty($_GET["action"]) || isset($_GET["action"])) {
             if (isset($_GET["fxReqid"]) && !empty($_GET["fxReqid"])) {
                 echo FXRFQClose($_GET["fxReqid"], $_GET['ref']);
             }
+            break;
         case 2:    // get all fx request info
             if (isset($_GET["id"]) && !empty($_GET["id"])) {
                 echo GetAllFxReq($_GET["id"]);
             }
+            break;
+        case 3:
+            echo AutoCloseFXRFQ();
             break;
 
         default:
             break;
     }
 }
+
+function AutoCloseFXRFQ(){
+
+    global $user_id;
+    global $loginRole;
+
+    $objdal = new dal();
+
+    $sql = "SELECT `ID`, `PO`, SUBSTRING(`PO`, 6) `FXId` FROM `wc_t_action_log` 
+            WHERE `PO` IN 
+            (SELECT CONCAT('FXRFP', Id) AS `PO` FROM `fx_request` 
+                WHERE `CuttsOffTime` < DATE_ADD(UTC_TIMESTAMP, INTERVAL 6 HOUR) ) 
+            AND `ActionID` = 203 
+            AND `Status` = 0";
+    $objdal->read($sql);
+
+    if (!empty($objdal->data)) {
+        foreach ($objdal->data as $row) {
+            $id = $row['ID'];
+            $pono = $row['PO'];
+            $fxId = $row['FXId'];
+
+            $udate_query = "UPDATE `fx_request` SET
+    		`status` = 2
+    		 where `id`= $fxId;";
+            echo $udate_query;
+            $objdal->update($udate_query, "Could not update FX Request status");
+
+            FXAction($fxId, action_fx_rfq_end);
+
+            // Action Log --------------------------------//
+            $action = array(
+                'refid' => $id,
+                'pono' => "'".$pono."'",
+                'actionid' => action_fx_rfq_end,
+                'status' => 1,
+                'msg' => "'FX RFQ # ".$pono." closed by system'",
+            );
+            //var_dump($action);
+            //exit();
+            UpdateAction($action);
+            // End Action Log -----------------------------
+        }
+    }
+
+    unset($objdal);
+    $res["status"] = 1;
+    $res["message"] = 'FX RFQ closed Successfully';
+    return json_encode($res);
+
+}
+
 function GetAllFxReq($id)
 {
     global $loginRole;
     if ($loginRole == role_foreign_strategy) {
         $objdal = new dal();
-        $query = "SELECT fx.`id`,u.`name` AS `supplier_name`,c.`name` AS `nature_of_services`,r.`name` AS `requisition_type`,curr.`name` AS `currency`,
-                    FORMAT(fx.`value`, 2) AS `value`,DATE_FORMAT(fx.`value_date`, '%d-%M-%Y')AS `value_date`,fx.`remarks`,fx.`attachment`
+        $query = "SELECT fx.`id`,r.`name` AS `requisition_type`,curr.`name` AS `currency`,
+                    FORMAT(fx.`value`, 2) AS `value`
                      FROM `fx_request` fx 
-                     LEFT JOIN `wc_t_company` u ON fx.`supplier_id` = u.`id`
-                     LEFT JOIN `wc_t_category` c ON fx.`nature_of_service` = c.`id`
                      LEFT JOIN `wc_t_category` r ON fx.`requisition_type` = r.`id`
                      LEFT JOIN `wc_t_category` curr ON fx.`currency` = curr.`id`
                      where fx.`id`= $id

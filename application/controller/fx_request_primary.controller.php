@@ -12,6 +12,8 @@ require_once(LIBRARY_PATH . "/dal.php");
 require_once(LIBRARY_PATH . "/lib.php");
 require_once(LIBRARY_PATH . "/loginId.php");
 
+/*      Get Methods     */
+
 if (!empty($_GET["action"]) || isset($_GET["action"]))
 {
     switch($_GET["action"])
@@ -19,32 +21,34 @@ if (!empty($_GET["action"]) || isset($_GET["action"]))
         case 1:	// get all fx request info
             echo GetAllFxReq($_GET["status"]);
             break;
+
         default:
             break;
     }
 }
 
+
+/*      DataTable Fetch Query       */
+
 function GetAllFxReq($status=0)
 {
     global $loginRole;
-
-    if ($loginRole == role_foreign_payment_team) {
-
+    if ($loginRole == role_foreign_strategy) {
         $objdal = new dal();
-
-        if ($status==0){
-            $where = 'AND fx.`status` <> 4';
-        } else {
-            $where = 'AND fx.`status` = 4';
-        }
+        if ($status == 0)
+            $where = 'fx.`status` in (0,5)';
+        else
+            $where = 'fx.`status` = '.$status;
 
         $strQuery = "SELECT
                     fx.`id`,
                     c.`name` AS supplier_name,
                     cn.`name` AS nature_of_service,
+                    req.`name` AS req_type,
                     wc.`name` AS currency,
                     FORMAT(fx.`value`, 2) AS fx_value,
-                    DATE_FORMAT(fx.`value_date`, '%d-%b-%Y') AS `value_date`,
+                    DATE_FORMAT(fx.`value_date`, '%d-%M-%Y') AS `value_date`,
+                    fx.`CuttsOffTime`,
                     fx.`status`
                 FROM
                     `fx_request_primary` fx
@@ -59,10 +63,11 @@ function GetAllFxReq($status=0)
                 LEFT JOIN `wc_t_category` req ON
                     fx.`requisition_type` = req.`id`
                 WHERE
-                    fx.`requisition_type` = 113 ".$where."
+                    $where
                 ORDER BY
                     fx.`id`
                 DESC;";
+        //echo $strQuery;
         $objdal->read($strQuery);
 
         $rows = array();
@@ -86,6 +91,7 @@ function GetAllFxReq($status=0)
         return $table_data;
     }
 }
+
 
 
 ?>

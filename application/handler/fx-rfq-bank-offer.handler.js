@@ -18,7 +18,9 @@ $(document).ready(function() {
             $('#cuttsofftime').html(row["CuttsOffTime"]);
 
             $('#FxRate').val(row["FxRate"]);
-            $('#OfferedVolumeAmount').val(row["OfferedVolumeAmount"]);
+            if(row["OfferedVolumeAmount"]!=null) {
+                $('#OfferedVolumeAmount').val(row["OfferedVolumeAmount"]);
+            }
             $('#remarks').val(row["remarks"]);
         });
 

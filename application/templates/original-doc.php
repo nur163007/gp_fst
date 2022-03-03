@@ -24,7 +24,6 @@ $actionLog = GetActionRef($_GET['ref']);
                     <input name="refId" id="refId" type="hidden" value="<?php if(!empty($_GET['ref'])){ echo $_GET['ref']; } ?>" />
                     <input name="shipno" id="shipno" type="hidden" value="<?php if(!empty($_GET['ship'])){ echo $_GET['ship']; } ?>" />
                     <input name="LcNo1" id="LcNo1" type="hidden" value="" />
-                    <input name="userAction" id="userAction" type="hidden" value="1" />
                     <div class="row row-lg">
                         <div class="col-md-12">
                             <h4 class="well well-sm example-title">Shipment & LC Information</h4>
@@ -154,7 +153,7 @@ $actionLog = GetActionRef($_GET['ref']);
                     </div>
                     <hr />
                     <div class="row row-lg">
-                        <div class="col-xlg-5 col-md-5">
+                        <div class="col-xlg-6 col-md-6">
                             <div class="form-group">
                                 <label class="col-sm-5 control-label">Bank Notification Date with Discrepancy Status:</label>
                                 <div class="col-sm-7">
@@ -162,7 +161,7 @@ $actionLog = GetActionRef($_GET['ref']);
                                         <span class="input-group-addon">
                                             <i class="icon wb-calendar" aria-hidden="true"></i>
                                         </span>
-                                        <input type="text" class="form-control" data-plugin="datepicker" name="bankNotifyDate" id="bankNotifyDate" />
+                                        <input type="text" class="form-control" data-plugin="datepicker" name="bankNotifyDate" id="bankNotifyDate" readonly />
                                     </div>
                                 </div>
                             </div>
@@ -175,8 +174,14 @@ $actionLog = GetActionRef($_GET['ref']);
                                     </ul>
                                 </div>
                             </div>
+                            <div class="form-group">
+                                <label class="col-sm-5 control-label">Original Document:</label>
+                                <div class="col-sm-7">
+                                    <span id="attachOriginalDocLink"></span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-xlg-7 col-md-7">                            
+                        <div class="col-xlg-6 col-md-6">
                             <div class="form-group">
                                 <label class="col-sm-12 control-label text-left margin-bottom-15">Discrepancy Detail: </label>
 								<div class="col-sm-12">
@@ -185,13 +190,13 @@ $actionLog = GetActionRef($_GET['ref']);
 							</div>
                         </div>
                     </div>
-                    <?php if($_SESSION[session_prefix.'wclogin_role']==role_LC_Operation){ ?>
+                    <?php if($_SESSION[session_prefix.'wclogin_role']==role_LC_Operation && $actionLog['ActionID']==action_Requested_to_Collect_Original_Doc){ ?>
                     <hr />
                     <div class="row row-lg">
                         <div class="col-xlg-12 col-md-12">
                             <div class="form-group">
                                 <div class="col-sm-12 text-right">
-                                    <button type="button" class="btn btn-primary" id="SendForAcceptance_btn">Send for Acceptance <i class="icon fa-arrow-right" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-primary" id="SendForAcceptance_btn">Send for EA Acceptance <i class="icon fa-arrow-right" aria-hidden="true"></i></button>
                                     <button type="button" class="btn btn-default btn-outline" id="close_btn">Close</button>
                                 </div>
                             </div>
@@ -226,35 +231,20 @@ $actionLog = GetActionRef($_GET['ref']);
                         <?php }?>
                         </div>
                     </form>
-                    
-                    <?php if($_SESSION[session_prefix.'wclogin_role']==role_LC_Operation){ ?>
-                    <form class="form-horizontal" id="originalDoc-form" name="originalDoc-form" method="post" autocomplete="off">
-                        <div class="col-xlg-6 col-md-6">
-                            <h4 class="well well-sm example-title">Attachments</h4>
-                            <div class="form-group">
-                                <label class="col-sm-4 control-label">Original Document:</label>
-                                <div class="col-sm-8">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" name="attachOriginalDoc" id="attachOriginalDoc" readonly placeholder=".pdf" />
-                                        <input type="hidden" name="attachOriginalDocOld" id="attachOriginalDocOld" />
-                                        <span class="input-group-btn">
-                                            <button type="button" id="btnUploadOriginalDoc" class="btn btn-outline"><i class="icon wb-upload" aria-hidden="true"></i></button>
-                                        </span>
-                                    </div>
-                                </div>
-                                <hr />
-                                <div class="col-sm-12 text-right">
-                                    <button type="button" class="btn btn-primary" id="btn_docDelivered"><i class="icon wb-file" aria-hidden="true"></i> Document Delivered</button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
 
+
+
+
+
+                    <?php if($_SESSION[session_prefix.'wclogin_role']==role_LC_Operation && $actionLog['ActionID']==action_Original_Document_Accepted_For_Document_Delivery){ ?>
                     <div class="col-xlg-6 col-md-6">
-                        <h4 class="well well-sm example-title">Sourcing Feedback</h4>
-                        <div class="form-group">
+                        <div id="sourceMsg">
+                            <h4 class="well well-sm example-title">Sourcing Feedback</h4>
                             <div class="table-bordered padding-20 comment-body" id="EAFeedback"></div>
                             <hr />
+                        </div>
+                        <div class="form-group">
+
                             <div class="text-right">
                             	<!--button type="button" class="btn btn-primary" id="btn_makeSightPayment" data-target="#modalSightPayment" data-toggle="modal" ><i class="icon wb-payment" aria-hidden="true"></i> Sight Payment</button-->
                                 <a class="btn btn-primary" href="#" id="btn_makeSightPayment"><i class="icon wb-payment" aria-hidden="true"></i> Sight Payment</a>
@@ -262,7 +252,7 @@ $actionLog = GetActionRef($_GET['ref']);
                             </div>
                         </div>
                     </div>
-                    <div class="col-xlg-12 col-md-12">
+                    <div class="col-xlg-6 col-md-6">
                         <div class="form-group">
                             <div class="form-group text-right">
                                 <button type="button" class="btn btn-primary" id="btn_generateBankLetter"><i class="icon wb-file" aria-hidden="true"></i> Document Acceptance Letter</button>

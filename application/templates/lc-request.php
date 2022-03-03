@@ -148,6 +148,7 @@ $actionLog = GetActionRef($_GET['ref']);
                                 <input name="userAction" id="userAction" type="hidden" value="" />
                                 <input name="lcAmount" id="lcAmount" type="hidden" value="" />
                                 <input name="lcCur" id="lcCur" type="hidden" value="" />
+                                <input name="hiddenShipMode" id="hiddenShipMode" type="hidden" value="" />
                                 <div id="PO_submit_error" style="display:none;"></div>
 
                                 <div class="row row-lg">
@@ -611,6 +612,22 @@ $actionLog = GetActionRef($_GET['ref']);
                                                     </select>
                                                     <input type="hidden" id="insuranceOld" name="insuranceOld" />
                                                     <input type="hidden" id="insuranceNew" name="insuranceNew" />
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group" id="hiddenShipType">
+                                                <label class="col-sm-4 control-label">Shipment Type: </label>
+                                                <div class="col-sm-8 margin-top-5">
+                                                    <ul class="list-unstyled list-inline">
+                                                        <li><input type="radio" id="withLC" name="withLC" value="0"
+                                                                   data-plugin="iCheck" data-radio-class="iradio_flat-green" checked />&nbsp;With LC
+                                                        </li>
+                                                        <li><input type="radio" id="withoutLC" name="withLC" value="1"
+                                                                   data-plugin="iCheck"
+                                                                   data-radio-class="iradio_flat-red" />&nbsp;Without LC</li>
+                                                    </ul>
+                                                    <!--input type="checkbox" class="icheckbox-primary" name="installbysupplier" id="installbysupplier"
+                                                        data-plugin="iCheck" data-checkbox-class="icheckbox_flat-blue" checked="" /-->
                                                 </div>
                                             </div>
                                         </div>

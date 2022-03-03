@@ -77,7 +77,7 @@ function GetPOBuyersList(){
             (SELECT 
                 p.createdby, u.username, trim(concat(u.firstname,' ' , u.lastname)) as fullname
             FROM
-                wc_t_po AS p
+                wc_t_pi AS p
             INNER JOIN wc_t_users AS u ON p.createdby = u.id
             GROUP BY p.createdby
             ORDER BY u.username) AS tab1
@@ -88,7 +88,7 @@ function GetPOBuyersList(){
                 (SELECT 
                 u.username, p.poid
             FROM
-                wc_t_po AS p
+                wc_t_pi AS p
             INNER JOIN wc_t_action_log AS l ON p.poid = l.PO
             INNER JOIN wc_t_action AS a ON l.ActionId = a.ID
             INNER JOIN wc_t_users AS u ON p.createdby = u.id
@@ -98,18 +98,21 @@ function GetPOBuyersList(){
             GROUP BY x.username) AS tab2 ON tab1.username = tab2.username;";
 
     $objdal->read(trim($sql));
+    $jsondata = [];
 
-    if(!empty($objdal->data)){
+//    if(!empty($objdal->data)){
+//    echo json_encode($objdal->data)!='null';
+    if(json_encode($objdal->data)!='null'){
         $i = 0;
         foreach($objdal->data as $val){
             $jsondata[$i] = $val;
             $i++;
         }
-        $jsondata = json_encode($jsondata);
+//        $jsondata = json_encode($jsondata);
     }
-
     unset($objdal);
-    return $jsondata;
+
+    return json_encode($jsondata);
 }
 
 /*!
@@ -128,7 +131,7 @@ function GetPODetail($id, $forPI=0, $shipno=0)
 
     //$response = ["status" => 0, "message" => "Invalid request access-denied"];
     if ($loginRole == role_Supplier) {
-        $strQuery = $objdal->getRow("SELECT `supplier` FROM `wc_t_po` WHERE `poid` = '$id';");
+        $strQuery = $objdal->getRow("SELECT `supplier` FROM `wc_t_pi` WHERE `poid` = '$id';");
         $supplier = $strQuery['supplier'];
         if ($supplier != $companyId) {
             $response = ["status" => 0, "message" => "Invalid request"];
@@ -141,7 +144,7 @@ function GetPODetail($id, $forPI=0, $shipno=0)
 
     if($forPI==1){
 
-        $sql = "SELECT `poid` FROM `wc_t_po` WHERE `poid` LIKE '".$id."%' ORDER BY `createdon` desc LIMIT 1;";
+        $sql = "SELECT `poid` FROM `wc_t_pi` WHERE `poid` LIKE '".$id."%' ORDER BY `createdon` desc LIMIT 1;";
         $objdal->read($sql);
 
         if(!empty($objdal->data)){
@@ -171,21 +174,24 @@ function GetPODetail($id, $forPI=0, $shipno=0)
 
     $extraWhere = ($loginRole == role_Supplier) ? " AND c2.`id` = $companyId" : "" ;
 
-    $sql = "SELECT p.`poid`, p.`povalue`, p.`podesc`, p.`lcdesc`, p.`importAs`, c4.`name` `importAsName`, p.`supplier`, c2.`name` `supname`, p.`supplier_address` `supadd`, 
-            p.`currency`, c1.`name` `curname`, p.`contractref`,p.`pr_no`,p.`department`, p.`pi_description` `pidesc`,p.`exp_type`,p.`producttype`,p.`user_justification` `user_just`, c3.`contractName` AS `contractrefName`, p.`deliverydate`, 
+    $sql = "SELECT p.`poid`, p.`PIReqNo`, p.`povalue`, p.`podesc`, p.`lcdesc`, p.`importAs`, c4.`name` `importAsName`, 
+            p.`supplier`, c2.`name` `supname`, p.`supplier_address` `supadd`, p.`currency`, c1.`name` `curname`, 
+            p.`contractref`,p.`pr_no`,p.`department`, p.`pi_description` `pidesc`, p.`exp_type`, p.`producttype`, 
+            c5.`name` `producttypeName`,p.`user_justification` `user_just`, p.`short_prod_name`, c3.`contractName` AS `contractrefName`, p.`deliverydate`, 
             p.`draftsendby`, p.`actualPoDate`, p.`emailto`, p.`emailcc`, p.`pruserto`, p.`prusercc`, p.`noflcissue`, p.`nofshipallow`, 
-            p.`installbysupplier`, p.`pinum`, p.`pivalue`, p.`hscode`, p.`shipmode`, p.`pidate`, p.`basevalue`, p.`origin`, 
+            p.`installbysupplier`, p.`pinum`, p.`pivalue`, p.`hscode`, p.`shipmode`,p.`withLC`, p.`pidate`, p.`basevalue`, p.`origin`, 
             p.`negobank`, p.`shipport`, p.`lcbankaddress`, p.`productiondays`, p.`buyercontact`, p.`techcontact`, 
             (SELECT `ActionID` FROM `wc_t_action_log` WHERE `PO` = '$id' ORDER BY `ID` DESC Limit 1) `status`, 
             p.`createdby`, CONCAT(u1.`firstname`,' ',u1.`lastname`) `buyersName`, u1.`email` `buyersEmail`, u1.`mobile` `buyersMobile`,
             CONCAT(u2.`firstname`,' ',u2.`lastname`) `prName`, u2.`email` `prEmail`, u2.`mobile` `prMobile`
-            FROM `wc_t_po` p 
+            FROM `wc_t_pi` p 
                 INNER JOIN `wc_t_category` c1 ON p.`currency` = c1.`id` 
                 INNER JOIN `wc_t_company` c2 ON p.`supplier` = c2.`id`
                 LEFT JOIN `wc_t_users` u1 ON p.`createdby` = u1.`id`
                 LEFT JOIN `wc_t_users` u2 ON p.`pruserto` = u2.`id`
                 LEFT JOIN `wc_t_contract` c3 ON p.`contractref` = c3.`id`
                 LEFT JOIN `wc_t_category` c4 ON p.`importAs` = c4.`id`
+                LEFT JOIN `wc_t_category` c5 ON p.`producttype` = c5.`id`
             WHERE p.`poid` = '$id';";
     //echo $sql;
     $objdal->read($sql);
@@ -282,9 +288,9 @@ function GetPODetail($id, $forPI=0, $shipno=0)
             (SELECT a4.`filename` FROM `wc_t_attachments` a4 WHERE a4.`poid`='$id' AND a4.`title`='Confirmation Charge Advice' ORDER BY a4.`id` DESC LIMIT 1) AS `attachConfChargeAdv`,
             (SELECT a5.`filename` FROM `wc_t_attachments` a5 WHERE a5.`poid`='$id' AND a5.`title`='Final LC Copy' ORDER BY a5.`id` DESC LIMIT 1) AS `attachFinalLC`
             FROM `wc_t_lc` lc 
-                LEFT JOIN `wc_t_bank_insurance` c1 ON lc.`lcissuerbank` = c1.`id` 
-                LEFT JOIN `wc_t_bank_insurance` c2 ON lc.`bankaccount` = c2.`id` 
-                LEFT JOIN `wc_t_bank_insurance` c3 ON lc.`insurance` = c3.`id` 
+                LEFT JOIN `wc_t_company` c1 ON lc.`lcissuerbank` = c1.`id` 
+                LEFT JOIN `wc_t_company` c2 ON lc.`bankaccount` = c2.`id` 
+                LEFT JOIN `wc_t_company` c3 ON lc.`insurance` = c3.`id` 
                 LEFT JOIN `wc_t_confirmation_charge` cc ON lc.`lcno` = cc.`lcno` 
                 LEFT JOIN `wc_t_category` c4 ON lc.`lctype` = c4.`id`
                 LEFT JOIN `wc_t_category` c5 ON lc.`producttype` = c5.`id`
@@ -334,13 +340,13 @@ function GetNewPONumber($expo=''){
     $objdal = new dal();
     if($expo==''){
         //$sql = "SELECT CONCAT(CONVERT((MAX(CONVERT(SUBSTR(`poid`,1,INSTR(poid, 'P')-1),UNSIGNED INTEGER))+1), 
-//            CHAR(9)), 'P01') AS num FROM `wc_t_po`;";
-        $sql = "SELECT CONVERT(IFNULL(MAX(`poid`),300004000),UNSIGNED INTEGER)+1 AS `num` FROM `wc_t_po` ;";
+//            CHAR(9)), 'P01') AS num FROM `wc_t_pi`;";
+        $sql = "SELECT CONVERT(IFNULL(MAX(`poid`),300004000),UNSIGNED INTEGER)+1 AS `num` FROM `wc_t_pi` ;";
         $objdal->read($sql);
         $res = $objdal->data[0]['num'];
     } else {
         $sql = "SELECT MAX(CONVERT(SUBSTR(`poid`,INSTR(`poid`,'P')+1), UNSIGNED INTEGER))+1 ship 
-            FROM `wc_t_po` WHERE poid like '".$expo."%'";
+            FROM `wc_t_pi` WHERE poid like '".$expo."%'";
         $objdal->read($sql);
         $lastShip = $objdal->data[0]['ship'];
         if(strlen($lastShip)<2){
@@ -357,7 +363,7 @@ function GetNewPONumber($expo=''){
 function checkValidNewPO($po){
 
     $objdal = new dal();
-    $query = "SELECT COUNT(poid) valid FROM wc_t_po WHERE SUBSTR(`poid`,1,INSTR(poid, 'P')-1)='$po';";
+    $query = "SELECT COUNT(poid) valid FROM wc_t_pi WHERE SUBSTR(`poid`,1,INSTR(poid, 'P')-1)='$po';";
 
     $objdal->read($query);
     $res = $objdal->data[0]['valid'];
@@ -407,7 +413,6 @@ function SubmitPO()
     $draftsendby = date('Y-m-d', strtotime($draftsendby));
     $actualPoDate = $objdal->sanitizeInput($_POST['actualPoDate']);
     $actualPoDate = date('Y-m-d', strtotime($actualPoDate));
-
     $pruserto = $objdal->sanitizeInput($_POST['prUserEmailTo']);
 
     $prusercc = '';
@@ -443,12 +448,13 @@ function SubmitPO()
     //------------------------------------------------------------------------------
     /*echo '<pre>';
         var_dump($_POST);
+        exit();
     echo '</pre>';*/
     if($oldPoid==""){
         // insert new po
-        $query = "INSERT INTO `wc_t_po` SET 
+        $query = "INSERT INTO `wc_t_pi` SET 
     		`poid` = '".replaceRegex($poid)."',
-    		`originalPONum` = $originalPOnum,
+    		`PONum` = '$originalPOnum',
             `povalue` = $povalue, 
             `podesc` = '$podesc',
             `importAs` = $importAs,
@@ -470,13 +476,13 @@ function SubmitPO()
     		`pr_no` = $pr_no,
     		`department` = '$department',
     		`supplier_address` = '$sup_address';";
-        //echo $query;
-        //die();
+//        echo $query;
+//        die();
         $objdal->insert($query);
 
     } else{
         // Update existing PO
-        $query = "UPDATE `wc_t_po` SET 
+        $query = "UPDATE `wc_t_pi` SET 
     		`povalue` = $povalue, 
             `podesc` = '$podesc',
             `importAs` = $importAs, 
@@ -529,7 +535,7 @@ function SubmitPO()
     if($oldPoid==""){
         $action = array(
             'pono' => "'".$poid."'",
-            'actionid' => action_New_PO_Initiated,
+            'actionid' => action_New_PO_Issued,
             'msg' => "'New PO initiated. PO# ".$poid."'",
             'usermsg' => "'".$buyersmessage."'",
             'mailcc' => $allemails,
@@ -577,10 +583,10 @@ function PoList($onlyPO=0)
 
     $objdal=new dal();
     if($onlyPO==0){
-        $sql = "SELECT `poid` FROM `wc_t_po` ORDER BY `poid`;";
+        $sql = "SELECT `poid` FROM `wc_t_pi` ORDER BY `poid`;";
     } else {
         $sql = "SELECT DISTINCT SUBSTR(`poid`,1,INSTR(poid, 'P')-1) `poid` 
-            FROM `wc_t_po` 
+            FROM `wc_t_pi` 
             GROUP BY SUBSTR(`poid`,1,INSTR(poid, 'P')-1)
             ORDER BY SUBSTR(`poid`,1,INSTR(poid, 'P')-1);";
     }
@@ -631,10 +637,10 @@ function GetDumpPO()
     $strQuery="SELECT
             DISTINCT pd.poNo
         FROM
-            `wc_t_po` po
+            `po` po
         RIGHT JOIN wc_t_po_dump pd ON
-            po.`originalPONum` = pd.poNo
-            WHERE po.`originalPONum` IS NULL;";
+            po.`poNo` = pd.poNo
+            WHERE po.`poNo` IS NULL;";
     $objdal->read($strQuery);
 
     // json
@@ -695,7 +701,8 @@ function getPODumpInfo($id)
 
     $objdal = new dal();
 
-    $sql = "SELECT p.`poNo`, p.`POAmount`, p.`poDesc`, p.`itemDesc`, p.`currency`,DATE_FORMAT(p.`poDate`, '%M %d, %Y') as `poDate`, DATE_FORMAT(p.`needByDate`, '%M %d, %Y') as`needByDate`,p.`PRUserDept`,p.`supplierId`,p.`ContractNo`
+    $sql = "SELECT p.`poNo`, p.`POAmount`, p.`poDesc`, p.`itemDesc`, p.`currency`,
+            p.`poDate`, p.`needByDate`, p.`PRUserDept`,p.`supplierId`,p.`ContractNo`
             FROM `wc_t_po_dump` p 
             WHERE p.`poNo` = '$id' LIMIT 1;";
     //echo $sql;

@@ -31,8 +31,11 @@
                             <div class="form-group">
                                 <label class="col-sm-5 control-label">LC Issuing Bank:</label>
                                 <div class="col-sm-7">
-                                    <select class="form-control" data-plugin="select2" name="LcIssuingBank" id="LcIssuingBank" disabled="">
-                                    </select>
+<!--                                    <select class="form-control" data-plugin="select2" name="LcIssuingBank" id="LcIssuingBank">-->
+<!--                                    </select>-->
+                                    <input type="text" class="form-control" name="LcIssuingBank" id="LcIssuingBank" readonly="" />
+                                    <input type="hidden" class="form-control" name="LcIssuingBankHidden" id="LcIssuingBankHidden"/>
+
                                 </div>
                             </div>
                             <div class="form-group">
@@ -127,7 +130,7 @@
                             <div class="form-group">
                                 <label class="col-sm-5 control-label">Cable Charge: </label>
                                 <div class="col-sm-7">
-                                    <input type="text" class="form-control curnum" name="cableCharge" id="cableCharge" value="0.00" />
+                                    <input type="text" class="form-control curnum" name="cableCharge" id="cableCharge" value="0.00"  />
                                 </div>
                             </div>
                             <div class="form-group">
@@ -137,7 +140,7 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-5 control-label">Non VAT Other Charges: </label>
+                                <label class="col-sm-5 control-label">Stamp Charge: </label>
                                 <div class="col-sm-7">
                                     <input type="text" class="form-control curnum" name="nonVAtOtherCharge" id="nonVAtOtherCharge" value="0.00" />
                                 </div>

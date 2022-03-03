@@ -19,6 +19,7 @@ $(document).ready(function(){
 		"columns": [
 			{ "data": "pono" },
 			{ "data": "ipcno" },
+			{ "data": "shipno" ,"class":"text-center"},
 			{ "data": "poline", "class":"text-center" },
 			{ "data": "item" },
 			{ "data": "desc" },
@@ -41,24 +42,24 @@ $(document).ready(function(){
      
                 // Total over all pages
                 totalAmount = api
-                    .column( 8 )
+                    .column( 9 )
                     .data()
                     .reduce( function (a, b) {
                         return intVal(a) + intVal(b);
                     }, 0 );
                 
                 usedCurrency = api
-                    .column( 9 )
+                    .column( 10 )
                     .data()
                     .reduce( function(a,b){
                         return b;
                     },0);
                 
                 // Update footer
-                $( api.column( 8 ).footer() ).html(
+                $( api.column( 9 ).footer() ).html(
                     commaSeperatedFormat(totalAmount.toFixed(2))
                 );
-                $( api.column( 9 ).footer() ).html(
+                $( api.column( 10 ).footer() ).html(
                     usedCurrency
                 );
                 validTotal();
@@ -144,6 +145,12 @@ $(document).ready(function(){
                     $('#whArrivalDate').datepicker('setDate', d);
                     $('#whArrivalDate').datepicker('update');
                     restrictRejection();
+                }
+                if (ship["docName"]==6){
+                   $("#ActualArrivalDateWarehouse").show();
+                }
+                else {
+                    $("#ActualArrivalDateWarehouse").hide();
                 }
                 
                 $("#scheduleETA").val(Date_toDetailFormat(new Date(ship['scheduleETA'])));
@@ -234,8 +241,7 @@ $(document).ready(function(){
                 }
             });
         } else {
-            $("#ipcNo").focus();
-            alertify.error("Please type IPC number");
+            return false;
         }
     });
     
@@ -262,7 +268,7 @@ $(document).ready(function(){
             });
         } else {
             $("#ipcNo").focus();
-            alertify.error("Please typr IPC number");
+            alertify.error("Please type IPC number");
         }
     });
     
@@ -286,8 +292,8 @@ $(document).ready(function(){
                 }
             });
         } else {
-            $("#ipcNo").focus();
-            alertify.error("Please enter IPC number");
+            $("#gitReceiveDate").focus();
+            alertify.error("Give a GIT receiving date!");
         }
     });
     
@@ -300,20 +306,24 @@ $(document).ready(function(){
                 data: "userAction=5"+"&pono="+$("#pono").val()+"&shipno="+$("#shipno").val()+"&whArrivalDate="+$("#whArrivalDate").val(),
                 cache: false,
                 success: function (result) {
-                    var res = JSON.parse(result);
-                    if (res['status'] == 1) {
-                        alertify.success(res['message']);
-                        checkStepOvered();
-                        //window.location.href = _adminURL;
-                    } else {
-                        alertify.error("FAILED to add!");
-                        return false;
+                    // alert(result);
+                    try {
+                        var res = JSON.parse(result);
+                        if (res['status'] == 1) {
+                            alertify.success(res['message']);
+                            checkStepOvered();
+                            //window.location.href = _adminURL;
+                        } else {
+                            alertify.error("FAILED to add!");
+                            return false;
+                        }
+                    } catch (err){
+                        alertify.error( err.errorCode+ ' ' + err.message + " FAILED to process the request!");
                     }
                 }
             });
         } else {
-            $("#ipcNo").focus();
-            alertify.error("Please type IPC number");
+            return false;
         }
     });
 
@@ -349,6 +359,33 @@ $(document).ready(function(){
         }
     });
 
+    $("#testMail").click(function (e) {
+        pono = $("#pono").val();
+        shipno = $("#shipno").val();
+
+        //alert(pono);
+        e.preventDefault();
+        $.ajax({
+            type: "POST",
+            url: "api/warehouse-inputs",
+            data: "userAction=8&pono=" + pono + "&shipno=" + shipno,
+            cache: false,
+            success: function (result) {
+                alert(result);
+                /*try {
+                    var res = JSON.parse(result);
+                    if (res['status'] == 1) {
+                        alertify.success(res['message']);
+                    } else {
+                        alertify.error("FAILED to add!");
+                        return false;
+                    }
+                } catch (err){
+                    alertify.error( err.errorCode+ ' ' + err.message + " FAILED to process te request!");
+                }*/
+            }
+        });
+    });
 });
 
 function validateForBuyerNotification(){
@@ -363,11 +400,13 @@ function validateForBuyerNotification(){
         alertify.error("GIT receiving date can not blank!");
         return false;
     }
-    /*if($("#whArrivalDate").val()==""){
+/*
+    if($("#whArrivalDate").val()==""){
         $("#whArrivalDate").focus();
         alertify.error("Warehouse receive date can not blank!");
         return false;
-    }*/
+    }
+*/
 
     return true;
 }

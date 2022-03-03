@@ -25,56 +25,66 @@ if (!empty($_POST)){
 
 function submitPI()
 {
-	global $user_id;
-	global $loginRole;
-    
+    global $user_id;
+    global $loginRole;
+    $objdal = new dal();
+
     $refId = decryptId($_POST["refId"]);
-    if(!is_numeric($refId)){
+    if (!is_numeric($refId)) {
         $res["status"] = 0;
-    	$res["message"] = 'Invalid reference code.';
-    	return json_encode($res);
+        $res["message"] = 'Invalid reference code.';
+        return json_encode($res);
     }
-    
-    $postatus = htmlspecialchars($_POST['postatus'],ENT_QUOTES, "ISO-8859-1");
-    
-    $poid = htmlspecialchars($_POST['poid'],ENT_QUOTES, "ISO-8859-1");
+
+    $postatus = $objdal->sanitizeInput($_POST['postatus']);
+
+    $poid = $objdal->sanitizeInput($_POST['pono']);
     $pinum = replaceTextRegex($_POST['pinum']);
-    $pivalue = htmlspecialchars($_POST['pivalue'],ENT_QUOTES, "ISO-8859-1");
+
+    $pivalue = $objdal->sanitizeInput($_POST['pivalue']);
     $pivalue = str_replace(",", "", $pivalue);
 
-    $producttype = htmlspecialchars($_POST['producttype'],ENT_QUOTES, "ISO-8859-1");
+    $pidesc = $objdal->sanitizeInput($_POST['pi_description']);
 
-    $shipmode = htmlspecialchars($_POST['shipmode'],ENT_QUOTES, "ISO-8859-1");
-    $hscode = htmlspecialchars(replaceTextRegex($_POST['hscode']),ENT_QUOTES, "ISO-8859-1");
-    
-    if($postatus>=action_Requested_for_Final_PI){
-        $pidate = htmlspecialchars($_POST['pidate'],ENT_QUOTES, "ISO-8859-1");    
+    $producttype = $objdal->sanitizeInput($_POST['producttype']);
+
+    $shipmode = $objdal->sanitizeInput($_POST['shipmode']);
+    $hscode = $objdal->sanitizeInput(replaceTextRegex($_POST['hscode']));
+    $importAs = $objdal->sanitizeInput($_POST['importAs']);
+
+    if ($postatus >= action_Requested_for_Final_PI) {
+        $pidate = $objdal->sanitizeInput($_POST['pidate']);
         $pidate = date('Y-m-d', strtotime($pidate));
 
-        $basevalue = htmlspecialchars($_POST['basevalue'],ENT_QUOTES, "ISO-8859-1");
+        $basevalue = $objdal->sanitizeInput($_POST['basevalue']);
         $basevalue = str_replace(",", "", $basevalue);
     }
-    
+
     $origin = '';
-    foreach($_POST['origin'] as $val) {
-        if(strlen($origin)>0){$origin .= ',';}
-        $origin.= htmlspecialchars($val,ENT_QUOTES, "ISO-8859-1");
+    foreach ($_POST['origin'] as $val) {
+        if (strlen($origin) > 0) {
+            $origin .= ',';
+        }
+        $origin .= $objdal->sanitizeInput($val);
     }
-    
-    $negobank = htmlspecialchars($_POST['negobank'],ENT_QUOTES, "ISO-8859-1");
-    $shipport = htmlspecialchars(replaceTextRegex($_POST['shipport']),ENT_QUOTES, "ISO-8859-1");
-    $lcbankaddress = htmlspecialchars($_POST['lcbankaddress'],ENT_QUOTES, "ISO-8859-1");
-    $productiondays = htmlspecialchars($_POST['productiondays'],ENT_QUOTES, "ISO-8859-1");
-    
-    if(!isset($_POST['messageyes'])){ $suppliersmessage = 'NULL'; } else{ $suppliersmessage = "'".htmlspecialchars($_POST['suppliersmessage'],ENT_QUOTES, "ISO-8859-1")."'"; };
-    
-    // attachment data in an 3D array
-    $attachDraftPI = htmlspecialchars($_POST['attachDraftPI'],ENT_QUOTES, "ISO-8859-1");
-    $attachDraftBOQ = htmlspecialchars($_POST['attachDraftBOQ'],ENT_QUOTES, "ISO-8859-1");
-    $attachCatelog = htmlspecialchars($_POST['attachCatelog'],ENT_QUOTES, "ISO-8859-1");
-    
-    $ip = htmlspecialchars($_SERVER['REMOTE_ADDR'],ENT_QUOTES, "ISO-8859-1");    
-    
+
+    $negobank = $objdal->sanitizeInput($_POST['negobank']);
+    $shipport = $objdal->sanitizeInput(replaceTextRegex($_POST['shipport']));
+    $lcbankaddress = $objdal->sanitizeInput($_POST['lcbankaddress']);
+    $productiondays = $objdal->sanitizeInput($_POST['productiondays']);
+
+    $nofLcIssue = $objdal->sanitizeInput($_POST['nofLcIssue']);
+    $nofShipAllow = $objdal->sanitizeInput($_POST['nofShipAllow']);
+    $installBy = $objdal->sanitizeInput($_POST['installBy']);
+
+    if (!isset($_POST['messageyes'])) {
+        $suppliersmessage = 'NULL';
+    } else {
+        $suppliersmessage = "'" . $objdal->sanitizeInput($_POST['suppliersmessage']) . "'";
+    }
+
+    $ip = $objdal->sanitizeInput($_SERVER['REMOTE_ADDR']);
+    /*
 	//---To protect MySQL injection for Security purpose----------------------------
     $poid = stripslashes($poid);
     $pivalue = stripslashes($pivalue);
@@ -91,7 +101,7 @@ function submitPI()
     $lcbankaddress = stripslashes($lcbankaddress);
     $productiondays = stripslashes($productiondays);
 	
-	$objdal = new dal();
+//	$objdal = new dal();
 	
     $poid = $objdal->real_escape_string($poid);
     $pivalue = $objdal->real_escape_string($pivalue);
@@ -109,126 +119,171 @@ function submitPI()
     $shipport = $objdal->real_escape_string($shipport);
     $lcbankaddress = $objdal->real_escape_string($lcbankaddress);
     $lcbankaddress = replaceTextRegex($lcbankaddress);
-    $productiondays = $objdal->real_escape_string($productiondays);
-	//------------------------------------------------------------------------------
-	//---return array---------------------------------------------------------------
-	$res["status"] = 0;    // 0 = failed, 1 = success
-	$res["message"] = 'FAILED!';
-	//------------------------------------------------------------------------------
+    $productiondays = $objdal->real_escape_string($productiondays);*/
+
+    // attachment data in an 3D array
+    if ($postatus < action_Draft_PI_Submitted) {
+        $attachpo = $objdal->sanitizeInput($_POST['attachpo']);
+        $attachboq = $objdal->sanitizeInput($_POST['attachboq']);
+        $attachother = $objdal->sanitizeInput($_POST['attachother']);
+    }
+    $attachDraftPI = $objdal->sanitizeInput($_POST['attachDraftPI']);
+    $attachDraftBOQ = $objdal->sanitizeInput($_POST['attachDraftBOQ']);
+    $attachCatelog = $objdal->sanitizeInput($_POST['attachCatelog']);
+
+    //------------------------------------------------------------------------------
+    //---return array---------------------------------------------------------------
+    $res["status"] = 0;    // 0 = failed, 1 = success
+    $res["message"] = 'FAILED!';
+    //------------------------------------------------------------------------------
     $forFinal = "";
-    if($postatus>=action_Requested_for_Final_PI){
+    if ($postatus >= action_Requested_for_Final_PI) {
         $forFinal = "
         `pidate` = '$pidate',
         `basevalue` = '$basevalue',";
     }
-	// update new po
-    $query = "UPDATE `wc_t_po` SET 
+
+    if ($postatus != action_Requested_for_Final_PI) {
+        // Getting PI sequence number
+        $query = "SELECT count(*)+1 `PIReqNo` FROM wc_t_pi where PONum = '$poid';";
+        $PIReqNo = $objdal->getScalar($query);
+
+        $systemPINo = $poid . 'PI' . $PIReqNo;
+        //echo $systemPINo;
+        $query = "INSERT INTO `wc_t_pi` (`poid`,`PONum`,`PIReqNo`,`povalue`,`podesc`,`importAs`,`supplier`,`currency`,`contractref`,`deliverydate`, 
+                    `draftsendby`,`actualPoDate`,`emailto`,`emailcc`,`pruserto`,`prusercc`,`noflcissue`,`nofshipallow`, 
+                    `installbysupplier`,`createdby`,`createdfrom`,`pr_no`,`department`,`supplier_address`)
+                SELECT '$systemPINo', p.poNo, $PIReqNo, p.poValue, p.poDesc, p.importAs, p.supplier, p.currency, p.contractRef, p.deliveryDate, 
+                    p.draftSendBy, p.actualPoDate, p.supplierEmailTo, p.supplierEmailCc, p.prUser, p.prUserCc, p.nofLcIssue, p.nofShipAllow,
+                    p.installBy, p.createdBy, p.createdFrom, p.prNo, p.department, p.supplierAddress
+                FROM `po` p
+                WHERE p.poNo = '$poid';";
+
+        $objdal->insert($query, "Failed to insert PO information");
+    } else {
+        $systemPINo = $poid;
+    }
+    // update new po
+    $query = "UPDATE `wc_t_pi` SET 
 		`pinum` = '$pinum',
         `pivalue` = $pivalue,
         `hscode` = '$hscode',
+        `importAs` = $importAs,
         `shipmode` = '$shipmode',
         `origin` = '$origin', $forFinal
         `negobank` = '$negobank',
         `shipport` = '$shipport',
         `lcbankaddress` = '$lcbankaddress',
         `productiondays` = $productiondays,
+        `noflcissue` = $nofLcIssue, 
+        `nofshipallow` = $nofShipAllow, 
+        `installbysupplier` = $installBy, 
         `modifiedby` = $user_id,
         `modifiedfrom` = '$ip',
         `pi_description` = '$pidesc',
         `producttype` = $producttype
-        WHERE `poid` = '$poid';";
-    //echo($query);
+        WHERE `poid` = '$systemPINo';";
+//    echo($query);
+    //exit();
     $objdal->update($query, "Failed to update PO data");
 
-    // Action Log --------------------------------//
-    if($postatus>=action_Requested_for_Final_PI){
-        $newActionID = action_Final_PI_Submitted;
-        $msg = "'Final PI submitted against PO# ".$poid."'";
+    // PI attachment naming
+    if ($postatus < action_Draft_PI_Submitted) {
+
+        $piAttachmentName = 'Suppliers Draft PI';
+        // insert attachment
+        $query = "INSERT INTO `wc_t_attachments`(`poid`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`) VALUES 
+        ('$systemPINo', 'Buyers PO', '$attachpo', $user_id, '$ip', $loginRole),
+        ('$systemPINo', 'Buyers BOQ', '$attachboq', $user_id, '$ip', $loginRole),
+        ('$systemPINo', '$piAttachmentName', '$attachDraftPI', $user_id, '$ip', $loginRole),
+        ('$systemPINo', 'BTRC BOQ', '$attachDraftBOQ', $user_id, '$ip', $loginRole),
+        ('$systemPINo', 'Suppliers Catalog', '$attachCatelog', $user_id, '$ip', $loginRole)";
+        if ($attachother != '') {
+
+            $query .= ",('$systemPINo', 'Other PO Doc', '$attachother', $user_id, '$ip', $loginRole)";
+        }
     } else{
-        $newActionID = action_Draft_PI_Submitted;
-        $msg = "'Draft PI submitted against PO# ".$poid."'";
+        $piAttachmentName = 'Suppliers Final PI';
+        // insert attachment
+        $query = "INSERT INTO `wc_t_attachments`(`poid`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`) VALUES 
+        ('$systemPINo', '$piAttachmentName', '$attachDraftPI', $user_id, '$ip', $loginRole),
+        ('$systemPINo', 'BTRC BOQ', '$attachDraftBOQ', $user_id, '$ip', $loginRole),
+        ('$systemPINo', 'Suppliers Catalog', '$attachCatelog', $user_id, '$ip', $loginRole);";
     }
-    $action = array(
-        'refid' => $refId,
-        'pono' => "'".$poid."'",
-        'actionid' => $newActionID,
-        'status' => 1,
-        'msg' => $msg,
-        'usermsg' => $suppliersmessage,
-    );
 
-    UpdateAction($action);
-    // End Action Log -----------------------------
 
-    // insert attachment
-    $query = "INSERT INTO `wc_t_attachments`(`poid`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`) VALUES 
-        ('$poid', 'Suppliers PI', '$attachDraftPI', $user_id, '$ip', $loginRole),
-        ('$poid', 'Suppliers BOQ', '$attachDraftBOQ', $user_id, '$ip', $loginRole),
-        ('$poid', 'Suppliers Catalog', '$attachCatelog', $user_id, '$ip', $loginRole);";
-    
-	$objdal->insert($query);
+    $objdal->insert($query);
     //echo($query);
     //Transfer file from 'temp' directory to respective 'docs' directory
-    fileTransferTempToDocs($poid);
+    //fileTransferTempToDocs($poid);
+    if ($postatus != action_Requested_for_Final_PI) {
 
-    // Deleting old po lines
-    $delete = "DELETE FROM `wc_t_po_line` WHERE `poNo` = '$poid'";
-    $objdal->delete($delete);
+        /*
+        // Deleting old po lines
+        $delete = "DELETE FROM `pi_lines` WHERE `poNo` = '$poid'";
+        $objdal->delete($delete);*/
 
-    $sqlHeader = "INSERT INTO `wc_t_po_line`(
+        $sqlHeader = "INSERT INTO `pi_lines`(
+                `buyersPo`,
                 `poNo`, 
                 `lineNo`, 
+                `PIReqNo`,
                 `itemCode`, 
                 `itemDesc`, 
-                `poDate`, 
-                `UOM`, 
+                `deliveryDate`, 
+                `uom`, 
                 `unitPrice`, 
                 `poQty`, 
                 `poTotal`, 
                 `delivQty`, 
                 `delivTotal`) VALUES ";
-    $sqlRows='';
-    $j = 0;
-    /*!
-     * Replace REPEATED |(PIPE) sign from string
-     * to protect empty row on partial line submission $_POST variable
-     * **********************************************************************/
-    $regex = "/\|+/";
-    $trimmedPoLines = rtrim(preg_replace($regex, '|', $_POST["consolidatedPoLines"]),'|');
+        $sqlRows = '';
+        $sqlUpdateLineStatus = "UPDATE `po_lines` SET `status`= 1 WHERE `poNo` = '$poid' AND `lineNo` IN (XXXXX);";
+        $lineNOs = "";
+        $j = 0;
+        /*!
+         * Replace REPEATED |(PIPE) sign from string
+         * to protect empty row on partial line submission $_POST variable
+         * **********************************************************************/
+        $regex = "/\|+/";
+        $trimmedPoLines = rtrim(preg_replace($regex, '|', $_POST["consolidatedPoLines"]), '|');
 
-    foreach (explode('|', $trimmedPoLines) as $separateRow) {
+        foreach (explode('|', $trimmedPoLines) as $separateRow) {
 
-        $separateCol = explode(';', $separateRow);
-        $lineNo = $objdal->sanitizeInput($separateCol[0]);
+            $separateCol = explode(';', $separateRow);
+            $lineNo = $objdal->sanitizeInput($separateCol[0]);
 
-        $itemCode = $objdal->sanitizeInput($separateCol[1]);
+            $itemCode = $objdal->sanitizeInput($separateCol[1]);
 
-        $itemDesc = $objdal->sanitizeInput($separateCol[2]);
-        //$itemDesc = ($separateCol[2]) ? $objdal->sanitizeInput($separateCol[2]) : 'NA';
-        $poDate = $objdal->sanitizeInput($separateCol[3]);
-        $uom = $objdal->sanitizeInput($separateCol[4]);
-        $unitPrice = str_replace(",", "", $separateCol[5]);
-        $unitPrice = $objdal->sanitizeInput($unitPrice);
-        $poQty = str_replace(",", "", $separateCol[6]);
-        $poQty = $objdal->sanitizeInput($poQty);
-        $poTotal = str_replace(",", "", $separateCol[7]);
-        $poTotal = $objdal->sanitizeInput($poTotal);
-        $delivQty = $objdal->sanitizeInput($separateCol[8]);
-        $delivQty = str_replace(",", "", $delivQty);
-        $delivTotal = str_replace(",", "", $separateCol[9]);
-        $delivTotal = $objdal->sanitizeInput($delivTotal);
-        /*$ldAmount = $objdal->sanitizeInput($_POST['ldAmnt'][$i], ENT_QUOTES, "ISO-8859-1");
-        $ldAmount = str_replace(",", "", $ldAmount);*/
-        // insert new again
+            $itemDesc = $objdal->sanitizeInput($separateCol[2]);
+            //$itemDesc = ($separateCol[2]) ? $objdal->sanitizeInput($separateCol[2]) : 'NA';
+            $poDate = $objdal->sanitizeInput($separateCol[3]);
+            $uom = $objdal->sanitizeInput($separateCol[4]);
+            $unitPrice = str_replace(",", "", $separateCol[5]);
+            $unitPrice = $objdal->sanitizeInput($unitPrice);
+            $poQty = str_replace(",", "", $separateCol[6]);
+            $poQty = $objdal->sanitizeInput($poQty);
+            $poTotal = str_replace(",", "", $separateCol[7]);
+            $poTotal = $objdal->sanitizeInput($poTotal);
+            $delivQty = $objdal->sanitizeInput($separateCol[8]);
+            $delivQty = str_replace(",", "", $delivQty);
+            $delivQtyValid = $objdal->sanitizeInput($separateCol[9]);
+            $delivQtyValid = str_replace(",", "", $delivQtyValid);
+            $delivTotal = str_replace(",", "", $separateCol[10]);
+            $delivTotal = $objdal->sanitizeInput($delivTotal);
+            /*$ldAmount = $objdal->sanitizeInput($_POST['ldAmnt'][$i], ENT_QUOTES, "ISO-8859-1");
+            $ldAmount = str_replace(",", "", $ldAmount);*/
+            // insert new again
 
-        if ($sqlRows != '') {
-            $sqlRows .= ',';
-        }
+            if ($sqlRows != '') {
+                $sqlRows .= ',';
+            }
 
-        $sqlRows .= "(
-            
-            '$poid', 
+            $sqlRows .= "(
+            '$poid',
+            '$systemPINo', 
             $lineNo, 
+            $PIReqNo,
             '$itemCode', 
             '$itemDesc', 
             '$poDate', 
@@ -239,28 +294,68 @@ function submitPI()
             $delivQty, 
             $delivTotal)";
 
-        $j++;
-        if ($j == 300) {
-            $sql = $sqlHeader . $sqlRows . ';';
+            if ($delivQtyValid == $delivQty) {
+                if ($lineNOs == "")
+                {
+                    $lineNOs = $lineNo;
+                }
+                else{
+                    $lineNOs .= ',' . $lineNo;
+                }
+            }
+
+            $j++;
+            if ($j == 300) {
+                $sql = $sqlHeader . $sqlRows . ';';
 //            echo $sql;
-            $objdal->insert($sql, "Failed to save PO Lines");
+                $objdal->insert($sql, "Failed to save PO Lines");
+                $sqlRows = '';
+                if ($lineNOs != "") {
+                    $sqlUpdateLineStatus = str_ireplace('XXXXX', $lineNOs, $sqlUpdateLineStatus);
+//            echo $sqlUpdateLineStatus;
+                    $objdal->update($sqlUpdateLineStatus);
+                }
+                $j = 0;
+            }
+        }
+        // finally if any rest rows to insert
+        if ($sqlRows != "") {
+            //echo $sqlHeader . $sqlRows;
+            $objdal->insert($sqlHeader . $sqlRows . ';', "Failed to save PO Lines");
             $sqlRows = '';
+            if ($lineNOs != "") {
+                $sqlUpdateLineStatus = str_ireplace('XXXXX', $lineNOs, $sqlUpdateLineStatus);
+//        echo $sqlUpdateLineStatus;
+                $objdal->update($sqlUpdateLineStatus);
+                $sqlUpdateLineStatus = '';
+            }
             $j = 0;
         }
     }
-    // finally if any rest rows to insert
-    if($sqlRows!="") {
-//        echo $sqlHeader . $sqlRows;
-        $objdal->insert($sqlHeader . $sqlRows . ';', "Failed to save PO Lines");
-        $sqlRows = '';
-        $j = 0;
-    }
-
     unset($objdal);
-	
-	$res["status"] = 1;
-	$res["message"] = 'PI, BOQ &amp; Catalog submitted.';
-	return json_encode($res);
+
+    // Action Log --------------------------------//
+    if ($postatus >= action_Requested_for_Final_PI) {
+        $newActionID = action_Final_PI_Submitted;
+        $msg = "'Final PI submitted against PO# " . $systemPINo . "'";
+    } else {
+        $newActionID = action_Draft_PI_Submitted;
+        $msg = "'Draft PI submitted against PO# " . $systemPINo . "'";
+    }
+    $action = array(
+        'refid' => $refId,
+        'pono' => "'" . $systemPINo . "'",
+        'actionid' => $newActionID,
+        'status' => 1,
+        'msg' => $msg,
+        'usermsg' => $suppliersmessage,
+    );
+    UpdateAction($action);
+    // End Action Log -----------------------------
+
+    $res["status"] = 1;
+    $res["message"] = 'PI submitted successfully';
+    return json_encode($res);
 }
 
 function rejectPO()

@@ -17,10 +17,11 @@ $(document).ready(function() {
             var row = JSON.parse(data);
             podata = row[0][0];
             lcinfo = row[3][0];
-            
+            // alert(podata['shipmode']);
             $("#ponum").val(poid);
             $("#insuranceValue").val( commaSeperatedFormat(podata['basevalue']));
-            
+            $("#shipmode").val( podata['shipmode']);
+
             $.get("api/category?action=8&id=17", function (list) {
                 $("#currency").html('<option value="" data-icon="" data-hidden="true"></option>').append(list);
                 $("#currency").selectpicker('refresh');
@@ -73,25 +74,26 @@ $(document).ready(function() {
                 });
                 $("#chargeType").val(28).change();
             });
-            
-            CalculateAll();
+
+            //CalculateAll();
+
         }
     });
     
-    $("#marine_ins_btn").click(function (e) {
+    $("#btnSaveInsuranceInfo").click(function (e) {
         /*alert('abcd');*/
         e.preventDefault();
         if (validate() === true) {
             alertify.confirm('Are you sure you want submit?', function (e) {
                 if (e) {
-                    $("#marine_ins_btn").prop('disabled', true);
+                    $("#btnSaveInsuranceInfo").prop('disabled', true);
                     $.ajax({
                         type: "POST",
                         url: "api/marine-insurance",
                         data: $('#marine-insurance-form').serialize(),
                         cache: false,
                         success: function (response) {
-                            $("#marine_ins_btn").prop('disabled', false);
+                            $("#btnSaveInsuranceInfo").prop('disabled', false);
                             //alert(response);
                             try {
                                 var res = JSON.parse(response);
@@ -125,17 +127,23 @@ $(document).ready(function() {
     $("#exchangeRate, #stampDuty, #otherCharges, #vatRebate, #lcCommAddVAT, #payOrderIssueCharge").keyup(function() {
         CalculateAll();
     });
+
+    $("#icPayOrderAmount").blur(function() {
+        CalculateAll();
+    });
+
+    $("#close_btn").attr("href", _dashboardURL+"lc-opening?po="+poid+"&ref="+$("#refId").val());
     
-    $("#close_btn").attr("href", _dashboardURL+"lc-opening?po="+$("#pono").val()+"&ref="+$("#refId").val());
-    
-    $.get("api/marine-insurance?action=1&po="+$("#pono").val(), function (data){
+    $.get("api/marine-insurance?action=1&po="+poid, function (data){
         
         if($.trim(data)!=""){
             
             var row = JSON.parse(data);
             
             minsInfo = row;
-            
+
+            $("#icPayOrderField").hide();
+
             $("#ponum").val(row["ponum"]);
             $("#insuranceValue").val(row["insuranceValue"]);
             $("#coverNoteNo").val(row["coverNoteNo"]);
@@ -177,22 +185,49 @@ $(document).ready(function() {
             
             CalculateAll();
             
-            // $("#marine_ins_btn").attr("disabled", true);
+            // $("#btnSaveInsuranceInfo").attr("disabled", true);
             // $("#marine-insurance-form input, #marine-insurance-form textarea, #marine-insurance-form select, #marine-insurance-form button").attr('disabled',true);
         
         } else{
 
-            $.get("api/lc-opening?action=3&po="+$("#pono").val(), function (lcInfo){
-                
+            $.get("api/lc-opening?action=3&po="+poid, function (lcInfo){
                 if($.trim(lcInfo)!=""){
                     var rowLCInfo = JSON.parse(lcInfo);
                     $("#exchangeRate").val(commaSeperatedFormat(rowLCInfo["xeBDT"]));
-                    CalculateAll();
+
+                    $.get('api/cn-request?action=4&poid='+poid, function(cnInfo) {
+
+                        var cni = JSON.parse(cnInfo)[0];
+                        if(cni["cn_no"]!=null) {
+                            $("#coverNoteNo").val(cni["cn_no"]);
+                            if (cni["cn_date"] != null) {
+                                $('#coverNoteDate').datepicker('setDate', new Date(cni["cn_date"]));
+                                $('#coverNoteDate').datepicker('update');
+                            }
+                            $("#icPayOrderAmount").val(cni["pay_order_amount"]);
+
+                            if (cni["attachInsCoverNote"] != null) {
+                                $("#attachInsCoverNoteOld").val(cni["attachInsCoverNote"]);
+                                $("#attachInsCoverNoteLink").html(attachmentLink(cni["attachInsCoverNote"]));
+                            }
+                            if (cni["attachPayOrderReceivedCopy"] != null) {
+                                $("#attachPayOrderReceivedCopyOld").val(cni["attachPayOrderReceivedCopy"]);
+                                $("#attachPayOrderReceivedCopyLink").html(attachmentLink(cni["attachPayOrderReceivedCopy"]));
+                            }
+                            if (cni["attachInsChargeOther"] != null) {
+                                $("#attachInsChargeOtherOld").val(cni["attachInsChargeOther"]);
+                                $("#attachInsChargeOtherLink").html(attachmentLink(cni["attachInsChargeOther"]));
+                            }
+                            $("#icPayOrderField").removeClass('hidden');
+                        }
+
+                        CalculateAll();
+                    });
                 }
             });
         }
     });
-    
+
 });
 
 $("#coverNoteDate").datepicker({
@@ -200,8 +235,35 @@ $("#coverNoteDate").datepicker({
     autoclose: true
 });
 
+$("#btnReset").click(function (e) {
+    location.reload();
+});
+
+$("#btnAcceptCN").click(function (e) {
+    /*alert('abcd');*/
+    e.preventDefault();
+
+    var otherCharge = parseToCurrency($("#otherCharges").val());
+    var chargeDeviation = parseToCurrency($("#chargeDeviation").html());
+
+    if(chargeDeviation<3) {
+        alertify.confirm('You are going to adjust discrepant amount as other charge,<br/>' +
+            'Are you sure you want to do it?', function (e) {
+            if (e) {
+                var totalOtherCharge = otherCharge + chargeDeviation;
+                $("#otherCharges").val(totalOtherCharge).change();
+                CalculateAll();
+            } else { // canceled
+                //alertify.error(e);
+            }
+        });
+    } else {
+        alertify.error("Unacceptable discrepant amount!");
+        return false;
+    }
+});
+
 function CalculateAll(){
-    
     var insuranceValue = parseToCurrency($("#insuranceValue").val()),
         assuredAmount = parseToCurrency($("#assuredAmount").val()),
         marine = parseToCurrency($("#marine").val()),
@@ -214,7 +276,13 @@ function CalculateAll(){
         vatRebate = parseToCurrency($("#vatRebate").val()),
         vatRebateAmount = parseToCurrency($("#vatRebateAmount").val()),
         exchangeRate = parseToCurrency($("#exchangeRate").val()),
-        total = 0, capex = 0, insuranceValueBDT = 0;
+        total = 0, capex = 0, insuranceValueBDT = 0,
+        icPayOrderAmount = 0,
+        chargeDeviation = 0;
+
+    if($("#icPayOrderAmount").val()!="") {
+        icPayOrderAmount = parseToCurrency($("#icPayOrderAmount").val());
+    }
     //alert(assuredAmount);
     insuranceValueBDT = insuranceValue * exchangeRate;
     assuredAmount = (insuranceValue * 1.1);
@@ -233,6 +301,7 @@ function CalculateAll(){
     vat = (netPremium * 0.15);
     $("#vat").val(commaSeperatedFormat(vat.toFixed(2)));
 
+    //alert(podata['shipmode']);
     if(podata['shipmode']=='sea') {
         stampDuty = assuredAmountBDT / 1500;
     } else if(podata['shipmode']=='air'){
@@ -240,18 +309,33 @@ function CalculateAll(){
     }
     $("#stampDuty").val(commaSeperatedFormat(stampDuty.toFixed(2)));
 
-        total = (netPremium + vat + stampDuty + otherCharges);
+    total = (netPremium + vat + stampDuty + otherCharges);
     $("#total").val(commaSeperatedFormat(total.toFixed(2)));
+
     vatRebateAmount = (vat * vatRebate)/100;
     $("#vatRebateAmount").val(commaSeperatedFormat(vatRebateAmount.toFixed(2)));
     capex = (total - vatRebateAmount);
     $("#capex").val(commaSeperatedFormat(capex.toFixed(2)));
     vatPayable = (vat - vatRebateAmount);
     $("#vatPayable").val(commaSeperatedFormat(vatPayable.toFixed(2)));
+
+    //alert(icPayOrderAmount);
+    if(icPayOrderAmount!=0) {
+        chargeDeviation = (icPayOrderAmount - total);
+        //$("#otherCharges").val(chargeDeviation.toFixed(2));
+        $("#chargeDeviation").html(chargeDeviation.toFixed(2));
+        $("#chargeDeviation").removeClass('hidden');
+
+        if (Math.abs(chargeDeviation) > 2) {
+            $("#chargeDeviation").addClass('has-txt-error');
+            // $("#otherCharges").closest("div.form-group").addClass('has-error');
+        } else {
+            $("#chargeDeviation").addClass('has-txt-okay');
+        }
+    }
 }
 
-function validate()
-{
+function validate() {
     if($("#bankname").val()=="")
 	{
 		$("#bankname").focus();
@@ -428,7 +512,6 @@ function ResetForm(){
     
 }
 
-
 $(function () {
 
     var button = $('#btnUploadInsCoverNote'), interval;
@@ -461,7 +544,6 @@ $(function () {
     });
 });
 
-
 $(function () {
 
     var button = $('#btnUploadPayOrderReceivedCopy'), interval;
@@ -493,7 +575,6 @@ $(function () {
         }
     });
 });
-
 
 $(function () {
 

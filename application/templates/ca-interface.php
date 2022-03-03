@@ -41,8 +41,12 @@ require_once(LIBRARY_PATH . "/lib.php");
                                                     <th>RefID</th>
                                                     <th><input type="checkbox" disabled></th>
                                                     <th>PO#</th>
+                                                    <th>PI#</th>
+                                                    <th>Date</th>
+                                                    <th>Desc.</th>
+                                                    <th>Amount</th>
                                                     <th>Status</th>
-                                                    <th>Stage</th>
+                                                    <th>Supplier</th>
                                                     <th>Buyer</th>
                                                     <th>ActionOn</th>
                                                 </tr>
@@ -77,8 +81,12 @@ require_once(LIBRARY_PATH . "/lib.php");
                                                     <th>ID</th>
                                                     <th>RefID</th>
                                                     <th>PO#</th>
+                                                    <th>PI#</th>
+                                                    <th>Date</th>
+                                                    <th>Desc.</th>
+                                                    <th>Amount</th>
                                                     <th>Status (pending for)</th>
-                                                    <th>Stage</th>
+                                                    <th>Supplier</th>
                                                     <th>Buyer</th>
                                                     <th>Pending To</th>
                                                     <th>ActionOn</th>

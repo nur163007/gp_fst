@@ -86,7 +86,7 @@ if (!empty($_POST)){
     }
     
     $dal = new dal();    
-    $sql = "UPDATE `wc_t_po` SET `".$_POST["name"]."` = ".$value." WHERE `poid`='".$_POST["pk"]."';";
+    $sql = "UPDATE `wc_t_pi` SET `".$_POST["name"]."` = ".$value." WHERE `poid`='".$_POST["pk"]."';";
     $dal->update($sql);
     
     unset($dal);

@@ -36,7 +36,7 @@ if($maintenance==1) {
 
         //$pageTitle = $page;
         $pageTitle = 'FST : Finance-Sourcing Tool';
-        $adminUrl = '/fst/';
+        $adminUrl = '/fstV3/';
 
         // Must pass in variables (as an array) to use in template
         $variables = array(

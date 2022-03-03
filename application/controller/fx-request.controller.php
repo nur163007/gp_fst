@@ -256,7 +256,7 @@ function SelectedBank($id){
             fxr.`FxRate`,
             fxr.`OfferedVolumeAmount`,
             fx.`value_date`,
-            fx.`value`,
+            fx1.`value`,
             fxr.`remarks`,
             ROUND (((fxr.`FxRate` - (SELECT MIN(fxr1.`FxRate`) FROM `fx_rfq_request` fxr1 WHERE fxr1.`FxRequestId`=fxr.`FxRequestId`))*fxr.`DealAmount`),2) `PotentialLoss`,
             fxr.`DealAmount`,
@@ -267,6 +267,7 @@ function SelectedBank($id){
         LEFT JOIN `wc_t_company` co ON
             fxr.`BankId` = co.`Id`
         LEFT JOIN `fx_request_primary` fx ON fxr.`FxRequestId` = fx.`Id`
+        LEFT JOIN `fx_request` fx1 ON fxr.`FxRequestId` = fx1.`Id`
         WHERE
             fxr.`FxRequestId` = $id;";
 

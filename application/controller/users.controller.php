@@ -102,11 +102,27 @@ function SaveProfile()
         $lastname = $objdal->sanitizeInput($_POST['lastname']);
         $mobile = $objdal->sanitizeInput($_POST['mobile']);
         $email = $objdal->sanitizeInput($_POST['email']);
+        $image = htmlspecialchars($_POST['image_col'], ENT_QUOTES, "ISO-8859-1");
         $ip = $_SERVER['REMOTE_ADDR'];
 
+        $image = stripslashes($image);
+        $image = $objdal->real_escape_string($image);
         //---return array---------------------------------------------------------------
         $res["status"] = 0;    // 0 = Failed, 1 = Success
-        $res["message"] = 'Invalid request, failed to update.';
+        $res["message"] = 'Failed to get inputs.';
+        //------------------------------------------------------------------------------
+        if (strpos('/' . $image, "temp") > 0) {
+            $ext = pathinfo($image, PATHINFO_EXTENSION);
+            $newFile = "../../media/proPic/" . date("Ymdis") . '.' . $ext;
+            if ($image != "") {
+                rename(str_replace('temp', '../../temp', $image), $newFile);
+                $newFile = str_replace('../../', '', $newFile);
+            }
+//        echo str_replace('temp', '../../temp', $image) . ' ' . $newFile;
+            //echo $image;
+        } else {
+            $newFile = $image;
+        }
         //------------------------------------------------------------------------------
         $csrf_token = $_POST['csrf_token'];
         $form_name = 'formProfile';
@@ -116,6 +132,7 @@ function SaveProfile()
             $query = "UPDATE `wc_t_users` SET 
                         `firstname` = '$firstname', 
                         `lastname` = '$lastname',
+                        `image` = '" . str_replace('../../', '', $newFile) . "',
                         `email` = '$email', 
                         `mobile` = '$mobile' 
                     WHERE `id` = $user_id;";
@@ -409,7 +426,7 @@ function getUserProfile()
     if ($user_id) {
         $objdal = new dal();
         $query = "SELECT 
-			        `firstname`, `lastname`, `image`, `email`, `mobile`
+			        `firstname`, `lastname`, `image`, `email`, `mobile`,`image`
                 FROM 
                     `wc_t_users` 
                 WHERE 

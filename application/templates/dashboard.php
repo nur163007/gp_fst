@@ -60,10 +60,10 @@
 <!-- Page -->
 
 <div class="page animsition">
-    
+
     <input type="hidden" id="currentRole" value="<?php echo $_SESSION[session_prefix.'wclogin_role']; ?>" />
     <input type="hidden" id="currentBuyer" value="<?php echo $_SESSION[session_prefix.'wclogin_username']; ?>" />
-
+    <?php if($_SESSION[session_prefix.'wclogin_role']!=role_coupa_user){ ?>
     <div class="page-content container-fluid">
 
         <div class="row" id="pendingsRow">
@@ -77,9 +77,14 @@
                                 <li class="active dropdown" role="presentation">
                                     <a data-toggle="tab" href="#myPendings" aria-controls="myPendings" role="tab"><span class="hot">MY PENDING</span></a>
                                 </li>
+                                <?php if(in_array($_SESSION[session_prefix.'wclogin_role'],
+                                    array(role_Supplier, role_bank_fx, role_bank_lc, role_insurance_company,
+                                        role_cnf_agent, role_foreign_payment_team,
+                                        role_foreign_strategy))!=1){ ?>
                                 <li role="presentation">
                                     <a data-toggle="tab" href="#otherPendings" aria-controls="otherPendings" role="tab">OTHER PENDING</a>
                                 </li>
+                                <?php }?>
                             </ul>
                             <div class="tab-content padding-top-5">
 
@@ -277,5 +282,6 @@
             <?php }?>
         </div>
     </div>
+    <?php }?>
 </div>
 <!-- End Page -->

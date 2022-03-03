@@ -83,12 +83,12 @@ if (!empty($_GET["action"]) || isset($_GET["action"])) {
                 (SELECT GROUP_CONCAT(CONCAT(c.`name`, ' : ', pt.`percentage`, '%') SEPARATOR ', ') FROM `wc_t_payment_terms` pt LEFT JOIN `wc_t_category` c ON pt.partname = c.id WHERE pt.`pono` = po.`poid` GROUP BY pt.`pono`)  AS `Payment Terms`,
                 `pono` AS `PONo`,
                 right(`pono`, 1) `PINo`,
-                (SELECT `createdon` FROM `wc_t_po` AS p WHERE p.`poid`=lc.`pono`) AS `SourcingApprovalDate`,
+                (SELECT `createdon` FROM `wc_t_pi` AS p WHERE p.`poid`=lc.`pono`) AS `SourcingApprovalDate`,
                 (SELECT `ActionOn` FROM `wc_t_action_log` WHERE `PO` = po.`poid` AND `ActionByRole` = " . role_LC_Approvar_5 . " AND `Status` = 1) AS `TradeFinanceApprovalDate`,
                 null AS `QueryResolveDate`,
                 null AS `Remarks`
             FROM `wc_t_lc` lc 
-                LEFT JOIN `wc_t_po` po ON lc.`pono` = po.`poid`
+                LEFT JOIN `wc_t_pi` po ON lc.`pono` = po.`poid`
                 LEFT JOIN `wc_t_company` co1 ON co1.`id` = po.`supplier`
                 LEFT JOIN `wc_t_category` cat1 ON cat1.`id` = po.`currency`
                 LEFT JOIN `wc_t_bank_insurance` bi1 ON lc.`insurance` = bi1.`id`
@@ -106,7 +106,7 @@ if (!empty($_GET["action"]) || isset($_GET["action"])) {
                 FORMAT(SUM(lc.`lcvalue` * `xeUSD`),2) AS `LC Value in USD`,
                 FORMAT(SUM(lc.`lcvalue` * `xeBDT`),2) AS `LC Value in BDT`
             FROM `wc_t_lc` AS lc 
-                LEFT JOIN `wc_t_po` po ON lc.`pono` = po.`poid`
+                LEFT JOIN `wc_t_pi` po ON lc.`pono` = po.`poid`
                 LEFT JOIN `wc_t_bank_insurance` AS bi ON lc.`lcissuerbank` = bi.`id`
                 LEFT JOIN `wc_t_category` AS cat1 ON cat1.`id` = po.`currency`  $where
             GROUP BY bi.`name`, cat1.`name`;";
@@ -120,7 +120,7 @@ if (!empty($_GET["action"]) || isset($_GET["action"])) {
                 FORMAT(SUM(lc.`lcvalue` * `xeUSD`),2) AS `LC Value in USD`,
                 FORMAT(SUM(lc.`lcvalue` * `xeBDT`),2) AS `LC Value in BDT`
             FROM `wc_t_lc` lc 
-                LEFT JOIN `wc_t_po` po ON lc.`pono` = po.`poid`
+                LEFT JOIN `wc_t_pi` po ON lc.`pono` = po.`poid`
                 LEFT JOIN `wc_t_company` co1 ON co1.`id` = po.`supplier`
                 LEFT JOIN `wc_t_category` cat1 ON cat1.`id` = po.`currency`  $where
             GROUP BY co1.`name`, cat1.`name`;";

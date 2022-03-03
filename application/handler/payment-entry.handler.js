@@ -432,7 +432,7 @@ function loadAfterLCSelect(){
             $("#lcType").val(row['lctype']).change();
         });
        
-        $.getJSON("api/bankinsurance?action=4&type=bank", function (list) {
+        $.getJSON("api/company?action=4&type=bank", function (list) {
             $("#bank").select2({
                 data: list,
                 placeholder: "Select a Bank",

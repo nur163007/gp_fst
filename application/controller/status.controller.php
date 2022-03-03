@@ -32,7 +32,7 @@ function GetPOTargetGroup($id)
 {
 	$objdal = new dal();
 	$query = "SELECT p.`poid`, p.`status`, s.`targetform`, s.`targetrole` 
-            FROM `wc_t_po` p INNER JOIN `wc_t_status` s ON p.`status`=s.`id`
+            FROM `wc_t_pi` p INNER JOIN `wc_t_status` s ON p.`status`=s.`id`
             WHERE p.`poid` = '$id';";
 	$objdal->read($query);
 	if(!empty($objdal->data)){

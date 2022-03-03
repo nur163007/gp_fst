@@ -174,7 +174,7 @@ function AvgCostWarehousePreview($pono, $shipno, $propCost=0)
 function AvgCostWarehouseView($pono, $shipno)
 {
 	$objdal = new dal();
-    $query = "SELECT `pono`,`ipcno`,`poline`,`item`,`desc`,`qty`,`uom`,`price`,`amount`,`curr`
+    $query = "SELECT `pono`,`ipcno`,`shipno`,`poline`,`item`,`desc`,`qty`,`uom`,`price`,format(`amount`,2) as `amount`,`curr`
             FROM `wc_t_average_cost` WHERE `pono` = '$pono' AND `shipno` = $shipno;";
     
 	$objdal->read($query);

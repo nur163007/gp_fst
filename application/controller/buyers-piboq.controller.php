@@ -51,7 +51,8 @@ function SubmitPIBOQ()
     $poid = htmlspecialchars($_POST['poid'],ENT_QUOTES, "ISO-8859-1");
     $lcdesc = htmlspecialchars($_POST['lcdesc'],ENT_QUOTES, "ISO-8859-1");
     $userAction = htmlspecialchars($_POST['userAction'],ENT_QUOTES, "ISO-8859-1");
-    
+    $shipMode = htmlspecialchars($_POST['shipMode'],ENT_QUOTES, "ISO-8859-1");
+
     if($userAction<>2){
         $messagetopr = htmlspecialchars($_POST['messageToPRUser'],ENT_QUOTES, "ISO-8859-1");
         $messagetoea = htmlspecialchars($_POST['messageToEATeam'],ENT_QUOTES, "ISO-8859-1");    
@@ -63,13 +64,15 @@ function SubmitPIBOQ()
 	//---To protect MySQL injection for Security purpose----------------------------
     $poid = stripslashes($poid);
     $lcdesc = stripslashes($lcdesc);
-    
+    $shipMode = stripslashes($shipMode);
+
 	
 	$objdal = new dal();
 	
     $poid = $objdal->real_escape_string($poid);
     $lcdesc = $objdal->real_escape_string($lcdesc);
-    
+    $shipMode = $objdal->real_escape_string($shipMode);
+
 	//------------------------------------------------------------------------------
 	
 	//---return array---------------------------------------------------------------
@@ -78,7 +81,7 @@ function SubmitPIBOQ()
 	//------------------------------------------------------------------------------
     
 	// update po
-    $query = "UPDATE `wc_t_po` SET 
+    $query = "UPDATE `wc_t_pi` SET 
 		`lcdesc` = '$lcdesc',
         `modifiedby` = $user_id,
         `modifiedfrom` = '$ip'
@@ -129,10 +132,22 @@ function SubmitPIBOQ()
             'pono' => "'".$poid."'",
             'actionid' => action_Final_PI_Accepted,
             'status' => 1,
-            'msg' => "'Final PI accepted and process started for BTRC permission against PO# ".$poid.".'",
+            'msg' => "'Final PI accepted and BTRC permission process started for PO# ".$poid.".'",
         );
         $lastAction = UpdateAction($action);
         // End Action Log -----------------------------
+
+        if($shipMode=='E-Delivery') {
+            // Action Log --------------------------------//
+            $action = array(
+                'refid' => $refId,
+                'pono' => "'" . $poid . "'",
+                'actionid' => action_Final_PI_Accepted_EDelivery_with_LC,
+                'msg' => "'Final PI accepted and BASIS Approval process started for PO# " . $poid . ".'",
+            );
+            $lastAction = UpdateAction($action);
+            // End Action Log -----------------------------
+        }
     }
 
     // Send PR & EA to recheck

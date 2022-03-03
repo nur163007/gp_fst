@@ -38,7 +38,12 @@
                                     </select>
 								</div>
 							</div>
-							
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">Ship Mode: </label>
+                                <div class="col-sm-7">
+                                    <input type="text" class="form-control" id="shipmode" name="shipmode" readonly="" />
+                                </div>
+                            </div>
 							<div class="form-group">
 								<label class="col-sm-4 control-label">Insurance Company:</label>
 								<div class="col-sm-7">
@@ -148,7 +153,24 @@
                                     <input type="text" class="form-control curnum" id="total" name="total" title="Net Premium+Total VAT+Stamp Charge+Other Charges" value="0" />
 								</div>
 							</div>
-                                                      
+							<!--<div class="form-group">
+								<label class="col-sm-4 control-label">Pay Order Amount: </label>
+								<div class="col-sm-7">
+                                    <input type="text" class="form-control curnum" id="icPayOrderAmount" name="total" value="0" readonly />
+								</div>
+							</div>-->
+							<div class="form-group hidden" id="icPayOrderField">
+								<label class="col-sm-4 control-label">Pay Order Amount:</label>
+                                <div class="col-sm-7">
+                                    <div class="input-group">
+                                        <span class="input-group-btn">
+                                          <button type="button" id="btnAcceptCN" class="btn btn-default btn-outline"><i class="icon wb-check" aria-hidden="true"></i></button>
+                                        </span>
+                                        <input type="text" class="form-control curnum" id="icPayOrderAmount" name="icPayOrderAmount" value="0" />
+                                    </div>
+                                    <label id="chargeDeviation" class="control-label text-right hidden"></label>
+                                </div>
+							</div>
                         </div>
                         <div class="col-xlg-6 col-md-6">
                             <h4 class="well well-sm example-title">VAT &amp; Charges</h4>
@@ -188,7 +210,7 @@
 							</div>
 							<div class="form-group">
 								<label class="col-sm-4 control-label">Premium Borne By:</label>
-								<div class="col-sm-8">
+								<div class="col-sm-7">
                                     <ul class="list-unstyled list-inline ">
                                         <li><input type="radio" id="premiumBorneBy_1" name="premiumBorneBy" value="1" data-plugin="iCheck" data-radio-class="iradio_flat-blue" checked="" />&nbsp;Applicant</li>
                                         <li><input type="radio" id="premiumBorneBy_0" name="premiumBorneBy" value="0" data-plugin="iCheck" data-radio-class="iradio_flat-green" />&nbsp;Beneficiary</li>
@@ -197,7 +219,7 @@
 							</div>
 							<div class="form-group">
 								<label class="col-sm-4 control-label">Charge Remarks:</label>
-								<div class="col-sm-8">
+								<div class="col-sm-7">
                                     <textarea class="form-control" name="chargeRemarks" id="chargeRemarks" cols="30" rows="3"></textarea>
 								</div>
 							</div>
@@ -210,7 +232,7 @@
 							</div>
 							<div class="form-group">
 								<label class="col-sm-4 control-label">Service Remarks:</label>
-								<div class="col-sm-8">
+								<div class="col-sm-7">
                                     <textarea class="form-control" name="serviceRemarks" id="serviceRemarks" cols="30" rows="3"></textarea>
 								</div>
 							</div>
@@ -261,7 +283,8 @@
                         <div class="col-xlg-12 col-md-12">
                             <div class="form-group">
                                 <div class="col-sm-12 text-right">
-                                    <button type="button" class="btn btn-primary" id="marine_ins_btn"><i class="icon fa-save"></i> Save Insurance Charge</button>
+                                    <button type="button" class="btn btn-primary" id="btnSaveInsuranceInfo"><i class="icon fa-save"></i> Save Insurance Charge</button>
+                                    <button type="button" class="btn btn-primary" id="btnReset"><i class="icon fa-refresh"></i> Reset</button>
                                     <a href="#" class="btn btn-default btn-outline" id="close_btn">Close</a>
                                 </div>
                             </div>

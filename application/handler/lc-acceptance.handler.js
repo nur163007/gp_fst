@@ -34,8 +34,12 @@ $(document).ready(function() {
                 $('#lcdesc').html(lcinfo['lcdesc']);
             }
             $('#supplier').html(podata['supname']);
+            $('#sup_address').html(podata['supadd']);
             $('#contractref').html(podata['contractrefName']);
-            $('#deliverydate').html(podata['deliverydate']);
+            $('#pr_no').html(podata['pr_no']);
+            $('#department').html(podata['department']);
+            $('#deliverydate').html(Date_toDetailFormat(new Date(podata['deliverydate'])));
+            $('#actualPoDate').html(Date_toDetailFormat(new Date(podata['actualPoDate'])));
             if (podata["installbysupplier"] == 0) {
                 $('#installbysupplier').html('No');
             } else {
@@ -49,6 +53,9 @@ $(document).ready(function() {
 
 
             $('#pivalue').html('<b>' + commaSeperatedFormat(podata['pivalue']) + '</b> ' + podata['curname']);
+            $('#pi_desc').html(podata['pidesc']);
+            $('#producttype').html(podata['producttypeName']);
+            $('#importAs').html(podata['importAsName']);
             $('#shipmode').html(podata['shipmode'].toUpperCase());
             $('#shippingMode').val(podata['shipmode']);
             $('#hscode').html(podata['hscode']);
@@ -65,7 +72,7 @@ $(document).ready(function() {
             $('#techcontact').html(podata['techcontact']);
 
             // Attachment
-            var attachList = ["Final LC Copy", "Amendment LC Copy"];
+            var attachList = ["Final LC Copy", "Amendment LC Copy", "Amendment Advice Note"];
             attachmentLogScript(attach, '#usersAttachments', 1, attachList);
 
             $("#lcno").val(lcinfo['lcno']);
@@ -128,7 +135,7 @@ $(document).ready(function() {
                                 //$("#refId").val(res['lastaction']);
                                 alertify.success(res['message']);
                                 //checkStepOver();
-                                window.location.href = _adminURL + "lc-acceptance?po=" + poid + "&ref=" + res["lastaction"];
+                                window.location.href = _adminURL + "shipment-schedule?po=" + poid + "&ref=" + res["lastaction"];
                             } else {
                                 alertify.error("FAILED!");
                                 return false;

@@ -14,6 +14,26 @@ $(document).ready(function() {
             $('#lastname').val(row["lastname"]);
             $('#mobile').val(row["mobile"]);
             $('#email').val(row["email"]);
+
+            if (row["image"] == null || row["image"] == "") {
+                //$('#upload div').empty().html('<img src="assets/images/no-image.png" style="width:100%;" />');
+                $("#upload div").empty().html(`<img src="${const_defaultImage}" style="width:100%;" alt="..." />`);
+
+                if ($("#btnPictureUpload").hasClass("hidden")) {
+                    $("#btnPictureUpload").removeClass("hidden");
+                }
+                $("#btnPictureDelete").addClass("hidden");
+            } else {
+
+                //doesFileExist(_adminURL+row["image"]);
+                $('#upload div').empty().html('<img src="' + row["image"] + '" style="width:100%;" />');
+                //$('#upload div').empty().html(`<img src="${ doesFileExist(_adminURL+row["image"]) ? row["image"] : const_defaultImage}" style="width:100%;" />`);
+
+                if ($("#btnPictureDelete").hasClass("hidden")) {
+                    $("#btnPictureDelete").removeClass("hidden");
+                }
+                $("#btnPictureUpload").addClass("hidden");
+            }
         }
     });
 
@@ -21,6 +41,7 @@ $(document).ready(function() {
 
         e.preventDefault();
         if (validateProfile() === true) {
+            $('#image_col').val($('#upload div img').attr('src'));
             var button = e.target;
             button.disabled = true;
             $.ajax({
@@ -121,6 +142,91 @@ $(document).ready(function() {
 
 });
 
+
+function doesFileExist(urlToFile) {
+    console.log(urlToFile);
+    $.ajax({
+        url:urlToFile,
+        type:'HEAD',
+        error: function()
+        {
+            //file not exists
+            return false;
+        },
+        success: function()
+        {
+            //file exists
+            return true
+        }
+    });
+}
+
+$(function () {
+
+    var imgContainer = $('#upload div');
+    var button = $('#btnPictureUpload'), interval;
+
+    new AjaxUpload(button, {
+        action: 'application/library/uploadhandler.php',
+        name: 'upl',
+        autoSubmit: true,
+        onComplete: function (file, response) {
+
+            var res = JSON.parse(response);
+
+            var tpl = $('<img src="temp/' + res['filename'] + '" style="width:100%;" />');
+
+            // Add the HTML to the IMG container div
+            imgContainer.fadeIn(function () {
+                imgContainer.html(tpl)
+            });
+
+            window.clearInterval(interval);
+
+            if ($("#btnPictureDelete").hasClass("hidden")) {
+                $("#btnPictureDelete").removeClass("hidden");
+            }
+            $("#btnPictureUpload").addClass("hidden");
+        },
+        onSubmit: function (file, ext) {
+            if (!(ext && /^(jpg|png|jpeg)$/i.test(ext))) {
+                alert('Invalid File Format.');
+                return false;
+            }
+            interval = window.setInterval(function () {
+                //
+            }, 200);
+        },
+        onChange: function (file, ext) {
+            //$('#btnPictureUpload').html("...");
+        }
+    });
+
+    //Function to delete uploaded file in server.
+    $('#btnPictureDelete').click(function () {
+
+        deleteFile($('#upload div img').attr('src'));
+        $('#upload div').empty();
+        if ($("#btnPictureUpload").hasClass("hidden")) {
+            $("#btnPictureUpload").removeClass("hidden");
+        }
+        $("#btnPictureDelete").addClass("hidden");
+    });
+
+});
+
+function deleteFile(objfile) {
+
+    $.ajax({
+        url: 'application/library/uploadhandler.php?del=' + encodeURI(objfile.replace("../", "")),
+        success: function (result) {
+            var res = JSON.parse(result);
+            if(res['status']==1) {
+                alertify.success("Deleted");
+            }
+        }
+    });
+}
 /**
  * Toggle password
  * */

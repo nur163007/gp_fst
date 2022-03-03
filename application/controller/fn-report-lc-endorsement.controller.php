@@ -88,7 +88,7 @@ if (!empty($_GET["action"]) || isset($_GET["action"])) {
                 null `QueryResolveDate`
             FROM `wc_t_shipment` sh 
                 LEFT JOIN `wc_t_lc` lc ON sh.`pono` = lc.`pono`
-                LEFT JOIN `wc_t_po` po ON sh.`pono` = po.`poid`
+                LEFT JOIN `wc_t_pi` po ON sh.`pono` = po.`poid`
                 LEFT JOIN `wc_t_company` co1 ON co1.`id` = po.`supplier`
                 LEFT JOIN `wc_t_category` cat1 ON cat1.`id` = po.`currency`
                 LEFT JOIN `wc_t_category` cat2 ON cat2.`id` = sh.`docType`
@@ -105,7 +105,7 @@ if (!empty($_GET["action"]) || isset($_GET["action"])) {
                 FORMAT((SUM(sh.`ciAmount` * lc.`xeBDT`)),2) AS `EndAmountInBDT`
             FROM `wc_t_shipment` AS sh 
                 LEFT JOIN `wc_t_lc` AS lc ON sh.`pono` = lc.`pono`
-                LEFT JOIN `wc_t_po` AS po ON sh.`pono` = po.`poid`
+                LEFT JOIN `wc_t_pi` AS po ON sh.`pono` = po.`poid`
                 LEFT JOIN `wc_t_category` AS cat ON cat.`id` = po.`currency`
                 LEFT JOIN `wc_t_bank_insurance` AS bi ON lc.`lcissuerbank` = bi.`id`
 			GROUP BY bi.`name`, cat.`name`;";
@@ -120,7 +120,7 @@ if (!empty($_GET["action"]) || isset($_GET["action"])) {
                 FORMAT((SUM(sh.`ciAmount` * lc.`xeBDT`)),2) AS `EndAmountInBDT`
             FROM `wc_t_shipment` AS sh 
                 LEFT JOIN `wc_t_lc` AS lc ON sh.`pono` = lc.`pono`
-                LEFT JOIN `wc_t_po` AS po ON sh.`pono` = po.`poid`
+                LEFT JOIN `wc_t_pi` AS po ON sh.`pono` = po.`poid`
                 LEFT JOIN `wc_t_category` AS cat ON cat.`id` = po.`currency`
                 LEFT JOIN `wc_t_company` AS co ON po.`supplier` = co.`id`
 			GROUP BY co.`name`, cat.`name`;";

@@ -19,11 +19,11 @@ if (!empty($_GET["action"]) || isset($_GET["action"]))
 	switch($_GET["action"])
 	{
 		case 1:
-            if(!empty($_GET["shipno"])){
-	           echo GetShipmentInfo($_GET["po"], $_GET["shipno"]);
-            } else{
-                echo GetShipmentInfo($_GET["po"]);
-            }
+			if(!empty($_GET["shipno"])){
+				echo GetShipmentInfo($_GET["po"], $_GET["shipno"]);
+			} else{
+				echo GetShipmentInfo($_GET["po"]);
+			}
 			break;
 		case 2:
 			echo GetCustomDutyDataFromLC($_GET["lc"]);
@@ -40,34 +40,39 @@ if (!empty($_GET["action"]) || isset($_GET["action"]))
 		case 6:
 			echo GetAvgCostInfo($_GET["po"],$_GET["mawb"],$_GET["hawb"],$_GET["bl"]);
 			break;
-        case 7:
-            echo getShareingStatus($_GET["po"], $_GET["shipno"]);
+		case 7:
+			echo getShareingStatus($_GET["po"], $_GET["shipno"]);
 			break;
-        case 8:
-            echo getPOByLC($_GET["lc"]);
+		case 8:
+			echo getPOByLC($_GET["lc"]);
 			break;
-        case 9:
-            if(!empty($_GET["shipno"])){
-	           echo getTotalCIValue($_GET["po"], $_GET["shipno"]);
-            } else{
-                echo getTotalCIValue($_GET["po"]);
-            }
+		case 9:
+			if(!empty($_GET["shipno"])){
+				echo getTotalCIValue($_GET["po"], $_GET["shipno"]);
+			} else{
+				echo getTotalCIValue($_GET["po"]);
+			}
 			break;
-        case 10:
-            echo getLCListByPO($_GET["po"], $_GET["shipno"]);
+		case 10:
+			echo getLCListByPO($_GET["po"], $_GET["shipno"]);
 			break;
-        case 11:
-            echo getCIList($_GET["po"]);
+		case 11:
+			echo getCIList($_GET["po"]);
 			break;
-        case 12:
-            echo getTotalEndorsedValue($_GET["po"]);
+		case 12:
+			echo getTotalEndorsedValue($_GET["po"]);
 			break;
 		case 13:
-            echo checkStepOver($_GET['pono'], $_GET['actionId'], $_GET['shipno']);
-            break;
+			echo checkStepOver($_GET['pono'], $_GET['actionId'], $_GET['shipno']);
+			break;
 		case 14:
-            echo checkStepOver($_GET['pono'], $_GET['actionId'], $_GET['shipno'],null,true);
-            break;
+			echo checkStepOver($_GET['pono'], $_GET['actionId'], $_GET['shipno'],null,true);
+			break;
+		case 15:
+			if(isset($_GET["pono"]) || !empty($_GET["pono"])) {
+				echo GetPiLines($_GET["pono"],$_GET["ship"]);
+			}
+			break;
 		default:
 			break;
 	}
@@ -75,6 +80,8 @@ if (!empty($_GET["action"]) || isset($_GET["action"]))
 
 // Case for Insert and update
 if (!empty($_POST)){
+//	var_dump($_POST);
+//	exit();
 	if (!empty($_POST["pono"]) || isset($_POST["pono"])){
 		if($_POST["userAction"]==1){
 			echo saveShipmentSchedule();
@@ -94,10 +101,12 @@ function saveShipmentSchedule()
 	/*echo '<pre>';
         var_dump($_POST);
     echo '</pre>';*/
+
 	global $user_id;
 	global $loginRole;
 
 	$refId = decryptId($_POST["refId"]);
+
 	if (!is_numeric($refId)) {
 		$res["status"] = 0;
 		$res["message"] = 'Invalid reference code.';
@@ -113,6 +122,9 @@ function saveShipmentSchedule()
 	$pono = $objdal->sanitizeInput($_POST['pono']);
 	$lcno = $objdal->sanitizeInput($_POST['lcno']);
 	$shipNo = $objdal->sanitizeInput($_POST['shipNo']);
+
+	$bpo = $objdal->sanitizeInput($_POST['bpo']);
+	$piReqNo = $objdal->sanitizeInput($_POST['piReqNo']);
 	$lastAction = $objdal->sanitizeInput($_POST['lastAction']);
 
 	$scheduleETA = $objdal->sanitizeInput($_POST['scheduleETA']);
@@ -155,6 +167,8 @@ function saveShipmentSchedule()
 
 	$ip = $_SERVER['REMOTE_ADDR'];
 
+//	$query = "SELECT count(*) `PIReqNo` FROM pi_lines where poNo = '$pono';";
+//	$PIReqNo = $objdal->getScalar($query);
 	//------------------------------------------------------------------------------
 
 	//---return array---------------------------------------------------------------
@@ -214,7 +228,7 @@ function saveShipmentSchedule()
 	//echo($query);
 	$lastShipId = $objdal->LastInsertId();
 
-	$query = "UPDATE `wc_t_shipment_ETA` SET `status`=1 WHERE `pono`='$pono' AND `shipNo` = $shipNo;";
+	$query = "UPDATE `wc_t_shipment_eta` SET `status`=1 WHERE `pono`='$pono' AND `shipNo` = $shipNo;";
 	$objdal->update($query);
 
 	// Insert attachment
@@ -261,6 +275,8 @@ function saveShipmentSchedule()
 			$objdal->update($query);
 		}
 	}
+	unset($objdal->data);
+
 
 	// Action Log --------------------------------//
 	if ($lastAction != action_Ship_Doc_Rejected_EATeam && $lastAction != action_Shipment_Document_Rejected) {
@@ -339,7 +355,7 @@ function updateDHLTrackingNumber(){
 	//------------------------------------------------------------------------------
 
 	$query = "UPDATE `wc_t_shipment` SET `dhlTrackNo`='$dhlTrackNo' WHERE `pono`='$pono' AND `shipNo` = $shipNo;";
-    //echo $query;
+	//echo $query;
 	$objdal->update($query);
 	//Add info to activity log table
 	addActivityLog(requestUri, 'DHL tracking number updated', $user_id, 1);
@@ -373,12 +389,12 @@ function updateDHLTrackingNumber(){
  * ********************************************************************/
 function GetShipmentInfo($pono, $shipno=0)
 {
-    $objdal = new dal();
-    $shipVal = "";
-    if ($shipno > 0) {
-        $shipVal = "(SELECT sum(`ciAmount`) ciAmount FROM `wc_t_shipment` WHERE `pono`='$pono' AND `shipNo`=$shipno) `totalShipValue`,";
+	$objdal = new dal();
+	$shipVal = "";
+	if ($shipno > 0) {
+		$shipVal = "(SELECT sum(`ciAmount`) ciAmount FROM `wc_t_shipment` WHERE `pono`='$pono' AND `shipNo`=$shipno) `totalShipValue`,";
 
-        $attach = "
+		$attach = "
         	(SELECT `filename` FROM `wc_t_attachments` WHERE `poid`='$pono' AND `shipno`=$shipno AND `title`='AWB/BL Scan Copy' ORDER BY `id` DESC LIMIT 1) `attachAwbOrBlScanCopy`,
         	(SELECT `filename` FROM `wc_t_attachments` WHERE `poid`='$pono' AND `shipno`=$shipno AND `title`='CI Scan Copy' ORDER BY `id` DESC LIMIT 1) `attachCiScanCopy`,
         	(SELECT `filename` FROM `wc_t_attachments` WHERE `poid`='$pono' AND `shipno`=$shipno AND `title`='Packing List Scan Copy' ORDER BY `id` DESC LIMIT 1) `attachPackListScanCopy`,
@@ -391,8 +407,8 @@ function GetShipmentInfo($pono, $shipno=0)
         	(SELECT `filename` FROM `wc_t_attachments` WHERE `poid`='$pono' AND `shipno`=$shipno AND `title`='Other Customs Doc' ORDER BY `id` DESC LIMIT 1) `attachOtherCustomDoc`,
         	(SELECT `filename` FROM `wc_t_attachments` WHERE `poid`='$pono' AND `shipno`=$shipno AND `title`='Original Bank Document' ORDER BY `id` DESC LIMIT 1) `attachOriginalBankDoc`,
         	(SELECT `filename` FROM `wc_t_attachments` WHERE `poid`='$pono' AND `shipno`=$shipno AND `title`='Endorsement Copy' ORDER BY `id` DESC LIMIT 1) `attachEndorsedBankDoc`";
-    }
-    $query = "SELECT *, 
+	}
+	$query = "SELECT *, 
         (SELECT `lcno` FROM `wc_t_lc` WHERE `pono`='$pono') `lcno`, 
         (SELECT `lcdesc` FROM `wc_t_lc` WHERE `pono`='$pono') `lcdesc`, 
         (SELECT c1.`name` FROM `wc_t_lc` lc LEFT JOIN `wc_t_category` c1 ON lc.`producttype` = c1.`id` WHERE `pono`='$pono') `producttype`, 
@@ -400,35 +416,35 @@ function GetShipmentInfo($pono, $shipno=0)
         (SELECT `lctype` FROM `wc_t_lc` WHERE `pono`='$pono') `lctype`, 
         (SELECT `lcissuedate` FROM `wc_t_lc` WHERE `pono`='$pono') `lcissuedate`, 
         (SELECT `lcissuerbank` FROM `wc_t_lc` WHERE `pono`='$pono') `lcissuerbank`, 
-        (SELECT `currency` FROM `wc_t_po` WHERE `poid`='$pono') `currency`, $shipVal
+        (SELECT `currency` FROM `wc_t_pi` WHERE `poid`='$pono') `currency`, $shipVal
         (SELECT MAX(`banknotifydate`) FROM `wc_t_original_doc` WHERE `lcno`=(SELECT `lcno` FROM `wc_t_lc` WHERE `pono`='$pono')) `banknotifydate`,
         (SELECT `ActionOn` FROM `wc_t_action_log` WHERE `PO` = '$pono' AND `shipNo` = $shipno AND `ActionID` = " . action_CD_BE_Copy_updated . " AND `Status` in (0,1)) `payOrderReqDate`,
-        
+        (SELECT wp.`docName` FROM `wc_t_payment` wp LEFT JOIN `wc_t_shipment` ws ON (wp.`LcNo` = ws.`lcNo` and wp.`ciNo`= ws.`ciNo`) ) `docName`,
         $attach
         
         FROM `wc_t_shipment` ";
-    //echo $query;
+	//echo $query;
 
-    if ($shipno > 0) {
-        $query .= "WHERE `pono` = '$pono' AND `shipNo` = $shipno";
-    } else {
-        $query .= "WHERE `pono` = '$pono'";
-    }
-    //echo $query;
+	if ($shipno > 0) {
+		$query .= "WHERE `pono` = '$pono' AND `shipNo` = $shipno";
+	} else {
+		$query .= "WHERE `pono` = '$pono'";
+	}
+	//echo $query;
 
-    $res = "";
-    $objdal->read($query);
-    if (!empty($objdal->data)) {
-        $res = $objdal->data[0];
-        extract($res);
-    }
-    unset($objdal);
-    if ($res == "") {
-        return $res;
-    } else {
-        return json_encode($res);
-    }
-    return $query;
+	$res = "";
+	$objdal->read($query);
+	if (!empty($objdal->data)) {
+		$res = $objdal->data[0];
+		extract($res);
+	}
+	unset($objdal);
+	if ($res == "") {
+		return $res;
+	} else {
+		return json_encode($res);
+	}
+	return $query;
 }
 
 function GetAvgCostInfo($pono, $mawb, $hawb, $bl)
@@ -437,28 +453,28 @@ function GetAvgCostInfo($pono, $mawb, $hawb, $bl)
 	$query = "SELECT `ciAmount`, `bankChargeCapex`, `insuranceCapex`, `cnfNetPayment`, `proportionateCost`
         FROM `wc_t_shipment` 
         WHERE `pono` = '$pono' ";
-    
-    if($mawb!=""){
-        $query .= " AND `mawbNo`='$mawb' ";
-    }
-    
-    if($hawb!=""){
-        $query .= " AND `hawbNo`='$hawb' '";
-    }
-    
-    if($bl!=""){
-        $query .= " AND `blNo`='$bl'";
-    }
-        
+
+	if($mawb!=""){
+		$query .= " AND `mawbNo`='$mawb' ";
+	}
+
+	if($hawb!=""){
+		$query .= " AND `hawbNo`='$hawb' '";
+	}
+
+	if($bl!=""){
+		$query .= " AND `blNo`='$bl'";
+	}
+
 	$objdal->read($query);
 	if(!empty($objdal->data)){
 		$res = $objdal->data[0];
 		extract($res);
-        //$ciVal = $ciAmount;
+		//$ciVal = $ciAmount;
 	}
 	unset($objdal);
 	return json_encode($res);
-    //echo $query;
+	//echo $query;
 }
 
 function GetCiValue($lcno, $ciNo)
@@ -471,17 +487,17 @@ function GetCiValue($lcno, $ciNo)
         (SELECT SUM(`paymentPercent`) FROM `wc_t_payment` WHERE `LcNo`='$lcno' AND `ciNo` = '$ciNo') `paidPart`,
         (SELECT SUM(`amount`) `totalAmount` FROM `wc_t_payment` WHERE `LcNo`='$lcno' AND `ciNo` = '$ciNo') `paidAmount`
         FROM `wc_t_shipment` WHERE `pono` = (SELECT `pono` FROM `wc_t_lc` WHERE `lcno`='$lcno') AND `ciNo`='$ciNo';";
-    //echo $query;
+	//echo $query;
 	$objdal->read($query);
-    $returnVal = 0;
+	$returnVal = 0;
 	if(!empty($objdal->data)){
 		$res = $objdal->data[0];
 		extract($res);
-        $returnVal = json_encode($res);
+		$returnVal = json_encode($res);
 	}
 	unset($objdal);
 	return $returnVal;
-    //echo $query;
+	//echo $query;
 }
 
 function getShareingStatus($pono, $shipNo)
@@ -490,11 +506,11 @@ function getShareingStatus($pono, $shipNo)
 	$query = "SELECT `status`
         FROM `wc_t_shipment_ETA` WHERE `pono` = '$pono' AND `shipNo`=$shipNo;";
 	$objdal->read($query);
-    $returnVal = 0;
+	$returnVal = 0;
 	if(!empty($objdal->data)){
 		$res = $objdal->data[0];
 		extract($res);
-        $returnVal = $status;
+		$returnVal = $status;
 	}
 	unset($objdal);
 	return $returnVal;
@@ -507,16 +523,16 @@ function GetShipByLC($lcno, $col)
             FROM `wc_t_shipment` 
         WHERE `pono` = (SELECT `pono` FROM `wc_t_lc` WHERE `lcno`='$lcno');";
 	$objdal->read($query);
-	
-    $jsondata = '[';
-    $jsondata .= '{"id": "", "text": ""}';
+
+	$jsondata = '[';
+	$jsondata .= '{"id": "", "text": ""}';
 	if(!empty($objdal->data)){
 		foreach($objdal->data as $val){
 			extract($val);
-            $jsondata .= ', {"id": "'.$col1.'", "text": "'.$col1.'"}';		
+			$jsondata .= ', {"id": "'.$col1.'", "text": "'.$col1.'"}';
 		}
 	}
-    $jsondata .= ']';
+	$jsondata .= ']';
 	unset($objdal);
 	return $jsondata;
 }
@@ -528,51 +544,51 @@ function GetShipByPo($pono, $col)
             FROM `wc_t_shipment` 
         WHERE `pono` = '$pono';";
 	$objdal->read($query);
-	
-    $jsondata = '[';
-    $jsondata .= '{"id": "", "text": ""}';
+
+	$jsondata = '[';
+	$jsondata .= '{"id": "", "text": ""}';
 	if(!empty($objdal->data)){
 		foreach($objdal->data as $val){
 			extract($val);
-            $jsondata .= ', {"id": "'.$col1.'", "text": "'.$col1.'"}';		
+			$jsondata .= ', {"id": "'.$col1.'", "text": "'.$col1.'"}';
 		}
 	}
-    $jsondata .= ']';
+	$jsondata .= ']';
 	unset($objdal);
 	return $jsondata;
 }
 
 function GetCustomDutyDataFromLC($lcno){
-    
-    $objdal = new dal();
-	
-    $query = "SELECT `pono`, `lcissuedate`, `lcvalue`  FROM `wc_t_lc` WHERE `lcno` = '$lcno';";
+
+	$objdal = new dal();
+
+	$query = "SELECT `pono`, `lcissuedate`, `lcvalue`  FROM `wc_t_lc` WHERE `lcno` = '$lcno';";
 	$objdal->read($query);
-    //echo $query;
-    $pono = "";
-    
-    if(!empty($objdal->data)){
+	//echo $query;
+	$pono = "";
+
+	if(!empty($objdal->data)){
 		$lcinfo[0] = $objdal->data[0];
-        $pono = $lcinfo[0]["pono"];
+		$pono = $lcinfo[0]["pono"];
 	}
-    
-    $i=0;
-    unset($objdal->data);
-    
-    $query = "SELECT `ciAmount`, `ciNo`, `mawbNo`, `hawbNo`, `blNo`, `awbOrBlDate`,
+
+	$i=0;
+	unset($objdal->data);
+
+	$query = "SELECT `ciAmount`, `ciNo`, `mawbNo`, `hawbNo`, `blNo`, `awbOrBlDate`,
             GERPVoucherNo, GERPVoucherDate 
         FROM `wc_t_shipment` WHERE `pono` = '$pono';";
 	$objdal->read($query);
-    
-    if(!empty($objdal->data)){
-        foreach($objdal->data as $val){
-    		$shipinfo[$i] = $val;
-            $i++;
-        }
+
+	if(!empty($objdal->data)){
+		foreach($objdal->data as $val){
+			$shipinfo[$i] = $val;
+			$i++;
+		}
 	}
-    unset($objdal);
+	unset($objdal);
 	//echo $query;
-    return json_encode(array($lcinfo, $shipinfo));
+	return json_encode(array($lcinfo, $shipinfo));
 }
 
 function getPOByLC($lcno)
@@ -582,7 +598,7 @@ function getPOByLC($lcno)
             FROM `wc_t_shipment` 
         WHERE `pono` = (SELECT `pono` FROM `wc_t_lc` WHERE `lcno`='$lcno');";
 	$objdal->read($query);
-    $res = 0;
+	$res = 0;
 	if(!empty($objdal->data)){
 		$res = $objdal->data[0];
 		extract($res);
@@ -593,21 +609,21 @@ function getPOByLC($lcno)
 
 function getLCListByPO($pono, $shipno)
 {
-    
-    $objdal=new dal();
+
+	$objdal=new dal();
 	$sql = "SELECT `lcno` FROM `wc_t_shipment` WHERE `pono` = '$pono' AND `shipNo` = $shipno;";
-	$objdal->read($sql); 
-	
-    // json
+	$objdal->read($sql);
+
+	// json
 	$jsondata = '[';
-    $jsondata .= '{"id": "", "text": ""}';
+	$jsondata .= '{"id": "", "text": ""}';
 	if(!empty($objdal->data)){
 		foreach($objdal->data as $val){
 			extract($val);
-            $jsondata .= ', {"id": "'.$lcno.'", "text": "'.$lcno.'"}';		
+			$jsondata .= ', {"id": "'.$lcno.'", "text": "'.$lcno.'"}';
 		}
 	}
-    $jsondata .= ']';
+	$jsondata .= ']';
 	unset($objdal);
 	return $jsondata;
 }
@@ -615,51 +631,51 @@ function getLCListByPO($pono, $shipno)
 function getTotalCIValue($pono, $shipno=0)
 {
 	$objdal = new dal();
-    if($shipno==0){
-	   $query = "SELECT ifnull(sum(`ciAmount`),0) `totalCi`
+	if($shipno==0){
+		$query = "SELECT ifnull(sum(`ciAmount`),0) `totalCi`
             FROM `wc_t_shipment` 
             WHERE `pono` = '$pono';";
-    } else{
-        $query = "SELECT ifnull(sum(`ciAmount`),0) `totalCi`
+	} else{
+		$query = "SELECT ifnull(sum(`ciAmount`),0) `totalCi`
             FROM `wc_t_shipment` 
             WHERE `pono` = '$pono' AND `shipNo`<$shipno;";
-    }
-    //echo $query;
+	}
+	//echo $query;
 	$objdal->read($query);
-    
-    $returnVal = 0;
-    
+
+	$returnVal = 0;
+
 	if(!empty($objdal->data)){
 		$res = $objdal->data[0];
 		extract($res);
-        $returnVal = $res['totalCi'];
+		$returnVal = $res['totalCi'];
 	}
-	
-    unset($objdal);
+
+	unset($objdal);
 	return $returnVal;
-    //return $query;
+	//return $query;
 }
 
 function getCIList($pono = '')
 {
-    $objdal=new dal();
-    $sql = "SELECT `shipNo`, `ciNo` FROM `wc_t_shipment`";
+	$objdal=new dal();
+	$sql = "SELECT `shipNo`, `ciNo` FROM `wc_t_shipment`";
 	if($pono!=''){
 		$sql .= " WHERE `pono` = '$pono' ORDER BY `shipNo`;";
 	}
 
 	$objdal->read($sql);
-	
-    // json
+
+	// json
 	$jsondata = '[';
-    $jsondata .= '{"id": "", "text": ""}';
+	$jsondata .= '{"id": "", "text": ""}';
 	if(!empty($objdal->data)){
 		foreach($objdal->data as $val){
 			extract($val);
-            $jsondata .= ', {"id": "'.$shipNo.'", "text": "'.$ciNo.'"}';		
+			$jsondata .= ', {"id": "'.$shipNo.'", "text": "'.$ciNo.'"}';
 		}
 	}
-    $jsondata .= ']';
+	$jsondata .= ']';
 	unset($objdal);
 	return $jsondata;
 }
@@ -702,5 +718,86 @@ function getTotalEndorsedValue($pono)
 }
 
 
+function GetPiLines($pono,$ship){
+//var_dump("ok");
+	$objdal = new dal();
+
+	/*!
+     * Query for non Delivered PO Lines
+     * **********************************/
+	$objdal = new dal();
+
+	$sql = "SELECT 
+            sl.`id`,
+            sl.`buyersPo`,
+            sl.`PIReqNo`,
+            sl.`poNo`,
+            DATE_FORMAT(sl.`deliveryDate`, '%Y-%m-%d') `deliveryDate`,
+            sl.`itemCode`,
+            REPLACE(sl.`itemDesc`, CHAR(194), '') AS `itemDesc`,
+            sl.`lineNo`,
+            ct.`name` AS `currencyName`,
+            sl.`uom`,
+            sl.`unitPrice`,
+            sl.`poQty`,
+            sl.`poTotal`,
+            sl.`status`,
+            IFNULL(SUM(sl.`delivQty`),0) AS `delivQty`,
+            ROUND(IFNULL(SUM(sl.`delivTotal`),0), 2) AS `delivTotal`,
+            IFNULL(SUM(pil.`delivQty`),0) AS `delivQtyValid`,
+            ROUND(IFNULL(SUM(pil.`delivTotal`),0), 2) AS `delivAmountValid`
+        FROM
+            `shipment_lines` AS sl
+            INNER JOIN
+            `po` AS po ON po.poNo = sl.`buyersPo`
+            LEFT JOIN 
+            `wc_t_category` ct ON po.`currency` = ct.`id`
+                LEFT JOIN
+            `pi_lines` pil ON (pil.`poNo` = sl.`poNo`
+                AND pil.`lineNo` = sl.`lineNo`)
+                 WHERE
+           sl.`poNo` = '$pono' AND sl.`shipNo` = $ship
+           GROUP BY sl.`id`, sl.`poNo`, sl.`deliveryDate`, sl.`itemCode`, sl.`itemDesc`, po.`currency`, pil.`poQty`, pil.`poTotal`,
+            sl.`lineNo`, sl.`uom`, sl.`unitPrice`, sl.`poQty`, sl.`poTotal`, sl.`status`;";
+	$objdal->read($sql);
+
+	if (!empty($objdal->data)) {
+		$nondelivered = $objdal->data;
+	} else {
+		$nondelivered = array();
+	}
+
+	unset($objdal);
+
+	/*!
+     * Query for rejected PO Lines
+     * **********************************/
+	$objdal = new dal();
+
+	$sql = "SELECT 
+            `poNo`, GROUP_CONCAT(`lineNo`) AS `rejectedlines`
+        FROM
+            `shipment_lines`
+        WHERE
+            `poNo` = '$pono' AND `status` = 1
+        GROUP BY `poNo`";
+	$objdal->read($sql);
+
+	if (!empty($objdal->data)) {
+		$rej = $objdal->data;
+	} else {
+		$rej = array();
+	}
+
+	$json = json_encode(array($nondelivered, $rej));
+	/*if (!empty($objdal->data)) {
+        $res = $objdal->data;
+        extract($res);
+    }
+    unset($objdal);
+    $json = json_encode($res);*/
+	return $json;
+
+}
 ?>
 

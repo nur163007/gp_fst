@@ -58,7 +58,7 @@ function tempToDocs()
 	$sql = "SELECT 
             a.`poid`, a.`shipno`, a.`filename`, a.`attachedon`, p.`createdon`
 		FROM `wc_t_attachments` a
-			INNER JOIN `wc_t_po` p ON p.`poid` = a.`poid`
+			INNER JOIN `wc_t_pi` p ON p.`poid` = a.`poid`
 		WHERE p.`poid` = '300043132PI1';";
 	$documents = $objdal->read($sql);
 
@@ -146,7 +146,7 @@ function missingPIFiles(){
 	$sql = "SELECT 
                 a.`poid`, a.`title`, a.`shipno`, a.`filename`, a.`attachedon`, p.`createdon`
             FROM `wc_t_attachments` a 
-			INNER JOIN `wc_t_po` p ON p.`poid` = a.`poid`
+			INNER JOIN `wc_t_pi` p ON p.`poid` = a.`poid`
             WHERE a.`title` IN ('PO','BOQ') AND a.`poid` IN('60001084PI2', '300041235PI5', '300047064PI2', '60000045PI2') 
             GROUP BY a.`poid`, a.`title` ORDER BY a.`attachedon` DESC;";
 	$documents = $objdal->read($sql);
@@ -173,7 +173,7 @@ function cpPOtoPI($po, $pi){
 
 	$target_dir = realpath(dirname(__FILE__) . "/../../docs");
 
-	$query = "SELECT p.`poid`, p.`createdon` FROM `wc_t_po` p WHERE p.`poid` = '$pi';";
+	$query = "SELECT p.`poid`, p.`createdon` FROM `wc_t_pi` p WHERE p.`poid` = '$pi';";
 	//echo $query;
 	$result = $objdal->getRow($query);
 
@@ -202,7 +202,7 @@ function cpPOtoPI($po, $pi){
 	$sql = "SELECT 
                 a.`poid`, a.`title`, a.`shipno`, a.`filename`, a.`attachedon`, p.`createdon`
             FROM `wc_t_attachments` a 
-			INNER JOIN `wc_t_po` p ON p.`poid` = a.`poid`
+			INNER JOIN `wc_t_pi` p ON p.`poid` = a.`poid`
             WHERE a.`title` IN ('PO','BOQ') AND a.`poid` = '$po'
             GROUP BY a.`poid`, a.`title` ORDER BY a.`attachedon` DESC;";
 	$documents = $objdal->read($sql);

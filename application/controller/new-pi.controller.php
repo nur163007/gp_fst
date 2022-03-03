@@ -88,7 +88,7 @@ function SubmitPO()
     die();*/
     if($oldPoid==""){
         // insert new po
-        $query = "INSERT INTO `wc_t_po` SET 
+        $query = "INSERT INTO `wc_t_pi` SET 
             `poid` = '".replaceRegex($poid)."', 
             `povalue` = $povalue, 
             `podesc` = '$podesc',
@@ -113,7 +113,7 @@ function SubmitPO()
 
     } else{
         // Update existing PO
-        $query = "UPDATE `wc_t_po` SET 
+        $query = "UPDATE `wc_t_pi` SET 
     		`povalue` = $povalue, 
             `podesc` = '$podesc',
             `importAs` = $importAs, 
@@ -162,7 +162,7 @@ function SubmitPO()
     if($oldPoid==""){
         $action = array(
             'pono' => "'".$poid."'",
-            'actionid' => action_New_PO_Initiated,
+            'actionid' => action_New_PO_Issued,
             'msg' => "'New PO initiated. PO# ".$poid."'",
             'usermsg' => "'".$buyersmessage."'",
             'mailcc' => $allemails,

@@ -18,4 +18,5 @@ if(isset($_SESSION[session_prefix.'wclogin_userid'])) {
     }
 }
 header("Location: login"); // Redirecting To login Page
+
 ?>

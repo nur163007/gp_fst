@@ -38,6 +38,7 @@ $actionLog = GetActionRef($_GET['ref']);
                                         <form action="">
                                             <input name="pono" id="pono" type="hidden" value="<?php if(!empty($_GET['po'])){ echo $_GET['po']; } ?>" />
                                             <input name="usertype" id="usertype" type="hidden" value="<?php echo $_SESSION[session_prefix.'wclogin_role']; ?>" />
+                                            <input name="shipno" id="shipno" type="hidden" value="<?php if(!empty($_GET['ship'])){ echo $_GET['ship']; } ?>" />
                                             <input name="refId1" id="refId1" type="hidden" value="<?php if(!empty($_GET['ref'])){ echo $_GET['ref']; } ?>" />
                                             <div id="PO_submit_error" style="display:none;"></div>
                                         <div class="col-xlg-6 col-md-6">
@@ -142,7 +143,7 @@ $actionLog = GetActionRef($_GET['ref']);
                                                                         <div class="col-sm-8">
                                                                             <div class="input-group">
                                                                                 <input type="text" class="form-control" name="attachporc" id="attachporc" readonly placeholder=".pdf, .docx, .jpg, .png" />
-                                                                                <input type="hidden" class="form-control" name="attachporcOLD" id="attachporcOLD"  />
+                                                                                <input type="hidden" class="form-control" name="attachporcOld" id="attachporcOld"  />
                                                                                 <span class="input-group-btn">
                                                                                     <button type="button" id="btnUploadPorc" class="btn btn-outline"><i class="icon wb-upload" aria-hidden="true"></i></button>
                                                                                 </span>
@@ -155,7 +156,7 @@ $actionLog = GetActionRef($_GET['ref']);
                                                                         <div class="col-sm-8">
                                                                             <div class="input-group">
                                                                                 <input type="text" class="form-control" name="attachother" id="attachother" readonly placeholder="incase of multiple file use .zip" />
-                                                                                <input type="hidden" class="form-control" name="attachotherOLD" id="attachotherOLD"  />
+                                                                                <input type="hidden" class="form-control" name="attachotherOld" id="attachotherOld"  />
                                                                                 <span class="input-group-btn">
                                                                                 <button type="button" id="btnUploadOther" class="btn btn-outline"><i class="icon wb-upload" aria-hidden="true"></i></button>
                                                                                 </span>
@@ -169,7 +170,7 @@ $actionLog = GetActionRef($_GET['ref']);
                                                             <div class="model-footer text-right">
                                                                 <label class="wc-error pull-left" id="form_error"></label>
                                                                 <button type="button" class="btn btn-primary" id="btnSendCNToGP" >Send Cover Note to GP</button>
-                                                                <button type="button" class="btn btn-primary" id="btnCloseCNRequest" >Close Request</button>
+                                                                <button type="button" class="btn btn-primary hidden" id="btnCloseCNRequest" >Close Request</button>
                                                                 <button type="button" class="btn btn-default btn-outline" data-dismiss="modal" aria-label="Close" onclick="CancelForm()">Cancel</button>
                                                             </div>
                                                         </div>

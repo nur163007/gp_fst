@@ -32,6 +32,13 @@ const ACTION_FINAL_PI_ACCEPTED = 21;
 const ACTION_SENT_FOR_BTRC_PERMISSION = 22;
 const ACTION_REJECTED_BY_BTRC = 23;
 const ACTION_ACCEPTED_BY_BTRC = 24;
+//-------------Start E delivery flow----------13.01.2022---
+const ACTION_FINAL_PI_ACCEPTED_EDELIVERY_WITH_LC = 109;
+const ACTION_REQUEST_FOR_BANK_FORWARDING_LETTER = 110;
+const ACTION_REQUEST_FOR_BASIS_APPROVAL_LETTER = 111;
+const ACTION_BASIS_APPROVAL_LETTER_SENT_BY_BANK = 112;
+const ACTION_BASIS_APPROVAL_LETTER_SHARED_TO_BUYER = 113;
+//-------------End E delivery flow-------------------------
 const ACTION_LC_REQUEST_SENT = 25;
 const ACTION_REJECTED_BY_1ST_LEVEL = 26;
 const ACTION_SENT_REVISED_LC_REQUEST_1 = 27;
@@ -122,6 +129,7 @@ const ACTION_BCS_EX_SENT_TO_FSO = 201;
 const ACTION_COVER_NOTE_REQUESTED_BY_TFO = 301;
 const ACTION_COVER_NOTE_SUBMITTED_BY_IC = 302;
 const ACTION_COVER_NOTE_ACCEPTED_BY_TFO = 303;
+const ACTION_REQUEST_FOR_INS_POLICY_BY_TFO = 310;
 
 const ACTION_DRAFT_LC_REQUEST_SENT_TO_BANK = 401;
 const ACTION_FINAL_LC_REQUEST_SENT_TO_BANK = 402;
@@ -156,6 +164,7 @@ const const_role_lc_bank = 23;
 const const_role_head_of_treasury = 24;
 const const_role_bank_fx = 25;
 const const_role_cnf_agent = 26;
+const const_role_coupa_user = 27;
 
 // Report constraint
 const report_buyer_wise_report = 1;
@@ -181,3 +190,8 @@ const docref_LC_endorsement_letter_ref = "Finance/Trade Operation/LC End/";
 const docref_custom_duty_ctg_letter_ref = "Finance/Trade Operation/CD-CTG/";
 const docref_custom_duty_dhk_letter_ref = "Finance/Trade Operation/CD-DHK/";
 const docref_custom_pra_letter_ref = "No. GP/RO/BTRC/APP/";
+
+const const_defaultImage = "assets/images/no-image.png";
+
+const btrc_division_ENO = 115;
+const btrc_division_SM = 116;

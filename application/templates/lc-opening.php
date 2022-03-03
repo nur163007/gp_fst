@@ -498,9 +498,10 @@ $actionLog = GetActionRef($_GET['ref']);
                                                     <input type="text" class="form-control" name="attachLCOpenRequest" id="attachLCOpenRequest" readonly placeholder=".pdf, .docx, .jpg, .png" />
                                                     <input type="hidden" name="attachLCOpenRequestOld" id="attachLCOpenRequestOld" />
                                                     <span class="input-group-btn">
-                                            <button type="button" id="btnUploadLCOpenRequest" class="btn btn-outline"><i class="icon wb-upload" aria-hidden="true"></i></button>
-                                        </span>
+                                                        <button type="button" id="btnUploadLCOpenRequest" class="btn btn-outline"><i class="icon wb-upload" aria-hidden="true"></i></button>
+                                                    </span>
                                                 </div>
+                                                <span id="attachLCOpenRequestLink"></span>
                                             </div>
                                         </div>
                                         <?php if ($actionLog['ActionID'] !=action_Final_LC_Copy_Sent_to_GP ){ ?>
@@ -554,7 +555,7 @@ $actionLog = GetActionRef($_GET['ref']);
 
                                         <hr />
                                         <div class="text-right margin-bottom-10">
-                                            <button type="button" class="btn btn-primary" id="btnBCSEXrate"><i class="icon fa-save" aria-hidden="true"></i> Request for BCS EX Rate</button>
+<!--                                            <button type="button" class="btn btn-primary" id="btnBCSEXrate"><i class="icon fa-save" aria-hidden="true"></i> Request for BCS EX Rate</button>-->
                                             <button type="button" class="btn btn-primary" id="btnCoverNote"><i class="icon fa-save" aria-hidden="true"></i> Send CoverNote Request</button>
                                             <button type="button" class="btn btn-primary" id="btnViewIC" data-target="#CNViewModal" data-toggle="modal" data-original-title="New CN Request"><i class="icon fa-save" aria-hidden="true"></i> View IC Inputs</button><hr>
                                             <button type="button" class="btn btn-primary hidden" id="btnGenerate_BankLetter"><i class="icon fa-file-word-o" aria-hidden="true"></i> Bank Letter (LC)</button>

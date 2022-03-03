@@ -54,6 +54,7 @@ function SubmitFeedback()
         }
         $exp_type = htmlspecialchars($_POST['exp_type'],ENT_QUOTES, "ISO-8859-1");
         $user_just = htmlspecialchars($_POST['user_just'],ENT_QUOTES, "ISO-8859-1");
+        $short_prodName = htmlspecialchars($_POST['short_prodName'],ENT_QUOTES, "ISO-8859-1");
     }
 
     if($loginRole == role_External_Approval){
@@ -77,7 +78,7 @@ function SubmitFeedback()
 	//------------------------------------------------------------------------------
     if($loginRole == role_External_Approval){
     // update po
-        $query = "UPDATE `wc_t_po` SET 
+        $query = "UPDATE `wc_t_pi` SET 
     		`lcdesc` = '$lcdesc',
             `modifiedby` = $user_id,
             `modifiedfrom` = '$ip'
@@ -85,9 +86,10 @@ function SubmitFeedback()
     	$objdal->insert($query);
     }
     elseif($loginRole == role_PR_Users){
-        $query = "UPDATE `wc_t_po` SET 
+        $query = "UPDATE `wc_t_pi` SET 
             `exp_type` = $exp_type,
-            `user_justification` = '$user_just'
+            `user_justification` = '$user_just',
+            `short_prod_name` = '$short_prodName'
             WHERE `poid` = '$poid';";
         $objdal->insert($query);
     }
@@ -250,7 +252,7 @@ function SubmitFeedback()
 
 function GetLastStatus($poid){
     $dal = new dal();
-    $sql = "SELECT `status` FROM `wc_t_po` WHERE `poid` = '$poid' ORDER BY `msgon` DESC LIMIT 1";
+    $sql = "SELECT `status` FROM `wc_t_pi` WHERE `poid` = '$poid' ORDER BY `msgon` DESC LIMIT 1";
     $dal->read($sql);
     $res = '';
     if(!empty($dal->data)){

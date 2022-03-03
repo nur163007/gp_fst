@@ -230,6 +230,10 @@ function SaveInsurance()
         fileTransferTempToDocs($ponum);
     }
 
+    // Updating CN request
+    $sql = "UPDATE `cn_request` SET `status` = 1 WHERE `po_no` = '$ponum';";
+    $objdal->update($sql);
+
     //echo($query);
     //Add info to activity log table
     addActivityLog(requestUri, $taskMessage, $user_id, 1);

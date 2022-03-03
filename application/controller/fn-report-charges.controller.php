@@ -57,7 +57,7 @@ if (!empty($_GET["action"]) || isset($_GET["action"])){
             FROM
                 wc_t_lc_opening_bank_charge AS bc
                 INNER JOIN wc_t_lc AS lc ON bc.LcNo = lc.lcno
-                INNER JOIN wc_t_po AS po ON lc.pono = po.poid
+                INNER JOIN wc_t_pi AS po ON lc.pono = po.poid
                 INNER JOIN wc_t_category AS c ON po.currency = c.id
                 INNER JOIN wc_t_bank_insurance AS bi ON lc.lcissuerbank = bi.id $where;";
     }
@@ -86,7 +86,7 @@ if (!empty($_GET["action"]) || isset($_GET["action"])){
             FORMAT(ic.vatPayable,2) AS `Vat Payable_right`
         FROM
             wc_t_insurance_charge AS ic
-            INNER JOIN wc_t_po AS po ON ic.ponum = po.poid
+            INNER JOIN wc_t_pi AS po ON ic.ponum = po.poid
             INNER JOIN wc_t_lc AS lc ON po.poid = lc.pono
             INNER JOIN wc_t_category AS c ON po.currency = c.id
             INNER JOIN wc_t_bank_insurance AS bi1 ON lc.lcissuerbank = bi1.id

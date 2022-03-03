@@ -25,29 +25,37 @@ $(document).ready(function() {
                 $('#shipmode').html(podata['shipmode'].toUpperCase());
 
                 $("#cn_number").val(podata['cn_no']);
-                $('#cn_date').datepicker('setDate', new Date(podata['cn_date']));
-                $('#cn_date').datepicker('update');
+                if(podata['cn_date']!=null){
+                    $('#cn_date').datepicker('setDate', new Date(podata['cn_date']));
+                    $('#cn_date').datepicker('update');
+                }
                 // $("#pay_order_amount").val(podata['pay_order_amount']);
-                payOrderAmount = parseToCurrency(podata['pay_order_amount']),
-                $("#pay_order_amount").val(commaSeperatedFormat(payOrderAmount.toFixed(2)));
-
+                if(podata['pay_order_amount']!=null){
+                    payOrderAmount = parseToCurrency(podata['pay_order_amount']);
+                    $("#pay_order_amount").val(commaSeperatedFormat(payOrderAmount.toFixed(2)));
+                }
                 if (podata["attachCNCopy"] != null) {
                     $("#attachcnOld").val(podata["attachCNCopy"]);
                     $("#attachInsCoverNoteLink").html(attachmentLink(podata["attachCNCopy"]));
                     // $("#attachLCOpenRequest").val(lcinfo["attachLCORequest"]);
                 }
                 if (podata["attachPORC"] != null) {
-                    $("#attachporcOLD").val(podata["attachPORC"]);
+                    $("#attachporcOld").val(podata["attachPORC"]);
                     $("#attachInsPORC").html(attachmentLink(podata["attachPORC"]));
                     // $("#attachLCOpenRequest").val(lcinfo["attachLCORequest"]);
                 }
                 if (podata["attachIOD"] != null) {
-                    $("#attachotherOLD").val(podata["attachIOD"]);
+                    $("#attachotherOld").val(podata["attachIOD"]);
                     $("#attachInsIOD").html(attachmentLink(podata["attachIOD"]));
                     // $("#attachLCOpenRequest").val(lcinfo["attachLCORequest"]);
                 }
+                else {
+                    $("#attachcnOld").val(podata["attachCNCopy"]);
+                    $("#attachporcOld").val(podata["attachCNCopy"]);
+                    $("#attachotherOld").val(podata["attachCNCopy"]);
+                }
                 //alert(attach.length);
-                attachmentLogScript(attach, '#usersAttachments');
+                // attachmentLogScript(attach, '#usersAttachments');
 
             }
         });
@@ -113,7 +121,7 @@ $(document).ready(function() {
                         data: $('#form-cn-request').serialize(),
                         cache: false,
                         success: function (response) {
-                            // alert(response);
+                            alert(response);
                             try {
                                 var res = JSON.parse(response);
                                 console.log(res)
@@ -194,7 +202,7 @@ function validate() {
         }
     }
     if ($("#userAction").val() == "2") {
-        if ($("#attachporc").val() == "" && $("#attachporcOLD").val() == "") {
+        if ($("#attachporc").val() == "" && $("#attachporcOld").val() == "") {
             $("#attachporc").focus();
             alertify.error("Attach PORC Documents!");
             return false;

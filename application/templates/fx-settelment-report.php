@@ -27,12 +27,9 @@
                                         <tr>
                                             <th>Fx RequestID#</th>
                                             <th>Request Date</th>
-                                            <th>Supplier Name</th>
-                                            <th>Nature Of Service</th>
                                             <th>Requisition Type</th>
                                             <th>Currency</th>
                                             <th>Fx Value</th>
-                                            <th>Value Date</th>
                                             <th>Bank Name</th>
                                             <th>Fx Rate</th>
                                             <th>Deal Amount</th>
@@ -61,4 +58,4 @@
         <!-- Panel End -->
     </div>
 </div>
-    <!-- Page End -->
+<!-- Page End -->

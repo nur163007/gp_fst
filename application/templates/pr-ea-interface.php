@@ -23,26 +23,26 @@ $actionLog = GetActionRef($_GET['ref']);
                     <input name="usertype" id="usertype" type="hidden" value="<?php echo $_SESSION[session_prefix.'wclogin_role']; ?>" />
                     <input name="postatus" id="postatus" type="hidden" value="<?php echo $actionLog['ActionID']; ?>" />
                     <input name="userAction" id="userAction" type="hidden" value="" />
+
                     <div class="row row-lg">
                         <div class="col-xlg-6 col-md-6">
-                            <h4 class="well well-sm example-title">Order Information</h4>
+                            <h4 class="well well-sm example-title">PO Information</h4>
                             <div class="form-group">
                                 <label class="col-sm-5 control-label">PO No:</label>
-                                <div class="col-sm-7">                                    
-                                    <label class="control-label"><b id="ponum"><img src="assets/images/busy.gif" /></a></b></label>
+                                <div class="col-sm-7">
+                                    <label class="control-label"><b id="ponum"><img src="assets/images/busy.gif" /></b></label>
                                 </div>
                                 <label class="col-sm-5 control-label">PO Value:</label>
                                 <div class="col-sm-7">
                                     <label class="control-label" id="povalue"><img src="assets/images/busy.gif" /></label>
                                 </div>
+                                <label class="col-sm-5 control-label">PO Date:</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label"><b id="actualPoDate"><img src="assets/images/busy.gif" /></b></label>
+                                </div>
                                 <label class="col-sm-5 control-label">Description:</label>
                                 <div class="col-sm-7">
                                     <label class="control-label text-left" id="podesc"><img src="assets/images/busy.gif" /></label>
-                                </div>
-                                <label class="col-sm-5 control-label">LC Description:</label>
-                                <div class="col-sm-7">
-                                    <textarea class="form-control" name="lcdesc" id="lcdesc"></textarea>
-                                    <label class="control-label text-left" id="lcdescLabel"><img src="assets/images/busy.gif" /></label>
                                 </div>
                                 <label class="col-sm-5 control-label">Supplier:</label>
                                 <div class="col-sm-7">
@@ -58,11 +58,11 @@ $actionLog = GetActionRef($_GET['ref']);
                                 </div>
                                 <label class="col-sm-5 control-label">PR No:</label>
                                 <div class="col-sm-7">
-                                    <label class="control-label"><b id="pr_no"><img src="assets/images/busy.gif" /></b></label>
+                                    <label class="control-label text-left" id="pr_no"><img src="assets/images/busy.gif" /></label>
                                 </div>
                                 <label class="col-sm-5 control-label">Department:</label>
                                 <div class="col-sm-7">
-                                    <label class="control-label"><b id="department"><img src="assets/images/busy.gif" /></b></label>
+                                    <label class="control-label text-left" id="department"><img src="assets/images/busy.gif" /></label>
                                 </div>
                                 <label class="col-sm-5 control-label">Need by Date:</label>
                                 <div class="col-sm-7">
@@ -72,46 +72,47 @@ $actionLog = GetActionRef($_GET['ref']);
                                 <div class="col-sm-7">
                                     <label class="control-label"><b id="installbysupplier"><img src="assets/images/busy.gif" /></b></label>
                                 </div>
-                                <label class="col-sm-5 control-label">Max shipment allowed:</label>
+                                <label class="col-sm-5 control-label">Max. shipment allowed:</label>
                                 <div class="col-sm-7">
                                     <label class="control-label" id="nofshipallow"><img src="assets/images/busy.gif" /></label>
                                 </div>
-                                <label class="col-sm-5 control-label">Max LC will be issued:</label>
+                                <label class="col-sm-5 control-label">Max. LC will be issued:</label>
                                 <div class="col-sm-7">
                                     <label class="control-label" id="noflcissue"><img src="assets/images/busy.gif" /></label>
                                 </div>
                             </div>
-                            
-                            <h4 class="well well-sm example-title">PI Information</h4>
 
+                        </div>
+                        <div class="col-xlg-6 col-md-6">
+                            <h4 class="well well-sm example-title">PI Information</h4>
                             <div class="form-group">
                                 <label class="col-sm-5 control-label">PI No:</label>
                                 <div class="col-sm-7">
-                                     <label class="control-label text-left" id="pinum"><img src="assets/images/busy.gif" /></label>
+                                    <label class="control-label text-left" id="pinum"><img src="assets/images/busy.gif" /></label>
                                 </div>
                                 <label class="col-sm-5 control-label">PI Value:</label>
                                 <div class="col-sm-7">
-                                     <label class="control-label text-left" id="pivalue"><img src="assets/images/busy.gif" /></label>
+                                    <label class="control-label text-left" id="pivalue"><img src="assets/images/busy.gif" /></label>
                                 </div>
                                 <label class="col-sm-5 control-label">PI Description:</label>
                                 <div class="col-sm-7">
                                     <label class="control-label"><b id="pi_desc"><img src="assets/images/busy.gif" /></b></label>
                                 </div>
                                 <div id="shipModeEditable">
-                                <label class="col-sm-5 control-label">Shipment Mode:</label>
-                                <div class="col-sm-7">
-                                    <ul class="list-unstyled list-inline margin-top-5">
-                                        <li><input type="radio" id="shipmodesea" name="shipmode" value="sea" data-plugin="iCheck" data-radio-class="iradio_flat-blue" />&nbsp;Sea</li>
-                                        <li><input type="radio" id="shipmodeair" name="shipmode" value="air" data-plugin="iCheck" data-radio-class="iradio_flat-green" />&nbsp;Air</li>
-                                        <li><input type="radio" id="shipmodeseaair" name="shipmode" value="sea+air" data-plugin="iCheck" data-radio-class="iradio_flat-red" />&nbsp;Sea + Air</li>
-                                    </ul>
-                                </div>
+                                    <label class="col-sm-5 control-label">Shipment Mode:</label>
+                                    <div class="col-sm-7">
+                                        <ul class="list-unstyled list-inline margin-top-5">
+                                            <li><input type="radio" id="shipmodesea" name="shipmode" value="sea" data-plugin="iCheck" data-radio-class="iradio_flat-blue" />&nbsp;Sea</li>
+                                            <li><input type="radio" id="shipmodeair" name="shipmode" value="air" data-plugin="iCheck" data-radio-class="iradio_flat-green" />&nbsp;Air</li>
+                                            <li><input type="radio" id="shipmodeseaair" name="shipmode" value="sea+air" data-plugin="iCheck" data-radio-class="iradio_flat-red" />&nbsp;Sea + Air</li>
+                                        </ul>
+                                    </div>
                                 </div>
                                 <div id="shipModeNonEditable">
-                                <label class="col-sm-5 control-label">Shipment Mode:</label>
-                                <div class="col-sm-7">
-                                    <label class="control-label text-left" id="shipmodeLabel"><img src="assets/images/busy.gif" /></label>
-                                </div>
+                                    <label class="col-sm-5 control-label">Shipment Mode:</label>
+                                    <div class="col-sm-7">
+                                        <label class="control-label text-left" id="shipmodeLabel"><img src="assets/images/busy.gif" /></label>
+                                    </div>
                                 </div>
                                 <label class="col-sm-5 control-label">HS Code:</label>
                                 <div class="col-sm-7">
@@ -138,6 +139,11 @@ $actionLog = GetActionRef($_GET['ref']);
                                 <div class="col-sm-7">
                                     <label class="control-label text-left" id="productiondays"><img src="assets/images/busy.gif" /></label>
                                 </div>
+                                <label class="col-sm-5 control-label">LC Description:</label>
+                                <div class="col-sm-7">
+                                    <textarea class="form-control" name="lcdesc" id="lcdesc"></textarea>
+                                    <label class="control-label text-left" id="lcdescLabel"><img src="assets/images/busy.gif" /></label>
+                                </div>
                                 <label class="col-sm-5 control-label">Buyer's Contact:</label>
                                 <div class="col-sm-7">
                                     <label class="control-label text-left" id="buyercontact"><img src="assets/images/busy.gif" /></label>
@@ -147,13 +153,14 @@ $actionLog = GetActionRef($_GET['ref']);
                                     <label class="control-label text-left" id="techcontact"><img src="assets/images/busy.gif" /></label>
                                 </div>
                             </div>
-                            
-                            <div id="usersAttachments">
-                            </div>                            
-                            
+                        </div>
+                    </div>
+
+                    <div class="row row-lg">
+                        <div class="col-xlg-6 col-md-6">
+                            <div id="usersAttachments"></div>
                         </div>
                         <div class="col-xlg-6 col-md-6">
-                            
                             <h4 class="well well-sm example-title" id="buyersmsgtitle">GP Comments</h4>
                             <div class="form-group">
                                 <div class="table-bordered margin-left-20 margin-right-20 padding-20 comment-body" style="" id="buyersmsg">
@@ -168,12 +175,15 @@ $actionLog = GetActionRef($_GET['ref']);
                         </div>
                     </div>
 
+                    <!--Start PO Lines-->
                     <div class="row row-lg">
-                        <!--PO Lines-->
                         <div class="col-xlg-12 col-md-12 margin-bottom-20">
-                            <h4 class="well well-sm example-title" style="background-color: #BFEDD8;">PO Lines</h4>
-                            <div id="deliveredPOLinesDetail">
-                                <table class="table table-bordered table-striped table-highlight order margin-0 small" id="dtPOLinesDelivered">
+                            <h4 class="well well-sm example-title">PO Lines
+                                <span class="pull-right" style="margin-top: 0;">
+                                    Delivered Number of Line: <label style="font-weight: bold" id="delivCount1">0</label>
+                                </span>
+                            </h4>
+                            <table class="table table-bordered table-striped table-highlight order margin-0 small" id="dtPOLinesDelivered">
                                 <thead>
                                 <tr>
                                     <th style="width:5%" class="text-center" rowspan="2">Line #</th>
@@ -219,18 +229,17 @@ $actionLog = GetActionRef($_GET['ref']);
                                 </tr>
                                 </tfoot>
                             </table>
-                            </div>
                         </div>
                     </div>
+                    <!--End PO Lines-->
 
-            <!--End PO Information-->
-
-            <hr/>
+                    <hr/>
+                    <?php if($_SESSION[session_prefix.'wclogin_role'] == role_PR_Users){ ?>
                     <div class="row row-lg">
-                        
+                        <div class="col-xlg-12 col-md-12">
+                            <h4 class="well well-sm example-title">PR Inputs</h4>
+                        </div>
                         <div class="col-xlg-6 col-md-6">
-                            <?php if($_SESSION[session_prefix.'wclogin_role'] == role_PR_Users){ ?>
-                            <h4 class="well well-sm example-title">PR Attachment</h4>
                             <div class="form-group">
                                 <label class="col-sm-4 control-label">Justification:</label>
                                 <div class="col-sm-8">
@@ -244,26 +253,36 @@ $actionLog = GetActionRef($_GET['ref']);
                                     <span id="attachJustificationLink"></span>
                                 </div>
                             </div>
-                                <div class="form-group">
-                                    <label class="col-sm-4 control-label">Expense Type: </label>
-                                    <div class="col-sm-8">
-                                        <select class="form-control" data-plugin="select2" name="exp_type" id="exp_type">
-                                            <option value="">Select expanse type</option>
-                                            <option value="1">Capex</option>
-                                            <option value="2">Opex</option>
-                                        </select>
-                                    </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">Expense Type: </label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" data-plugin="select2" name="exp_type" id="exp_type">
+                                        <option value="">Select expanse type</option>
+                                        <option value="1">Capex</option>
+                                        <option value="2">Opex</option>
+                                    </select>
                                 </div>
+                            </div>
 
-                                <div class="form-group">
-                                    <label class="col-sm-4 control-label">User Justification: </label>
-                                    <div class="col-sm-8">
-                                        <textarea class="form-control" name="user_just" id="user_just" placeholder="Write Something..."></textarea>
-                                    </div>
-                                </div>
-                            <?php } else {echo "&nbsp;"; } ?>
                         </div>
-                        
+                        <div class="col-xlg-6 col-md-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">Justification: </label>
+                                <div class="col-sm-8">
+                                    <textarea class="form-control" name="user_just" id="user_just" placeholder="Write Something..."></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">Short Product Name: </label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" name="short_prodName" id="short_prodName" placeholder="short product name"/>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row row-lg">
+                    <?php } else {echo "&nbsp;"; } ?>
                         <div class="col-xlg-6 col-md-6">
                             <h4 class="well well-sm example-title clearfix">Comment</h4>
                             <div class="form-group isMessageUser">

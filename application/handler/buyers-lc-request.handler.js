@@ -31,7 +31,7 @@ $(document).ready(function(){
                 pterms = row[4];
             }
 
-            // PO Information
+            // Start PO & PI Information-------------------------------------------------------
             $('#ponum').html(podata['poid']);
             $('#povalue').html(commaSeperatedFormat(podata['povalue']));
             $('#currency').html(podata['curname']);
@@ -39,9 +39,13 @@ $(document).ready(function(){
             $('#lcdesc').html('<b>'+HTMLDecode(podata['lcdesc'])+'</b>');
             
             $('#supplier').html(podata['supname']).attr('data-value',podata['supname']);
+            $('#sup_address').html(podata['supadd']);
+            $('#pr_no').html(podata['pr_no']);
+            $('#department').html(podata['department']);
             
             $('#contractref').html(podata['contractrefName']);
             $('#deliverydate').html(Date_toDetailFormat(new Date(podata['deliverydate'])));
+            $('#actualPoDate').html(Date_toDetailFormat(new Date(podata['actualPoDate'])));
             $('#installbysupplier').html(getImplementedBy(podata["installbysupplier"]));
             $('#noflcissue').html(podata['noflcissue']).attr('data-value',podata['noflcissue']);
             $('#nofshipallow').html(podata['nofshipallow']).attr('data-value',podata['nofshipallow']);
@@ -51,17 +55,13 @@ $(document).ready(function(){
             
             // PI info
             $('#pinum').html(podata['pinum']);
-            
-            $('#pivalue').html(commaSeperatedFormat(podata['pivalue']));
-            $('#picurrency').html(podata['curname']);
+            $('#pi_desc').html(podata['pidesc']);
+
+            $('#pivalue').html('<b>' + commaSeperatedFormat(podata['pivalue']) + '</b> ' + podata['curname']);
             $('#shipmode').html(podata['shipmode'].toUpperCase());
             
-            $('#shipHSCsea').hide();
-            $('#shiphscode').hide();
-            
-            if(podata['shipmode']=='sea'){$('#shipHSCsea').show(); $("#forAirShipment1").val(""); $("#forAirShipment2").val(""); }
-            if(podata['shipmode']=='air'){$('#shiphscode').show(); $("#forSeaShipment1").val(""); $("#forSeaShipment2").val(""); }
-            if(podata['shipmode']=='sea+air'){$('#shipHSCsea').show(); $('#shiphscode').show();}
+            if(podata['shipmode']=='sea'){$("#forAirShipment1").val(""); $("#forAirShipment2").val(""); }
+            if(podata['shipmode']=='air'){$("#forSeaShipment1").val(""); $("#forSeaShipment2").val(""); }
 
             if(podata['shipmode']=='sea'){$('#shippingRemarks').val( $('#shippingRemarks').val().replace("XXXX", "Bill of Lading") );}
             if(podata['shipmode']=='air'){$('#shippingRemarks').val( $('#shippingRemarks').val().replace("XXXX", "Air Way Bill") );}
@@ -77,9 +77,14 @@ $(document).ready(function(){
             $('#shipport').html(podata['shipport']);
             $('#lcbankaddress').html(podata['lcbankaddress']);
             $('#productiondays').html(podata['productiondays']+' days');
-            //$('#buyercontact').html(podata['buyercontact']);
-            //$('#techcontact').html(podata['techcontact']);
-            
+            $('#buyercontact').html(podata['buyersName']);
+            $('#techcontact').html(podata['prName']);
+
+            //Loading PO Lines
+            writeDeliveredPOLines(poid);
+            // End PO & PI Information-------------------------------------------------------
+
+
             // LC Request Form
             
             $('#pono1').val(podata['poid']);

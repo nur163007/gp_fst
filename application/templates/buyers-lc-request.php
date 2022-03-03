@@ -27,6 +27,7 @@ require_once(LIBRARY_PATH . "/lib.php");
                     <div class="tab-content padding-top-20">
                         <div class="tab-pane" id="tabPOInfo" role="tabpanel">
                             <div class="form-horizontal">
+                                <!--Start PO & PI Information-->
                                 <div class="row row-lg">
                                     <div class="col-xlg-6 col-md-6">
 
@@ -40,21 +41,33 @@ require_once(LIBRARY_PATH . "/lib.php");
                                             <div class="col-sm-7">
                                                 <label class="control-label" id="povalue"><img src="assets/images/busy.gif" /></label>
                                             </div>
+                                            <label class="col-sm-5 control-label">PO Date:</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label"><b id="actualPoDate"><img src="assets/images/busy.gif" /></b></label>
+                                            </div>
                                             <label class="col-sm-5 control-label">Description:</label>
                                             <div class="col-sm-7">
                                                 <label class="control-label text-left" id="podesc"><img src="assets/images/busy.gif" /></label>
-                                            </div>
-                                            <label class="col-sm-5 control-label">LC Description:</label>
-                                            <div class="col-sm-7">
-                                                <label class="control-label text-left" id="lcdesc"><img src="assets/images/busy.gif" /></label>
                                             </div>
                                             <label class="col-sm-5 control-label">Supplier:</label>
                                             <div class="col-sm-7">
                                                 <label class="control-label"><b id="supplier"><img src="assets/images/busy.gif" /></b></label>
                                             </div>
+                                            <label class="col-sm-5 control-label">Supplier Address:</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label text-left"><b id="sup_address"><img src="assets/images/busy.gif" /></b></label>
+                                            </div>
                                             <label class="col-sm-5 control-label">Contract Ref:</label>
                                             <div class="col-sm-7">
                                                 <label class="control-label text-left" id="contractref"><img src="assets/images/busy.gif" /></label>
+                                            </div>
+                                            <label class="col-sm-5 control-label">PR No:</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label text-left" id="pr_no"><img src="assets/images/busy.gif" /></label>
+                                            </div>
+                                            <label class="col-sm-5 control-label">Department:</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label text-left" id="department"><img src="assets/images/busy.gif" /></label>
                                             </div>
                                             <label class="col-sm-5 control-label">Need by Date:</label>
                                             <div class="col-sm-7">
@@ -64,13 +77,13 @@ require_once(LIBRARY_PATH . "/lib.php");
                                             <div class="col-sm-7">
                                                 <label class="control-label"><b id="installbysupplier"><img src="assets/images/busy.gif" /></b></label>
                                             </div>
-                                            <label class="col-sm-5 control-label">Number of shipment allowed:</label>
-                                            <div class="col-sm-7">
-                                                <label class="control-label" id="noflcissue"><img src="assets/images/busy.gif" /></label>
-                                            </div>
-                                            <label class="col-sm-5 control-label">Number of LC will be issued:</label>
+                                            <label class="col-sm-5 control-label">Max. shipment allowed:</label>
                                             <div class="col-sm-7">
                                                 <label class="control-label" id="nofshipallow"><img src="assets/images/busy.gif" /></label>
+                                            </div>
+                                            <label class="col-sm-5 control-label">Max. LC will be issued:</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label" id="noflcissue"><img src="assets/images/busy.gif" /></label>
                                             </div>
                                         </div>
                                     </div>
@@ -81,9 +94,17 @@ require_once(LIBRARY_PATH . "/lib.php");
                                             <div class="col-sm-7">
                                                 <label class="control-label text-left" id="pinum"><img src="assets/images/busy.gif" /></label>
                                             </div>
+                                            <label class="col-sm-5 control-label">PI Date:</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label text-left" id="pidate"><img src="assets/images/busy.gif" /></label>
+                                            </div>
                                             <label class="col-sm-5 control-label">PI Value:</label>
                                             <div class="col-sm-7">
                                                 <label class="control-label text-left" id="pivalue"><img src="assets/images/busy.gif" /></label>
+                                            </div>
+                                            <label class="col-sm-5 control-label">PI Description:</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label"><b id="pi_desc"><img src="assets/images/busy.gif" /></b></label>
                                             </div>
                                             <label class="col-sm-5 control-label">Shipment Mode:</label>
                                             <div class="col-sm-7">
@@ -92,14 +113,6 @@ require_once(LIBRARY_PATH . "/lib.php");
                                             <label class="col-sm-5 control-label">HS Code:</label>
                                             <div class="col-sm-7">
                                                 <label class="control-label text-left" id="hscode"><img src="assets/images/busy.gif" /></label>
-                                            </div>
-                                            <label class="col-sm-5 control-label">PI Date:</label>
-                                            <div class="col-sm-7">
-                                                <label class="control-label text-left" id="pidate"><img src="assets/images/busy.gif" /></label>
-                                            </div>
-                                            <label class="col-sm-5 control-label">Insurance / Base Value:</label>
-                                            <div class="col-sm-7">
-                                                <label class="control-label text-left" id="basevalue"><img src="assets/images/busy.gif" /></label>
                                             </div>
                                             <label class="col-sm-5 control-label">Country of Origin:</label>
                                             <div class="col-sm-7">
@@ -113,7 +126,7 @@ require_once(LIBRARY_PATH . "/lib.php");
                                             <div class="col-sm-7">
                                                 <label class="control-label text-left" id="shipport"><img src="assets/images/busy.gif" /></label>
                                             </div>
-                                            <label class="col-sm-5 control-label">L/C Beneficiary &amp; Address:</label>
+                                            <label class="col-sm-5 control-label">L/C Beneficiary &amp Address:</label>
                                             <div class="col-sm-7">
                                                 <label class="control-label text-left" id="lcbankaddress"><img src="assets/images/busy.gif" /></label>
                                             </div>
@@ -121,17 +134,81 @@ require_once(LIBRARY_PATH . "/lib.php");
                                             <div class="col-sm-7">
                                                 <label class="control-label text-left" id="productiondays"><img src="assets/images/busy.gif" /></label>
                                             </div>
-                                            <!--<label class="col-sm-5 control-label">Buyer's Contact:</label>
+                                            <label class="col-sm-5 control-label">LC Description:</label>
+                                            <div class="col-sm-7">
+                                                <label class="control-label text-left" id="lcdesc"><img src="assets/images/busy.gif" /></label>
+                                            </div>
+                                            <label class="col-sm-5 control-label">Buyer's Contact:</label>
                                             <div class="col-sm-7">
                                                 <label class="control-label text-left" id="buyercontact"><img src="assets/images/busy.gif" /></label>
                                             </div>
                                             <label class="col-sm-5 control-label">Technical Contact:</label>
                                             <div class="col-sm-7">
                                                 <label class="control-label text-left" id="techcontact"><img src="assets/images/busy.gif" /></label>
-                                            </div>-->
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                                <!--End PO & PI Information-->
+
+                                <!--Start PO Lines-->
+                                <div class="row row-lg">
+                                    <div class="col-xlg-12 col-md-12 margin-bottom-20">
+                                        <h4 class="well well-sm example-title">PO Lines
+                                            <span class="pull-right" style="margin-top: 0;">
+                                    Delivered Number of Line: <label style="font-weight: bold" id="delivCount1">0</label>
+                                </span>
+                                        </h4>
+                                        <table class="table table-bordered table-striped table-highlight order margin-0 small" id="dtPOLinesDelivered">
+                                            <thead>
+                                            <tr>
+                                                <th style="width:5%" class="text-center" rowspan="2">Line #</th>
+                                                <th style="width:10%" class="text-center" rowspan="2">Item</th>
+                                                <th style="width:24%" class="text-center" rowspan="2">Item Description</th>
+                                                <th style="width:10%" class="text-center" rowspan="2">Delivery Date</th>
+                                                <th style="width:5%" class="text-center" rowspan="2">UOM</th>
+                                                <th style="width:10%" class="text-center" rowspan="2">Unit Price</th>
+                                                <th style="width:10%" class="text-center poBg" colspan="2">PO</th>
+                                                <th style="width:5%" class="text-center delivBg" colspan="2">Delivered</th>
+                                                <!--<th style="width:5%" class="text-center" rowspan="2">LD</th>-->
+                                            </tr>
+                                            <tr>
+                                                <th style="width:5%" class="text-center poBg">Qty.</th>
+                                                <th style="width:10%" class="text-center poBg">Total Price</th>
+                                                <th style="width:5%" class="text-cente delivBg">Qty.</th>
+                                                <th style="width:10%" class="text-center delivBg">Total Price</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td class="text-center"></td>
+                                                <td class="text-left"></td>
+                                                <td class="text-left"></td>
+                                                <td class="text-left"></td>
+                                                <td class="text-left"></td>
+                                                <td class="text-right"></td>
+                                                <td class="text-right poBg"></td>
+                                                <td class="text-right poBg"></td>
+                                                <td class="text-right delivBg"></td>
+                                                <td class="text-right delivBg"></td>
+                                                <!--<td class="text-right"></td>-->
+                                            </tr>
+                                            </tbody>
+                                            <tfoot>
+                                            <tr style="font-weight: bolder;">
+                                                <th colspan="6" class="text-right padding-top-15" style="font-weight: bold; font-size: inherit">Total: </th>
+                                                <th class="text-center poBg padding-top-15" id="poQtyTotal" style="font-weight: bold; font-size: inherit"></th>
+                                                <th class="text-right poBg padding-top-15" id="grandTotal" style="font-weight: bold; font-size: inherit"></th>
+                                                <th class="text-center delivBg padding-top-15" id="dlvQtyTotal" style="font-weight: bold; font-size: inherit"></th>
+                                                <th class="text-right delivBg padding-top-15" id="dlvGrandTotal" style="font-weight: bold; font-size: inherit"></th>
+                                                <!--<th class="text-right" id="ldAmntTotal"></th>-->
+                                            </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                                <!--End PO Lines-->
+
                                 <!--<hr />
                                 <div class="row row-lg">
                                     <div class="col-xlg-12 col-md-12 text-right">

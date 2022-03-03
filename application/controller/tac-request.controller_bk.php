@@ -370,7 +370,7 @@ function GetFilteredPOList($supplier=0)
     $sql = "SELECT 
                 po.`poid` 
             FROM 
-                `wc_t_po` po 
+                `wc_t_pi` po 
                 INNER JOIN `wc_t_shipment` s ON s.`pono` = po.`poid` 
                 INNER JOIN `wc_t_payment` p ON p.`LcNo` = s.`lcNo` 
             WHERE 
@@ -434,7 +434,7 @@ function GetTacInfo($po,$shipNo)
                 co.`name` AS  `supplierName`
             FROM 
                 `wc_t_shipment` s 
-                INNER JOIN `wc_t_po` p ON p.`poid` = s.`pono` 
+                INNER JOIN `wc_t_pi` p ON p.`poid` = s.`pono` 
                 INNER JOIN `wc_t_category` c ON c.`id` = p.`currency` 
                 INNER JOIN `wc_t_company` co ON co.`id` = p.`supplier` 
             WHERE 
@@ -522,7 +522,7 @@ function getCFacValueByShip()
     $objdal = new dal();
     $query = "SELECT 
                 lcvalue,
-				(SELECT lcbankaddress FROM wc_t_po WHERE poid = '$poNo') as lcbeneficiary,
+				(SELECT lcbankaddress FROM wc_t_pi WHERE poid = '$poNo') as lcbeneficiary,
 				(SELECT blNo FROM wc_t_shipment WHERE poNo = '$poNo' AND shipNo = '$ship') as blNo
             FROM 
                 `wc_t_lc`
@@ -558,7 +558,7 @@ function tacPdfGenerate($poNo,$shipNo,$partName)
                 co.`name` AS `suppName`
             FROM 
                 `wc_t_shipment` s 
-                INNER JOIN `wc_t_po` p ON p.`poid` = s.`pono` 
+                INNER JOIN `wc_t_pi` p ON p.`poid` = s.`pono` 
                 INNER JOIN `wc_t_category` c ON c.`id` = p.`currency` 
                 INNER JOIN `wc_t_company`co ON co.`id` = p.`supplier`
             WHERE 
@@ -882,7 +882,7 @@ function getLetterText($poNo, $ship,$partName, $lastActId)
         $query = "SELECT 
                   p.`lcbankaddress` AS `lcbeneficiary`,
                   c.`name` AS `suppName`
-                  FROM `wc_t_po` p
+                  FROM `wc_t_pi` p
                   INNER JOIN `wc_t_company` c ON c.`id` = p.`supplier`
                 WHERE p.`poid` = '$poNo' LIMIT 1;";
         //echo $query;
@@ -984,7 +984,7 @@ function cfacPdfGenerate($poNo,$ship,$partName)
                 co.`name` AS `suppName`
             FROM 
                 `wc_t_shipment` s 
-                INNER JOIN `wc_t_po` p ON p.`poid` = s.`pono` 
+                INNER JOIN `wc_t_pi` p ON p.`poid` = s.`pono` 
                 INNER JOIN `wc_t_category` c ON c.`id` = p.`currency` 
                 INNER JOIN `wc_t_company`co ON co.`id` = p.`supplier`
             WHERE 
@@ -1018,7 +1018,7 @@ function cfacPdfGenerate($poNo,$ship,$partName)
     $objdal = new dal();
     $query = "SELECT 
                 lcvalue,
-				(SELECT lcbankaddress FROM wc_t_po WHERE poid = '$poNo') as lcbeneficiary,
+				(SELECT lcbankaddress FROM wc_t_pi WHERE poid = '$poNo') as lcbeneficiary,
 				(SELECT blNo FROM wc_t_shipment WHERE poNo = '$poNo' AND shipNo = '$ship') as blNo
             FROM 
                 `wc_t_lc`
@@ -1363,7 +1363,7 @@ function getCpoApprovedPO($user=0)
         $where ="";
     }
 
-    $sql = "SELECT c.`poNo` FROM `wc_t_cacfac_request` c INNER JOIN `wc_t_po` p ON p.`poid` = c.`poNo` $where GROUP BY c.`poNo`;";
+    $sql = "SELECT c.`poNo` FROM `wc_t_cacfac_request` c INNER JOIN `wc_t_pi` p ON p.`poid` = c.`poNo` $where GROUP BY c.`poNo`;";
     //echo $sql .'<br>';
     $objdal->read($sql);
 
@@ -1453,7 +1453,7 @@ function getCertsPayHistory($poNo)
             FROM
                 `wc_t_payment_terms` pt
                 INNER JOIN `wc_t_lc` lc ON pt.`pono` = lc.`pono`
-                INNER JOIN `wc_t_po` po ON po.`poid` = pt.`pono`
+                INNER JOIN `wc_t_pi` po ON po.`poid` = pt.`pono`
                 INNER JOIN `wc_t_category` c ON c.`id` = po.`currency`
                 INNER JOIN `wc_t_shipment` sh ON lc.`lcno` = sh.`lcNo`
             WHERE

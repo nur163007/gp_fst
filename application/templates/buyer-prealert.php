@@ -477,7 +477,7 @@ $isShipDocAccepted = checkStepOver($_GET['po'], action_Ship_Doc_Accepted_Buyer_P
                                                 </div>
                                                 <div class="form-group">
                                                     <div class="col-sm-12 text-right">
-                                                        <button type="button" class="btn btn-primary" id="btnMailToWarehouse"><i class="icon wb-envelope" aria-hidden="true"></i> Mail to Warehouse</button>
+                                                        <button type="button" class="btn btn-primary" id="btnMailToWarehouse"><i class="icon wb-envelope" aria-hidden="true"></i> Send to Warehouse</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -489,6 +489,7 @@ $isShipDocAccepted = checkStepOver($_GET['po'], action_Ship_Doc_Accepted_Buyer_P
                                             <input name="refId" id="refId" type="hidden" value="<?php if(!empty($_GET['ref'])){ echo $_GET['ref']; } ?>" />
                                             <input name="shipno" id="shipno" type="hidden" value="<?php echo $actionLog['shipNo']; ?>" />
                                             <input name="lcno" id="lcno3" type="hidden" value="" />
+                                            <input name="lcbank" id="lcbank" type="hidden" value="" />
                                             <!--<input name="userAction" id="userAction" type="hidden" value="3" />-->
                                             <div class="col-sm-6">
                                                 <h4 class="well well-sm example-title clearfix" id="buyersMsgToEATitle">To EA Team</h4>
@@ -556,7 +557,7 @@ $isShipDocAccepted = checkStepOver($_GET['po'], action_Ship_Doc_Accepted_Buyer_P
                                                 </div>
                                                 <div class="form-group">
                                                     <div class="col-sm-12 text-right">
-                                                        <button type="button" class="btn btn-primary" id="btnMailToFinance"><i class="icon wb-envelope" aria-hidden="true"></i> Mail to Finance</button>
+                                                        <button type="button" class="btn btn-primary" id="btnMailToFinance"><i class="icon wb-check" aria-hidden="true"></i> Update Voucher</button>
                                                     </div>
                                                 </div>
                                             </div>

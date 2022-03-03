@@ -69,16 +69,16 @@ if (!empty($_GET["action"]) || isset($_GET["action"]))
             l.`ActionID`, l.`Status`, 
             (SELECT al.`Status` FROM `wc_t_action_log` AS al WHERE al.ID = l.RefID) AS lastStatus,
             a.`ActionDone`, a.`ActionDoneBy`, 
-            (SELECT u.`username` from `wc_t_po` p INNER JOIN `wc_t_users` u ON p.`createdby` = u.`id` WHERE p.`poid` = l.`PO` ) `Buyer`,
+            (SELECT u.`username` from `wc_t_pi` p INNER JOIN `wc_t_users` u ON p.`createdby` = u.`id` WHERE p.`poid` = l.`PO` ) `Buyer`,
 			a.`ActionPending`, a.`ActionPendingTo`, r.`name` AS `PendingToRoleName`, a.`TargetForm`,
-            (SELECT `name` FROM `wc_t_company` c WHERE c.`id` = (SELECT `supplier` FROM `wc_t_po` p WHERE p.`poid` = l.`PO`)) `CoName`,
+            (SELECT `name` FROM `wc_t_company` c WHERE c.`id` = (SELECT `supplier` FROM `wc_t_pi` p WHERE p.`poid` = l.`PO`)) `CoName`,
             DATEDIFF(CURRENT_DATE, l.`BaseActionOn`) as `pendingFor`, 
             if(DATEDIFF(CURRENT_DATE, l.`BaseActionOn`) > DATEDIFF(l.`SLADate`, l.`BaseActionOn`), 'danger', 'default') as `criticality`, 
             l.`ID` AS `ActionOn`, a.`stage`
             FROM `wc_t_action_log` l 
             	INNER JOIN `wc_t_action` a ON l.`ActionID` = a.`ID`
                 INNER JOIN `wc_t_roles` r ON a.`ActionPendingTo` = r.`id`
-                INNER JOIN `wc_t_po` p ON p.`poid` = l.`PO`
+                INNER JOIN `wc_t_pi` p ON p.`poid` = l.`PO`
                 LEFT JOIN `wc_t_cacfac_request` cr ON cr.`id` = l.`certReqId`
             WHERE a.`ActionPendingTo` = $loginRole AND l.`Status` = 0 AND a.`ActionPending` != 'Acknowledgement' $sqlWhere
             ORDER BY l.`PO`, l.`shipNo`;";
@@ -90,16 +90,16 @@ if (!empty($_GET["action"]) || isset($_GET["action"]))
             l.`ActionID`, l.`Status`, 
             (SELECT al.`Status` FROM `wc_t_action_log` AS al WHERE al.ID = l.RefID) AS lastStatus,
             a.`ActionDone`, a.`ActionDoneBy`, 
-            (SELECT u.`username` from `wc_t_po` p INNER JOIN `wc_t_users` u ON p.`createdby` = u.`id` WHERE p.`poid` = l.`PO` ) `Buyer`,
+            (SELECT u.`username` from `wc_t_pi` p INNER JOIN `wc_t_users` u ON p.`createdby` = u.`id` WHERE p.`poid` = l.`PO` ) `Buyer`,
 			a.`ActionPending`, a.`ActionPendingTo`, r.`name` AS `PendingToRoleName`, a.`TargetForm`,
-            (SELECT `name` FROM `wc_t_company` c WHERE c.`id` = (SELECT `supplier` FROM `wc_t_po` p WHERE p.`poid` = l.`PO`)) `CoName`,
+            (SELECT `name` FROM `wc_t_company` c WHERE c.`id` = (SELECT `supplier` FROM `wc_t_pi` p WHERE p.`poid` = l.`PO`)) `CoName`,
             DATEDIFF(CURRENT_DATE, l.`BaseActionOn`) as `pendingFor`, 
             if(DATEDIFF(CURRENT_DATE, l.`BaseActionOn`) > DATEDIFF(l.`SLADate`, l.`BaseActionOn`), 'danger', 'default') as `criticality`,
             l.`ID` as `ActionOn`, a.`stage`
             FROM `wc_t_action_log` l 
             	INNER JOIN `wc_t_action` a ON l.`ActionID` = a.`ID`
                 INNER JOIN `wc_t_roles` r ON a.`ActionPendingTo` = r.`id`
-                INNER JOIN `wc_t_po` p ON p.`poid` = l.`PO`
+                INNER JOIN `wc_t_pi` p ON p.`poid` = l.`PO`
                 LEFT JOIN `wc_t_cacfac_request` cr ON cr.`id` = l.`certReqId`
             WHERE a.`ActionPendingTo` <> $loginRole AND l.`Status` = 0 AND a.`ActionPending` != 'Acknowledgement' $sqlWhere
             ORDER BY l.`PO`, l.`shipNo`;";
@@ -258,16 +258,17 @@ function GetInbox($my){
             l.`ActionID`, l.`Status`, 
             (SELECT al.`Status` FROM `wc_t_action_log` AS al WHERE al.ID = l.RefID) AS lastStatus,
             a.`ActionDone`, a.`ActionDoneBy`, 
-            (SELECT u.`username` from `wc_t_po` p INNER JOIN `wc_t_users` u ON p.`createdby` = u.`id` WHERE p.`poid` = l.`PO` ) `Buyer`,
+            (SELECT u.`username` from `wc_t_pi` p INNER JOIN `wc_t_users` u ON p.`createdby` = u.`id` WHERE p.`poid` = l.`PO` ) `Buyer`,
 			a.`ActionPending`, a.`ActionPendingTo`, r.`name` AS `PendingToRoleName`, a.`TargetForm`,
-            (SELECT `name` FROM `wc_t_company` c WHERE c.`id` = (SELECT `supplier` FROM `wc_t_po` p WHERE p.`poid` = l.`PO`)) `CoName`,
+            (SELECT `name` FROM `wc_t_company` c WHERE c.`id` = (SELECT `supplier` FROM `wc_t_pi` p WHERE p.`poid` = l.`PO`)) `CoName`,
             DATEDIFF(CURRENT_DATE, l.`BaseActionOn`) as `pendingFor`, 
             if(DATEDIFF(CURRENT_DATE, l.`BaseActionOn`) > DATEDIFF(l.`SLADate`, l.`BaseActionOn`), 'danger', 'default') as `criticality`, 
-            l.`ID` AS `ActionOn`, a.`stage`
+            l.`ID` AS `ActionOn`, a.`stage`, p.`pinum`, DATE_FORMAT(p.`pidate`, '%d-%b-%Y') `pidate`, 
+            p.`pi_description`, concat((select `name` from `wc_t_category` where `id` = p.`currency`), ' ', format(p.`pivalue`,2)) `pivalue`, '' `btrcDiv`
             FROM `wc_t_action_log` l 
             	INNER JOIN `wc_t_action` a ON l.`ActionID` = a.`ID`
                 INNER JOIN `wc_t_roles` r ON a.`ActionPendingTo` = r.`id`
-                ".$join." JOIN `wc_t_po` p ON p.`poid` = l.`PO`
+                ".$join." JOIN `wc_t_pi` p ON p.`poid` = l.`PO`
                 LEFT JOIN `wc_t_cacfac_request` cr ON cr.`id` = l.`certReqId`
             WHERE (a.`ActionPendingTo` = $loginRole $sqlFXFloatBank) AND l.`Status` = 0 AND a.`ActionPending` != 'Acknowledgement' $sqlWhere
             ORDER BY l.`PO`, l.`shipNo`;";
@@ -279,16 +280,18 @@ function GetInbox($my){
             l.`ActionID`, l.`Status`, 
             (SELECT al.`Status` FROM `wc_t_action_log` AS al WHERE al.ID = l.RefID) AS lastStatus,
             a.`ActionDone`, a.`ActionDoneBy`, 
-            (SELECT u.`username` from `wc_t_po` p INNER JOIN `wc_t_users` u ON p.`createdby` = u.`id` WHERE p.`poid` = l.`PO` ) `Buyer`,
+            (SELECT u.`username` from `wc_t_pi` p INNER JOIN `wc_t_users` u ON p.`createdby` = u.`id` WHERE p.`poid` = l.`PO` ) `Buyer`,
 			a.`ActionPending`, a.`ActionPendingTo`, r.`name` AS `PendingToRoleName`, a.`TargetForm`,
-            (SELECT `name` FROM `wc_t_company` c WHERE c.`id` = (SELECT `supplier` FROM `wc_t_po` p WHERE p.`poid` = l.`PO`)) `CoName`,
+            (SELECT `name` FROM `wc_t_company` c WHERE c.`id` = (SELECT `supplier` FROM `wc_t_pi` p WHERE p.`poid` = l.`PO`)) `CoName`,
             DATEDIFF(CURRENT_DATE, l.`BaseActionOn`) as `pendingFor`, 
             if(DATEDIFF(CURRENT_DATE, l.`BaseActionOn`) > DATEDIFF(l.`SLADate`, l.`BaseActionOn`), 'danger', 'default') as `criticality`,
-            l.`ID` as `ActionOn`, a.`stage`
+            l.`ID` as `ActionOn`, a.`stage`, p.`pinum`, DATE_FORMAT(p.`pidate`, '%d-%b-%Y') `pidate`, 
+            p.`pi_description`, concat((select `name` from `wc_t_category` where `id` = p.`currency`), ' ', format(p.`pivalue`,2)) `pivalue`, 
+            (SELECT c.`name` FROM `ca_activity_table` b inner join `wc_t_category` c on b.`btrc_division`=c.`id` where b.`po_no`=l.`PO` order by `action_date` desc limit 1) `btrcDiv`
             FROM `wc_t_action_log` l 
             	INNER JOIN `wc_t_action` a ON l.`ActionID` = a.`ID`
                 INNER JOIN `wc_t_roles` r ON a.`ActionPendingTo` = r.`id`
-                INNER JOIN `wc_t_po` p ON p.`poid` = l.`PO`
+                INNER JOIN `wc_t_pi` p ON p.`poid` = l.`PO`
                 LEFT JOIN `wc_t_cacfac_request` cr ON cr.`id` = l.`certReqId`
             WHERE a.`ActionPendingTo` <> $loginRole AND l.`Status` = 0 AND a.`ActionPending` != 'Acknowledgement' $sqlWhere
             ORDER BY l.`PO`, l.`shipNo`;";
@@ -333,6 +336,11 @@ function GetInbox($my){
                         'pendingfor' => $pendingFor,
                         'criticality' => $criticality,
                         'stage' => $stage,
+                        'pinum' => $pinum,
+                        'pidate' => $pidate,
+                        'pi_description' => $pi_description,
+                        'pivalue' => $pivalue,
+                        'btrcDiv' => $btrcDiv,
                     );
                 } else{
                     if($xref==$XRefID){
@@ -372,6 +380,11 @@ function GetInbox($my){
                     $lastStatus = $aRow['lastStatus'];
                     $xRefValid = 1;
                     $stage = $aRow['stage'];
+                    $pinum = $aRow['pinum'];
+                    $pidate = $aRow['pidate'];
+                    $pi_description = $aRow['pi_description'];
+                    $pivalue = $aRow['pivalue'];
+                    $btrcDiv = $aRow['btrcDiv'];
 
                     $xref = null;
                 }
@@ -386,14 +399,16 @@ function GetInbox($my){
                     "ActionPending": "'.$ActionPending.'", "Buyer": "'.$Buyer.'", "ActionPendingTo": "'.$ActionPendingTo.'", 
                     "TargetForm": "'.$TargetForm.'", "PendingToRoleName": "'.$PendingToRoleName.'", "pendingFor": "'.$pendingFor.'", 
                     "criticality": "'.$criticality.'", "CoName": "'.$CoName.'", "marge": "'.$xRefValid.'", "lastStatus": "'.$lastStatus.'", 
-                    "ActionOn": "'.$ActionOn.'", "stage": "'.$stage.'"}';
+                    "ActionOn": "'.$ActionOn.'", "stage": "'.$stage.'", "pinum": "'.$pinum.'", "pidate": "'.$pidate.'", 
+                    "pi_description": "'.$pi_description.'", "pivalue": "'.$pivalue.'", "btrcDiv": "'.$btrcDiv.'"}';
                 else
                     $table_data .= ',{"ID": "'.encryptId($ID).'", "RefID": "'.$RefID.'", "PO": "'.$PO.'", "PI": "'.$PI.'", 
                     "shipNo": "'.$shipNo.'",  "eaRefNo": "'.$eaRefNo.'", "ActionDone": "'.$ActionDone.'", 
                     "ActionPending": "'.$ActionPending.'", "Buyer": "'.$Buyer.'", "ActionPendingTo": "'.$ActionPendingTo.'", 
                     "TargetForm": "'.$TargetForm.'", "PendingToRoleName": "'.$PendingToRoleName.'", "pendingFor": "'.$pendingFor.'", 
                     "criticality": "'.$criticality.'", "CoName": "'.$CoName.'", "marge": "'.$xRefValid.'", "lastStatus": "'.$lastStatus.'", 
-                    "ActionOn": "'.$ActionOn.'", "stage": "'.$stage.'"}';
+                    "ActionOn": "'.$ActionOn.'", "stage": "'.$stage.'", "pinum": "'.$pinum.'", "pidate": "'.$pidate.'", 
+                    "pi_description": "'.$pi_description.'", "pivalue": "'.$pivalue.'", "btrcDiv": "'.$btrcDiv.'"}';
             }
         }
     }
@@ -423,7 +438,7 @@ function GetPiToBTRCProcess(){
             kpi3 AS `s3`
         FROM
         (SELECT 
-        (SELECT COUNT(`poid`) FROM `wc_t_po`) AS TotalPo,
+        (SELECT COUNT(`poid`) FROM `wc_t_pi`) AS TotalPo,
         (SELECT COUNT(PO) FROM `wc_t_action_log` WHERE `ActionID` = 1) AS kpi1,
         (SELECT COUNT(PO) FROM `wc_t_action_log` WHERE `ActionID` = 4) AS kpi2,
         (SELECT COUNT(PO) FROM `wc_t_action_log` WHERE `ActionID` = 22) AS kpi3) AS a) AS b;";
@@ -515,26 +530,26 @@ function GetBayerWiseActivitiesChartData($start, $end){
         u.username,
         trim(concat(u.firstname,' ' , u.lastname)) as `Buyer`,
         (SELECT COUNT(*)
-                 FROM `wc_t_po` AS po1
+                 FROM `wc_t_pi` AS po1
                  WHERE po1.createdby = po.`createdby`
                    AND po1.`createdon` BETWEEN '$dates[0]' AND '$dates[1]') AS `PO`,
         (SELECT COUNT(PO) FROM
                 (SELECT lg.`PO`, lg.`ActionID`, MIN(lg.`ActionOn`) AS `ActionOn` FROM `wc_t_action_log` AS lg GROUP BY lg.`PO`, lg.`ActionID`) AS lg1
-                    INNER JOIN wc_t_po AS po1 ON lg1.PO = po1.poid WHERE po1.createdby = po.createdby AND lg1.ActionId = 4
+                    INNER JOIN wc_t_pi AS po1 ON lg1.PO = po1.poid WHERE po1.createdby = po.createdby AND lg1.ActionId = 4
                     AND lg1.ActionOn BETWEEN '$dates[0]' AND '$dates[1]') AS `PI`,
         (SELECT COUNT(PO) FROM
                 (SELECT lg.`PO`, lg.`ActionID`, MIN(lg.`ActionOn`) AS `ActionOn` FROM `wc_t_action_log` AS lg GROUP BY lg.`PO`, lg.`ActionID`) AS lg1
-                    INNER JOIN wc_t_po AS po1 ON lg1.PO = po1.poid WHERE po1.createdby = po.createdby AND lg1.ActionId = 22
+                    INNER JOIN wc_t_pi AS po1 ON lg1.PO = po1.poid WHERE po1.createdby = po.createdby AND lg1.ActionId = 22
                     AND lg1.ActionOn BETWEEN '$dates[0]' AND '$dates[1]') AS `BTRC`,
         (SELECT COUNT(PO) FROM
                 (SELECT lg.`PO`, lg.`ActionID`, MIN(lg.`ActionOn`) AS `ActionOn` FROM `wc_t_action_log` AS lg GROUP BY lg.`PO`, lg.`ActionID`) AS lg1
-                    INNER JOIN wc_t_po AS po1 ON lg1.PO = po1.poid WHERE po1.createdby = po.createdby AND lg1.ActionId = 25
+                    INNER JOIN wc_t_pi AS po1 ON lg1.PO = po1.poid WHERE po1.createdby = po.createdby AND lg1.ActionId = 25
                     AND lg1.ActionOn BETWEEN '$dates[0]' AND '$dates[1]') AS `LC`,
         (SELECT COUNT(PO) FROM
                 (SELECT lg.`PO`, lg.`shipNo`, lg.`ActionID`, MIN(lg.`ActionOn`) AS `ActionOn` FROM `wc_t_action_log` AS lg GROUP BY lg.`PO`, lg.`shipNo`, lg.`ActionID`) AS lg1
-                    INNER JOIN wc_t_po AS po1 ON lg1.PO = po1.poid WHERE po1.createdby = po.createdby AND lg1.ActionId = 89
+                    INNER JOIN wc_t_pi AS po1 ON lg1.PO = po1.poid WHERE po1.createdby = po.createdby AND lg1.ActionId = 89
                     AND lg1.ActionOn BETWEEN '$dates[0]' AND '$dates[1]') AS `GIT`
-    FROM wc_t_po AS po 
+    FROM wc_t_pi AS po 
     INNER JOIN `wc_t_users` AS u ON po.`createdby` = u.`id`
     LEFT JOIN `wc_t_action_log` log ON log.`PO` = po.`poid`
     WHERE log.`ActionOn` BETWEEN '$dates[0]' AND '$dates[1]'
@@ -568,26 +583,26 @@ function GetBayerWiseActivities($start, $end){
         trim(concat(u.firstname,' ' , u.lastname)) as `Buyer`,
         (SELECT COUNT(PO) FROM
                 (SELECT lg.`PO`, lg.`ActionID`, MIN(lg.`ActionOn`) AS `ActionOn` FROM `wc_t_action_log` AS lg GROUP BY lg.`PO`, lg.`ActionID`) AS lg1
-                    INNER JOIN wc_t_po AS po1 ON lg1.PO = po1.poid WHERE po1.createdby = po.createdby AND lg1.ActionId = 1
+                    INNER JOIN wc_t_pi AS po1 ON lg1.PO = po1.poid WHERE po1.createdby = po.createdby AND lg1.ActionId = 1
                     AND lg1.ActionOn BETWEEN '$dates[0]' AND '$dates[1]') AS `PO`,
         (SELECT COUNT(PO) FROM
                 (SELECT lg.`PO`, lg.`ActionID`, MIN(lg.`ActionOn`) AS `ActionOn` FROM `wc_t_action_log` AS lg GROUP BY lg.`PO`, lg.`ActionID`) AS lg1
-                    INNER JOIN wc_t_po AS po1 ON lg1.PO = po1.poid WHERE po1.createdby = po.createdby AND lg1.ActionId = 4
+                    INNER JOIN wc_t_pi AS po1 ON lg1.PO = po1.poid WHERE po1.createdby = po.createdby AND lg1.ActionId = 4
                     AND lg1.ActionOn BETWEEN '$dates[0]' AND '$dates[1]') AS `PI`,
         (SELECT COUNT(PO) FROM
                 (SELECT lg.`PO`, lg.`ActionID`, MIN(lg.`ActionOn`) AS `ActionOn` FROM `wc_t_action_log` AS lg GROUP BY lg.`PO`, lg.`ActionID`) AS lg1
-                    INNER JOIN wc_t_po AS po1 ON lg1.PO = po1.poid WHERE po1.createdby = po.createdby AND lg1.ActionId = 22
+                    INNER JOIN wc_t_pi AS po1 ON lg1.PO = po1.poid WHERE po1.createdby = po.createdby AND lg1.ActionId = 22
                     AND lg1.ActionOn BETWEEN '$dates[0]' AND '$dates[1]') AS `BTRC`,
         (SELECT COUNT(PO) FROM
                 (SELECT lg.`PO`, lg.`ActionID`, MIN(lg.`ActionOn`) AS `ActionOn` FROM `wc_t_action_log` AS lg GROUP BY lg.`PO`, lg.`ActionID`) AS lg1
-                    INNER JOIN wc_t_po AS po1 ON lg1.PO = po1.poid WHERE po1.createdby = po.createdby AND lg1.ActionId = 25
+                    INNER JOIN wc_t_pi AS po1 ON lg1.PO = po1.poid WHERE po1.createdby = po.createdby AND lg1.ActionId = 25
                     AND lg1.ActionOn BETWEEN '$dates[0]' AND '$dates[1]') AS `LC`,
         (SELECT COUNT(PO) FROM
                 (SELECT lg.`PO`, lg.`shipNo`, lg.`ActionID`, MIN(lg.`ActionOn`) AS `ActionOn` FROM `wc_t_action_log` AS lg GROUP BY lg.`PO`, lg.`shipNo`, lg.`ActionID`) AS lg1
-                    INNER JOIN wc_t_po AS po1 ON lg1.PO = po1.poid WHERE po1.createdby = po.createdby AND lg1.ActionId = 89
+                    INNER JOIN wc_t_pi AS po1 ON lg1.PO = po1.poid WHERE po1.createdby = po.createdby AND lg1.ActionId = 89
                     AND lg1.ActionOn BETWEEN '$dates[0]' AND '$dates[1]') AS `GIT`
     FROM
-        wc_t_po AS po INNER JOIN
+        wc_t_pi AS po INNER JOIN
         wc_t_users AS u ON po.createdby = u.id
     ORDER BY trim(concat(u.firstname,' ' , u.lastname));";
 

@@ -52,7 +52,7 @@ if (!empty($_GET["action"]) || isset($_GET["action"])){
                     IF(DATEDIFF(l.`daysofexpiry`, CURRENT_DATE)>90, 'success', IF(DATEDIFF(l.`daysofexpiry`, CURRENT_DATE)<30, 'danger', 'warning')) `status`
                 FROM `wc_t_lc` l 
                 INNER JOIN `wc_t_bank_insurance` bi ON l.`lcissuerbank` = bi.`id`
-                INNER JOIN `wc_t_po` po ON l.`pono` = po.`poid` 
+                INNER JOIN `wc_t_pi` po ON l.`pono` = po.`poid` 
                 	INNER JOIN `wc_t_company` co ON po.`supplier` = co.`id`
                     INNER JOIN `wc_t_category` c1 ON po.`currency` = c1.`id` $where;";
     } else {
@@ -65,7 +65,7 @@ if (!empty($_GET["action"]) || isset($_GET["action"])){
                     COUNT(IF(DATEDIFF(l.`daysofexpiry`, CURRENT_DATE)<0, 1, null)) `expired`
                 FROM `wc_t_lc` l 
                 INNER JOIN `wc_t_bank_insurance` bi ON l.`lcissuerbank` = bi.`id`
-                INNER JOIN `wc_t_po` po ON l.`pono` = po.`poid` 
+                INNER JOIN `wc_t_pi` po ON l.`pono` = po.`poid` 
                 	INNER JOIN `wc_t_company` co ON po.`supplier` = co.`id`
                 GROUP BY $sumByCol;";
     }

@@ -6622,7 +6622,9 @@ a:focus {
   margin-top: 5px;
 }
 .comment-content p {
-  margin-bottom: 10px;
+    margin-bottom: 10px;
+    border-left: solid 5px #dedede;
+    padding-left: 10px;
 }
 .comment-actions {
   margin-top: 10px;

@@ -77,7 +77,7 @@ if (!empty($_GET["action"]) || isset($_GET["action"])){
         FROM
             wc_t_shipment AS sh
                 LEFT JOIN
-            wc_t_po AS po ON sh.pono = po.poid
+            wc_t_pi AS po ON sh.pono = po.poid
                 LEFT JOIN
             wc_t_lc AS lc ON sh.pono = lc.pono
                 LEFT JOIN

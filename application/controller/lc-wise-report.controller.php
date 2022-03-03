@@ -104,7 +104,7 @@ function getSQL($action, $where){
                 `lcvalue` * `xeBDT` AS `LC Value in BDT`,
                 `pono` AS `PO No.`
             FROM `wc_t_lc` lc 
-                LEFT JOIN `wc_t_po` po ON lc.`pono` = po.`poid`
+                LEFT JOIN `wc_t_pi` po ON lc.`pono` = po.`poid`
                 LEFT JOIN `wc_t_company` co1 ON co1.`id` = po.`supplier`
                 LEFT JOIN `wc_t_category` cat1 ON cat1.`id` = po.`currency`
                 LEFT JOIN `wc_t_bank_insurance` bi1 ON lc.`insurance` = bi1.`id`
@@ -133,7 +133,7 @@ function getSQL($action, $where){
                 sh.`shipNo` AS `Shipment/ Endorsement No.`            
             FROM `wc_t_shipment` sh 
                 LEFT JOIN `wc_t_lc` lc ON sh.`pono` = lc.`pono`
-                LEFT JOIN `wc_t_po` po ON sh.`pono` = po.`poid`
+                LEFT JOIN `wc_t_pi` po ON sh.`pono` = po.`poid`
                 LEFT JOIN `wc_t_company` co1 ON co1.`id` = po.`supplier`
                 LEFT JOIN `wc_t_category` cat1 ON cat1.`id` = po.`currency`
                 LEFT JOIN `wc_t_bank_insurance` bi1 ON lc.`insurance` = bi1.`id`
@@ -158,7 +158,7 @@ function getSQL($action, $where){
                 'qq' AS `Any Adjustment`
             FROM `wc_t_amendment` am 
                 LEFT JOIN `wc_t_lc` lc ON am.`poNo` = lc.`pono`
-                LEFT JOIN `wc_t_po` po ON am.`poNo` = po.`poid`
+                LEFT JOIN `wc_t_pi` po ON am.`poNo` = po.`poid`
                 LEFT JOIN `wc_t_company` co1 ON co1.`id` = po.`supplier`
                 LEFT JOIN `wc_t_category` cat1 ON cat1.`id` = po.`currency`
                 LEFT JOIN `wc_t_bank_insurance` bi1 ON lc.`insurance` = bi1.`id`
@@ -172,7 +172,7 @@ function getSQL($action, $where){
                 SUM(lc.`lcvalue` * `xeUSD`) AS `LC Value in USD`,
                 SUM(lc.`lcvalue` * `xeBDT`) AS `LC Value in BDT`
             FROM `wc_t_lc` lc 
-                LEFT JOIN `wc_t_po` po ON lc.`pono` = po.`poid`
+                LEFT JOIN `wc_t_pi` po ON lc.`pono` = po.`poid`
                 LEFT JOIN `wc_t_company` co1 ON co1.`id` = po.`supplier`
                 LEFT JOIN `wc_t_category` cat1 ON cat1.`id` = po.`currency` $where 
                 GROUP BY co1.`name`, cat1.`name`;";

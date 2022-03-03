@@ -333,11 +333,11 @@ $(document).ready(function() {
 
 });
 
-$('#endDate').datepicker({
+`$('#endDate').datepicker({
         format: 'MM dd, yyyy',
         todayHighlight: true,
         autoclose: true
-});
+});`
 
 function validateZip(){
     return true;

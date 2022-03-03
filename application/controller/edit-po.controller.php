@@ -344,7 +344,7 @@ function UpdatePO($postatus)
     //------------------------------------------------------------------------------
 
     // Updating PO table
-    $query = "UPDATE `wc_t_po` SET 
+    $query = "UPDATE `wc_t_pi` SET 
             `povalue` = $povalue, 
             `podesc` = '$podesc',";
 

@@ -224,6 +224,7 @@ $(document).ready(function() {
         e.preventDefault();
         if (e) {
             if (validatemsg() === true) {
+                alertify.confirm( 'Are you sure you want submit?', function (e) {
                 $.ajax({
                     type: "POST",
                     url: "api/lc-bank",
@@ -252,6 +253,7 @@ $(document).ready(function() {
                     error: function (xhr, textStatus, error) {
                         alertify.error(textStatus + ": " + xhr.status + " " + error);
                     }
+                });
                 });
             }
         } else {
@@ -265,6 +267,7 @@ $(document).ready(function() {
         e.preventDefault();
         if (e) {
             if (validatemsg() === true) {
+                alertify.confirm( 'Are you sure you want submit?', function (e) {
                 $.ajax({
                     type: "POST",
                     url: "api/lc-bank",
@@ -294,6 +297,8 @@ $(document).ready(function() {
                         alertify.error(textStatus + ": " + xhr.status + " " + error);
                     }
                 });
+             });
+
             }
         } else {
 

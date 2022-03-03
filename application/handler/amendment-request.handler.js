@@ -6,6 +6,7 @@
 //alert("fdsfsfdg");
 
 var poid = $('#pono').val();
+var actionId = $('#amndStatus').val();
 $(document).ready(function() {
 
     if($('#pono').val()==""){
@@ -56,6 +57,22 @@ $(document).ready(function() {
         width: "100%"
     });
     if(poid!=""){
+        $.get('api/amendment-request?action=3&id=' + poid +'&actionId='+actionId, function (data) {
+
+            if (!$.trim(data)) {
+                $(".panel-body").empty();
+                $(".panel-body").append(`<h4 class="well well-sm well-warning">No data found</h4>`);
+            } else {
+
+                var row = JSON.parse(data);
+                 var AmendData = row[0][0];
+                var attachAmendment = row[1];
+
+                //alert(attach.length);
+                attachmentLogScript(attachAmendment, '#attachAmendmentOpenRequestLink');
+
+            }
+        });
         $.get('api/purchaseorder?action=2&id='+poid, function (data) {
 
             if(!$.trim(data)){
@@ -83,13 +100,15 @@ $(document).ready(function() {
                     }
                 });*/
 
+                // attachmentLogScript(attach, '#attachAmendmentOpenRequestLink');
+
                 if($("#reqType").val()=="new"){
                     $.get('api/amendment-request?action=1&po='+poid+"&lc="+$("#lcno").val(), function (data){
                         $("#amendNo").val(data);
                     });
                     $("#clauseInfoTable").hide();
                      //CalculateAll();
-                    if($("#usertype").val()!=11){
+                    if($("#usertype").val()!=11 && $("#usertype").val()!=23){
                         $("#forLCOper input").attr('readonly',true);
                         $("#forLCOper select").attr('disabled',true);
                     }
@@ -128,7 +147,7 @@ $(document).ready(function() {
                             $("#clauseInfoTable").append(cRow);
                         }
                         $("#clausData").val(clausData);
-                        if($("#usertype").val()!=11){
+                        if($("#usertype").val()!=11 && $("#usertype").val()!=23){
                             $("#amendment-request-form input").attr('readonly',true);
                             $("#amendment-request-form select").attr('disabled',true);
                         }
@@ -267,31 +286,76 @@ $(document).ready(function() {
         //alert('abcd');
         e.preventDefault();
         if (validateSendCopy()) {
-            $("#SendAmendmentCopy_btn").prop('disabled', true);
-            $.ajax({
-                type: "POST",
-                url: "api/amendment-request",
-                data: $('#amendment-request-form').serialize() + "&userAction=4",
-                cache: false,
-                success: function (response) {
-                    //alert(response);
-                    try {
-                        var res = JSON.parse(response)
-                        if (res['status'] == 1) {
-                            alertify.success('Amendment copy sent successfully.');
-                            window.location.href = _dashboardURL;
-                        } else {
-                            alertify.error("FAILED to add!");
-                            return false;
+            alertify.confirm('Are you sure you want to submit?', function (e) {
+                if (e) {
+                    $("#SendAmendmentCopy_btn").prop('disabled', true);
+                    $.ajax({
+                        type: "POST",
+                        url: "api/amendment-request",
+                        data: $('#amendment-request-form').serialize() + "&userAction=4",
+                        cache: false,
+                        success: function (response) {
+                            //alert(response);
+                            try {
+                                var res = JSON.parse(response)
+                                if (res['status'] == 1) {
+                                    alertify.success('Amendment copy sent successfully.');
+                                    window.location.href = _dashboardURL;
+                                } else {
+                                    alertify.error("FAILED to add!");
+                                    return false;
+                                }
+                            } catch (e) {
+                                $("#SendAmendmentCopy_btn").prop('disabled', false);
+                                alertify.error(response + ' Failed to process the request.', 30);
+                                return false;
+                            }
+                        },
+                        error: function (xhr) {
+                            console.log('Error: ' + xhr);
                         }
-                    } catch (e) {
-                        $("#SendAmendmentCopy_btn").prop('disabled', false);
-                        alertify.error(response + ' Failed to process the request.', 30);
-                        return false;
-                    }
-                },
-                error: function (xhr) {
-                    console.log('Error: ' + xhr);
+                    });
+                }
+            });
+        } else {
+            return false;
+        }
+    });
+
+    //AMENDMENT COPY SENT FROM BANK TO TFO
+    $("#SendAmendmentToTFO_btn").click(function (e) {
+        //alert('abcd');
+        e.preventDefault();
+        if (validateSendAmendment()) {
+            alertify.confirm('Are you sure you want to submit?', function (e) {
+                if (e) {
+                    $("#SendAmendmentToTFO_btn").prop('disabled', true);
+                    $.ajax({
+                        type: "POST",
+                        url: "api/amendment-request",
+                        data: $('#amendment-request-form').serialize() + "&userAction=7",
+                        cache: false,
+                        success: function (response) {
+                            //alert(response);
+                            try {
+                                var res = JSON.parse(response)
+                                if (res['status'] == 1) {
+                                    alertify.success('Amendment copy sent successfully.');
+                                    window.location.href = _dashboardURL;
+                                } else {
+                                    alertify.error("FAILED to add!");
+                                    return false;
+                                }
+                            } catch (e) {
+                                $("#SendAmendmentToTFO_btn").prop('disabled', false);
+                                alertify.error(response + ' Failed to process the request.', 30);
+                                return false;
+                            }
+                        },
+                        error: function (xhr) {
+                            console.log('Error: ' + xhr);
+                        }
+                    });
                 }
             });
         } else {
@@ -328,6 +392,45 @@ $(document).ready(function() {
                 },
                 error: function (xhr) {
                     console.log('Error: ' + xhr);
+                }
+            });
+        } else {
+            return false;
+        }
+    });
+    $("#btnAmendmentSendToBank").click(function (e) {
+        //alert('abcd');
+        e.preventDefault();
+        if (validateAttachment()) {
+            alertify.confirm('Are you sure you want to submit?', function (e) {
+                if (e) {
+                    $("#btnAmendmentSendToBank").prop('disabled', true);
+                    $.ajax({
+                        type: "POST",
+                        url: "api/amendment-request",
+                        data: $('#amendment-request-form').serialize() + "&userAction=6",
+                        cache: false,
+                        success: function (response) {
+                            //alert(response);
+                            try {
+                                var res = JSON.parse(response)
+                                if (res['status'] == 1) {
+                                    alertify.success('Amendment request sent to Bank.');
+                                    window.location.href = _dashboardURL;
+                                } else {
+                                    alertify.error("FAILED to add!");
+                                    return false;
+                                }
+                            } catch (e) {
+                                $("#btnAmendmentSendToBank").prop('disabled', false);
+                                alertify.error(response + ' Failed to process the request.', 30);
+                                return false;
+                            }
+                        },
+                        error: function (xhr) {
+                            console.log('Error: ' + xhr);
+                        }
+                    });
                 }
             });
         } else {
@@ -401,17 +504,18 @@ function validateReject(){
 }
 
 function validateSendCopy(){
-    if($("#attachAmendmentCopy").val()=="")
-	{
-		$("#attachAmendmentCopy").focus();
-        alertify.error("Please Attach Amendment Copy!");
-		return false;
-	} else {
-        if(!validAttachment($("#attachAmendmentCopy").val())){
-            alertify.error('Invalid File Format.');
-            return false;
-        }
-	}
+    // if($("#attachAmendmentCopy").val()=="")
+	// {
+	// 	$("#attachAmendmentCopy").focus();
+    //     alertify.error("Please Attach Amendment Copy!");
+	// 	return false;
+	// } else {
+    //     if(!validAttachment($("#attachAmendmentCopy").val())){
+    //         alertify.error('Invalid File Format.');
+    //         return false;
+    //     }
+	// }
+
 
     /*if(parseToCurrency($("#charge").val())>0){
         if($("#attachAdviceNote").val()=="")
@@ -426,6 +530,33 @@ function validateSendCopy(){
             }
     	}
     }*/
+    if($("#remarks").val()==""){
+        $("#remarks").focus();
+        alertify.error("Please write your valued comment");
+        return false;
+    }
+    return true;
+}
+
+function validateSendAmendment(){
+    if($("#bankAmendCharge").val()=="")
+    {
+        $("#bankAmendCharge").focus();
+        alertify.error("Amendment charge is required!");
+        return false;
+    }
+    if($("#attachAmendmentCopy").val()=="")
+    {
+        $("#attachAmendmentCopy").focus();
+        alertify.error("Please Attach Amendment Copy!");
+        return false;
+    }
+    if($("#attachAdviceNote").val()=="")
+    {
+        $("#attachAdviceNote").focus();
+        alertify.error("Please Attach Advice Copy!");
+        return false;
+    }
     return true;
 }
 
@@ -567,7 +698,17 @@ function validateSave() {
 	return true;
 }
 
-if($("#usertype").val()==const_role_LC_Operation) {
+function validateAttachment() {
+    if($("#attachAmendmentLetter").val()=="")
+    {
+        $("#attachAmendmentLetter").focus();
+        alertify.error("Please attached Amendment Instruction Letter!");
+        return false;
+    }
+    return true;
+}
+
+if($("#usertype").val()==const_role_lc_bank) {
     $(function () {
 
         var button = $('#btnUploadAmendmentCopy'), interval;
@@ -616,6 +757,40 @@ if($("#usertype").val()==const_role_LC_Operation) {
             onSubmit: function (file, ext) {
                 if (!(ext && /^(jpg|png|xlsx|xls|doc|docx|pdf|zip)$/i.test(ext))) {
                     alert('Invalid File Format.');
+                    return false;
+                }
+                txtbox.val("Uploading...");
+                // Uploding -> Uploading. -> Uploading...
+                interval = window.setInterval(function () {
+                    var text = txtbox.val();
+                    if (txtbox.val().length < 13) {
+                        txtbox.val(txtbox.val() + '.');
+                    } else {
+                        txtbox.val('Uploading');
+                    }
+                }, 200);
+            }
+        });
+    });
+}
+if($("#usertype").val()==const_role_LC_Operation) {
+
+    $(function () {
+
+        var button = $('#btnUploadAmendmentLetter'), interval;
+        var txtbox = $('#attachAmendmentLetter');
+
+        new AjaxUpload(button, {
+            action: 'application/library/uploadhandler.php',
+            name: 'upl',
+            onComplete: function (file, response) {
+                var res = JSON.parse(response);
+                txtbox.val(res['filename']);
+                window.clearInterval(interval);
+            },
+            onSubmit: function (file, ext) {
+                if (!(ext && /^(jpg|png|xlsx|xls|doc|docx|pdf|zip)$/i.test(ext))) {
+                    alertify.error('Invalid File Format.');
                     return false;
                 }
                 txtbox.val("Uploading...");
@@ -700,7 +875,7 @@ $("#btnGenerateAmndInstructionLetter").click(function(e) {
                             temp = temp.replace(/##LCNO##/g, $("#lcNum").val());
                             temp = temp.replace('##BANKNAME##', bankData["name"]);
                             temp = temp.replace('##BANKADDRESS##', bankData["address"].replace(/\n/g, "<br />"));
-                            temp = temp.replace('##PONO##', originalPO($("#poNum").val()));
+                            temp = temp.replace('##PONO##', $("#poNum").val());
                             var chargeBorneBy_check = $('input:radio[name=chargeBorneBy]:checked').val();
                             if (chargeBorneBy_check == 1) {
                                 temp = temp.replace('##BORNBY##', "Applicant");

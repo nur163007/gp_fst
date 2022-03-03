@@ -1,4 +1,5 @@
 var poid = $('#pono').val();
+var shipno = $('#shipno').val();
 var podata, comments, attach;
 $(document).ready(function() {
     if(poid){
@@ -24,7 +25,8 @@ $(document).ready(function() {
                 $('#shipmode').html(podata['shipmode'].toUpperCase());*/
 
                 //alert(attach.length);
-                attachmentLogScript(attach, '#usersAttachments');
+                // var attachList = ["CI Scan Copy", "Insurance Cover Note", "AWB/BL Scan Copy"];
+                attachmentLogScript(attach, '#usersAttachments'/*, 1, attachList*/);
 
             }
         });

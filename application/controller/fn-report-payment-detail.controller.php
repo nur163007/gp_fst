@@ -93,7 +93,7 @@ if (!empty($_GET["action"]) || isset($_GET["action"])){
         FROM
             `wc_t_payment` AS p
                 INNER JOIN `wc_t_lc` AS lc ON p.`LcNo` = lc.`lcno`
-                INNER JOIN `wc_t_po` AS po ON lc.`pono` = po.`poid`
+                INNER JOIN `wc_t_pi` AS po ON lc.`pono` = po.`poid`
                 INNER JOIN `wc_t_shipment` AS sh ON p.`LcNo` = sh.`lcNo`
                 INNER JOIN `wc_t_bank_insurance` AS bi1 ON lc.`lcissuerbank` = bi1.`id`
                 LEFT JOIN `wc_t_bank_insurance` AS bi2 ON p.`fundCollectFrom` = bi2.`id`

@@ -138,7 +138,6 @@ $actionLog = GetActionRef($_GET['ref']);
                                     </div>
                                 </div>
                             </div>
-
                         </div>
 
                         <div class="tab-pane <?php if($actionLog['ActionID']==action_Requested_for_Warehouse_Inputs){?>active<?php }?>" id="tabShipment" role="tabpanel">
@@ -299,7 +298,7 @@ $actionLog = GetActionRef($_GET['ref']);
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-group">
+                                            <div class="form-group" id="ActualArrivalDateWarehouse">
                                             <label class="col-sm-6 control-label">Date of Actual Arrival at Warehouse: </label>
                                             <div class="col-sm-6">
                                                 <div class="input-group">
@@ -310,9 +309,11 @@ $actionLog = GetActionRef($_GET['ref']);
                                                 </div>
                                             </div>
                                         </div>
+
                                         <hr />
                                         <div class="form-group">
                                             <div class="col-sm-12 text-right">
+                                                <button type="button" class="btn btn-primary" id="testMail"><i class="icon wb-bell" aria-hidden="true"></i> testMail</button>
                                                 <button type="button" class="btn btn-primary" id="btn_NotifyToBuyer"><i class="icon wb-bell" aria-hidden="true"></i> Notify to Buyer</button>
                                             </div>
                                         </div>
@@ -338,11 +339,11 @@ $actionLog = GetActionRef($_GET['ref']);
                                 <div class="row row-lg">
                                     <div class="col-xlg-12 col-md-12">
                                         <h4 class="well well-sm example-title">Average cost update data
-                                            <input class="hidden" type="text" id="importCSVFile" name="importCSVFile" value="" />
-                                            <button class="btn btn-sm btn-inverse btn-round pull-right" style="margin-top: -8px;" id="importCSVFile_btn">
-                                                <i class="icon wb-download" aria-hidden="true"></i>
-                                                <span class="hidden-xs">Import from CSV</span>
-                                            </button>
+<!--                                            <input class="hidden" type="text" id="importCSVFile" name="importCSVFile" value="" />-->
+<!--                                            <button class="btn btn-sm btn-inverse btn-round pull-right" style="margin-top: -8px;" id="importCSVFile_btn">-->
+<!--                                                <i class="icon wb-download" aria-hidden="true"></i>-->
+<!--                                                <span class="hidden-xs">Import from CSV</span>-->
+<!--                                            </button>-->
                                         </h4>
                                         <!-- Table-->
                                         <div>
@@ -351,19 +352,20 @@ $actionLog = GetActionRef($_GET['ref']);
                                                 <tr>
                                                     <th>PO</th>
                                                     <th>IPCNo</th>
+                                                    <th>ShipNo</th>
                                                     <th>POLine</th>
                                                     <th>Item</th>
                                                     <th>Description</th>
                                                     <th>Quantity</th>
                                                     <th>UOM</th>
-                                                    <th>Price</th>
+                                                    <th>UnitPrice</th>
                                                     <th>Amount</th>
                                                     <th>Currency</th>
                                                 </tr>
                                                 </thead>
                                                 <tfoot>
                                                 <tr>
-                                                    <td colspan="8"><span class="pull-right">Total:</span></th>
+                                                    <td colspan="9"><span class="pull-right">Total:</span></th>
                                                     <td style="font-weight: bold;" id="dtTotalAmount"></td>
                                                     <td></td>
                                                 </tr>

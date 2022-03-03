@@ -46,7 +46,7 @@ function tacPdfGenerate($poNo,$shipNo,$partName)
                 co.`name` AS `suppName`
             FROM 
                 `wc_t_shipment` s 
-                INNER JOIN `wc_t_po` p ON p.`poid` = s.`pono` 
+                INNER JOIN `wc_t_pi` p ON p.`poid` = s.`pono` 
                 INNER JOIN `wc_t_category` c ON c.`id` = p.`currency` 
                 INNER JOIN `wc_t_company`co ON co.`id` = p.`supplier`
             WHERE 
@@ -404,7 +404,7 @@ function cfacPdfGenerate($poNo,$ship,$partName)
                 co.`name` AS `suppName`
             FROM 
                 `wc_t_shipment` s 
-                INNER JOIN `wc_t_po` p ON p.`poid` = s.`pono` 
+                INNER JOIN `wc_t_pi` p ON p.`poid` = s.`pono` 
                 INNER JOIN `wc_t_category` c ON c.`id` = p.`currency` 
                 INNER JOIN `wc_t_company`co ON co.`id` = p.`supplier`
             WHERE 
@@ -438,7 +438,7 @@ function cfacPdfGenerate($poNo,$ship,$partName)
     $objdal = new dal();
     $query = "SELECT 
                 lcvalue,
-				(SELECT lcbankaddress FROM wc_t_po WHERE poid = '$poNo') as lcbeneficiary,
+				(SELECT lcbankaddress FROM wc_t_pi WHERE poid = '$poNo') as lcbeneficiary,
 				(SELECT blNo FROM wc_t_shipment WHERE poNo = '$poNo' AND shipNo = '$ship') as blNo
             FROM 
                 `wc_t_lc`

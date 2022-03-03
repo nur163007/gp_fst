@@ -156,9 +156,10 @@ define("role_bank_lc",23);
 define("role_head_of_treasury",24);
 define("role_bank_fx",25);
 define("role_cnf_agent",26);
+define("role_coupa_user",27);
 
 // Action constant---------------------------
-define("action_New_PO_Initiated",1);
+define("action_New_PO_Issued",1);
 define("action_PO_Rejected_by_Supplier",2);
 define("action_Revised_PO_Sent",3);
 define("action_Draft_PI_Submitted",4);
@@ -182,6 +183,13 @@ define("action_Final_PI_Accepted",21);
 define("action_Sent_for_BTRC_Permission",22);
 define("action_Rejected_by_BTRC",23);
 define("action_Accepted_by_BTRC",24);
+//-------------Start E delivery flow-------------
+define("action_Final_PI_Accepted_EDelivery_with_LC",109);
+define("action_Request_for_Bank_Forwarding_Letter", 110);
+define("action_Request_for_BASIS_Approval_Letter", 111);
+define("action_BASIS_Approval_Letter_Sent_by_Bank", 112);
+define("action_BASIS_Approval_Letter_Shared_to_Buyer", 113);
+//-------------End E delivery flow---------------
 define("action_LC_Request_Sent",25);
 define("action_Rejected_by_1st_Level",26);
 define("action_Sent_Revised_LC_Request_1",27);
@@ -268,10 +276,11 @@ define("action_Request_for_CNF_Input",104);
 define("action_CNF_Input_Given",105);
 define("action_Accept_CNF_Inputs",106);
 define("action_Reject_CNF_Inputs",107);
+define("action_Pre_Alert_To_Bank_for_Org_Doc",108);
+define("action_Shared_Shipment_Schedule_For_EDeliv_WO_LC",114);
+define("action_Amendment_Request_By_TFO",115);
+define("action_Amendment_Process_Done_By_Bank",116);
 
-
-
-define("requisition_type",114);
 //--------FX Action----------------------------------------
 define("action_fx_request_for_lc", 201);        //0 pending
 define("action_fx_request_for_fee", 202);       //0 pending
@@ -293,7 +302,7 @@ define("action_CN_Issued_by_IC",302);
 define("action_CN_Accepted_by_TFO",303);
 define("action_CN_Rejected_by_TFO",304);
 define("action_Requested_for_Ins_Policy_by_TFO",310);
-define("action_Ins_Policy_sent_by_IC",311);
+define("action_Ins_Policy_Sent_by_IC",311);
 
 //LC PROCESS FOR TFO & BANK
 define("action_Draft_LC_Request_sent_to_Bank",401);
@@ -322,6 +331,9 @@ define("action_SIAC_Payment",159);
 define("action_DFS_Payment",160);
 define("action_Close_PO",161);
 //---------------------------------------------------------
+define("requisition_type",114);
+
+//---------------------------------------------------------
 
 define("doctype_original", 47);
 define("doctype_endorsed", 48);
@@ -345,5 +357,7 @@ define("company_type_INSURANCE", 119);
 define("company_type_CNF", 120);
 define("company_type_SUPPLIER", 121);
 
-
+//BTRC division
+define("btrc_division_ENO", 115);
+define("btrc_division_SM", 116);
 ?>

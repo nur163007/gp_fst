@@ -1,0 +1,2 @@
+https://codeofaninja.com/rest-api-authentication-example-php-jwt-tutorial/
+https://www.techiediaries.com/php-jwt-authentication-tutorial/

@@ -693,8 +693,37 @@ if(isset($_REQUEST['q'])) {
                     '<link rel="stylesheet" href="assets/vendor/asspinner/asSpinner.css">'
                 );
                 break;
+            case "doc-notifications-bank":
+                $page_specific_css = array(
+                    '<link rel="stylesheet" href="assets/vendor/daterangepicker/daterangepicker.css" />',
+                    '<link rel="stylesheet" href="assets/vendor/select2/select2.css">',
+                    '<link rel="stylesheet" href="assets/vendor/bootstrap-select/bootstrap-select.css">',
+                    '<link rel="stylesheet" href="assets/vendor/datatables-bootstrap/dataTables.bootstrap.css" />',
+                    '<link rel="stylesheet" href="assets/vendor/asspinner/asSpinner.css">'
+                );
+                break;
+            case "bank-document-receive":
+                $page_specific_css = array(
+                    '<link rel="stylesheet" href="assets/vendor/daterangepicker/daterangepicker.css" />',
+                    '<link rel="stylesheet" href="assets/vendor/select2/select2.css">',
+                    '<link rel="stylesheet" href="assets/vendor/bootstrap-select/bootstrap-select.css">',
+                    '<link rel="stylesheet" href="assets/vendor/datatables-bootstrap/dataTables.bootstrap.css" />',
+                    '<link rel="stylesheet" href="assets/vendor/icheck/icheck.css">',
+                    '<link rel="stylesheet" href="assets/vendor/asspinner/asSpinner.css">'
+                );
+                break;
 
         case "cn-request":
+             $page_specific_css = array(
+                    '<link rel="stylesheet" href="assets/vendor/bootstrap-datepicker/bootstrap-datepicker.css">',
+                    '<link rel="stylesheet" href="assets/vendor/daterangepicker/daterangepicker.css" />',
+                    '<link rel="stylesheet" href="assets/vendor/select2/select2.css">',
+                    '<link rel="stylesheet" href="assets/vendor/bootstrap-select/bootstrap-select.css">',
+                    '<link rel="stylesheet" href="assets/vendor/datatables-bootstrap/dataTables.bootstrap.css" />',
+                    '<link rel="stylesheet" href="assets/vendor/asspinner/asSpinner.css">'
+                );
+                break;
+        case "fx-settelment-pending-fn":
              $page_specific_css = array(
                     '<link rel="stylesheet" href="assets/vendor/bootstrap-datepicker/bootstrap-datepicker.css">',
                     '<link rel="stylesheet" href="assets/vendor/daterangepicker/daterangepicker.css" />',
@@ -772,12 +801,8 @@ if(isset($_REQUEST['q'])) {
             );
             break;
 
-            case "fx_request_primary":
+        case "fx-request-primary":
             $page_specific_css = array(
-                '<link rel="stylesheet" href="assets/vendor/bootstrap-datepicker/bootstrap-datepicker.css">',
-                '<link rel="stylesheet" href="assets/vendor/daterangepicker/daterangepicker.css" />',
-                '<link rel="stylesheet" href="assets/vendor/select2/select2.css">',
-                '<link rel="stylesheet" href="assets/vendor/bootstrap-select/bootstrap-select.css">',
                 '<link rel="stylesheet" href="assets/vendor/datatables-bootstrap/dataTables.bootstrap.css" />',
                 '<link rel="stylesheet" href="assets/vendor/asspinner/asSpinner.css">'
             );
@@ -792,6 +817,69 @@ if(isset($_REQUEST['q'])) {
                 '<link rel="stylesheet" href="assets/vendor/asspinner/asSpinner.css">'
             );
             break;
+
+        case "po-history":
+            $page_specific_css = array(
+                '<link rel="stylesheet" href="assets/vendor/daterangepicker/daterangepicker.css" />',
+                '<link rel="stylesheet" href="assets/vendor/select2/select2.css">',
+                '<link rel="stylesheet" href="assets/vendor/bootstrap-select/bootstrap-select.css">',
+                '<link rel="stylesheet" href="assets/vendor/datatables-bootstrap/dataTables.bootstrap.css" />',
+                '<link rel="stylesheet" href="assets/vendor/asspinner/asSpinner.css">'
+            );
+            break;
+
+        case "edelivery-doc-request":
+            $page_specific_css = array(
+                '<link rel="stylesheet" href="assets/vendor/select2/select2.css">',
+                '<link rel="stylesheet" href="assets/vendor/bootstrap-select/bootstrap-select.css">',
+            );
+            break;
+
+        case "workflow-procedure":
+            $page_specific_css = array(
+                '<link rel="stylesheet" href="assets/vendor/daterangepicker/daterangepicker.css" />',
+                '<link rel="stylesheet" href="assets/vendor/select2/select2.css">',
+                '<link rel="stylesheet" href="assets/vendor/bootstrap-select/bootstrap-select.css">',
+                '<link rel="stylesheet" href="assets/vendor/datatables-bootstrap/dataTables.bootstrap.css" />',
+                '<link rel="stylesheet" href="assets/vendor/asspinner/asSpinner.css">'
+            );
+            break;
+
+            case "shipment-schedule":
+            $page_specific_css = array(
+                '<link rel="stylesheet" href="assets/vendor/daterangepicker/daterangepicker.css" />',
+                '<link rel="stylesheet" href="assets/vendor/bootstrap-datepicker/bootstrap-datepicker.css">',
+                '<link rel="stylesheet" href="assets/vendor/select2/select2.css">',
+                '<link rel="stylesheet" href="assets/vendor/bootstrap-select/bootstrap-select.css">',
+                '<link rel="stylesheet" href="assets/vendor/datatables-bootstrap/dataTables.bootstrap.css" />',
+                '<link rel="stylesheet" href="assets/vendor/asspinner/asSpinner.css">'
+            );
+            break;
+
+            case "lc-processing-docs":
+            $page_specific_css = array(
+                '<link rel="stylesheet" href="assets/vendor/daterangepicker/daterangepicker.css" />',
+                '<link rel="stylesheet" href="assets/vendor/bootstrap-datepicker/bootstrap-datepicker.css">',
+                '<link rel="stylesheet" href="assets/vendor/select2/select2.css">',
+                '<link rel="stylesheet" href="assets/vendor/bootstrap-select/bootstrap-select.css">',
+                '<link rel="stylesheet" href="assets/vendor/datatables-bootstrap/dataTables.bootstrap.css" />',
+                '<link rel="stylesheet" href="assets/vendor/asspinner/asSpinner.css">'
+            );
+            break;
+
+
+            case "bank-charge":
+            $page_specific_css = array(
+                '<link rel="stylesheet" href="assets/vendor/daterangepicker/daterangepicker.css" />',
+                '<link rel="stylesheet" href="assets/vendor/bootstrap-datepicker/bootstrap-datepicker.css">',
+                '<link rel="stylesheet" href="assets/vendor/select2/select2.css">',
+                '<link rel="stylesheet" href="assets/vendor/bootstrap-select/bootstrap-select.css">',
+                '<link rel="stylesheet" href="assets/vendor/datatables-bootstrap/dataTables.bootstrap.css" />',
+                '<link rel="stylesheet" href="assets/vendor/asspinner/asSpinner.css">'
+            );
+            break;
+
+
 
         default:
             $page_specific_css = array();

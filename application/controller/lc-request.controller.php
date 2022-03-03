@@ -40,13 +40,14 @@ function SubmitLCApproval()
     $approversComment = htmlspecialchars($_POST['approversComment'],ENT_QUOTES, "ISO-8859-1");
     
     $userAction = htmlspecialchars($_POST['userAction'],ENT_QUOTES, "ISO-8859-1");
-    
+
     //if(in_array($loginRole, array(role_LC_Approvar_4,role_LC_Approvar_5))){
     if($loginRole==role_LC_Approvar_4){
         
         $bank = htmlspecialchars($_POST['bank'],ENT_QUOTES, "ISO-8859-1");
         $insurance = htmlspecialchars($_POST['insurance'],ENT_QUOTES, "ISO-8859-1");
-        
+        $shipType = htmlspecialchars($_POST['withLC'],ENT_QUOTES, "ISO-8859-1");
+        $shipMode = htmlspecialchars($_POST['hiddenShipMode'],ENT_QUOTES, "ISO-8859-1");
         /*if($loginRole == role_LC_Approvar_5){
             $lcissuerbankOld = htmlspecialchars($_POST['lcissuerbankOld'],ENT_QUOTES, "ISO-8859-1");
             $lcissuerbankNew = htmlspecialchars($_POST['lcissuerbankNew'],ENT_QUOTES, "ISO-8859-1");
@@ -54,7 +55,8 @@ function SubmitLCApproval()
             $insuranceNew = htmlspecialchars($_POST['insuranceNew'],ENT_QUOTES, "ISO-8859-1");
         }*/
     }
-    
+
+
     $ip = htmlspecialchars($_SERVER['REMOTE_ADDR'],ENT_QUOTES, "ISO-8859-1");
     
 	//---To protect MySQL injection for Security purpose----------------------------
@@ -65,6 +67,8 @@ function SubmitLCApproval()
 	if($loginRole==role_LC_Approvar_4){
         $bank = stripslashes($bank);
         $insurance = stripslashes($insurance);
+        $shipType = stripslashes($shipType);
+        $shipMode = stripslashes($shipMode);
     }
     
 	$objdal = new dal();
@@ -76,6 +80,8 @@ function SubmitLCApproval()
     if($loginRole==role_LC_Approvar_4){
         $bank = $objdal->real_escape_string($bank);
         $insurance = $objdal->real_escape_string($insurance);
+        $shipType = $objdal->real_escape_string($shipType);
+        $shipMode = $objdal->real_escape_string($shipMode);
     }
     
 	//------------------------------------------------------------------------------
@@ -84,7 +90,7 @@ function SubmitLCApproval()
 	$res["status"] = 0;    // 0 = failed, 1 = success
 	$res["message"] = 'Failed to PO!';
 	//------------------------------------------------------------------------------
-    
+
     if($loginRole==role_LC_Approvar_1){
         $level = '1st';
         if($userAction==1){$newStatus = 16;} elseif($userAction==2) {$newStatus = 17;}
@@ -127,6 +133,9 @@ function SubmitLCApproval()
     if($loginRole==role_LC_Approvar_4 && $userAction!=2){
         $query = "UPDATE `wc_t_lc` SET `lcissuerbank` = $bank, `insurance` = $insurance WHERE `pono` = '$pono';";
         $objdal->update($query);
+
+        $sql = "UPDATE `wc_t_pi` SET `withLC` = b'$shipType' WHERE `poid` = '$pono';";
+        $objdal->update($sql);
     }
     
     /*if($loginRole == role_LC_Approvar_5){
@@ -144,17 +153,33 @@ function SubmitLCApproval()
             //mailToUser('lca04', 'Bank/Insurance changed by Operation', $changemsg);
         }
     }*/
+
     if($userAction==1){
-        // Action Log --------------------------------//    
-        $action = array(
-            'refid' => $refId,
-            'pono' => "'".$pono."'",
-            'actionid' => $actionId,
-            'status' => 1,
-            'msg' => "'".$msgTitle."'",
-            'usermsg' => "'".$approversComment."'",
-        );
-        UpdateAction($action);
+        // Action Log --------------------------------//
+        if ($loginRole== role_LC_Approvar_4 && $shipMode == 'E-DELIVERY' && $shipType == 1){
+            $action = array(
+                'refid' => $refId,
+                'pono' => "'".$pono."'",
+                'actionid' => action_Shared_Shipment_Schedule_For_EDeliv_WO_LC,
+                'status' => 1,
+                'msg' => "'".$msgTitle."'",
+                'usermsg' => "'".$approversComment."'",
+            );
+            UpdateAction($action);
+        }
+        else{
+            $action = array(
+                'refid' => $refId,
+                'pono' => "'".$pono."'",
+                'actionid' => $actionId,
+                'status' => 1,
+                'msg' => "'".$msgTitle."'",
+                'usermsg' => "'".$approversComment."'",
+            );
+            UpdateAction($action);
+        }
+
+
         // End Action Log -----------------------------
     }
     if($userAction==2){

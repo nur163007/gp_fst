@@ -38,7 +38,7 @@ function GetPOBuyersSelectList(){
     $sql = "SELECT 
             po.`createdby` as buyersId, trim(concat(u.firstname,' ' , u.lastname)) as buyersName
         FROM
-            wc_t_po AS po
+            wc_t_pi AS po
                 INNER JOIN
             wc_t_users AS u ON po.createdby = u.id
         GROUP BY po.createdby
@@ -67,7 +67,7 @@ function GetPOSupplierSelectList(){
     $sql = "SELECT 
             po.`supplier`, c.`name`
         FROM
-            wc_t_po AS po
+            wc_t_pi AS po
                 INNER JOIN
             wc_t_company AS c ON po.supplier = c.id
         GROUP BY po.supplier

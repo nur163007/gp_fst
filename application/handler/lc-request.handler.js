@@ -92,6 +92,7 @@ $(document).ready(function(){
             $('#supplier1').html(podata['supname']);
             $('#shipmode1').html('Shipment Mode: '+podata['shipmode']);
             $('#shipmode2').html(podata['shipmode'].toUpperCase());
+            $('#hiddenShipMode').val(podata['shipmode'].toUpperCase());
             $('#hscsea').html(podata['hscsea']);
             $('#hscode').html(podata['hscode']);
             if(podata['shipmode']=='sea'){
@@ -213,8 +214,10 @@ $(document).ready(function(){
                     });
                     if(podata['shipmode']=='E-Delivery'){
                         $('#insurance').val(0).change();
+                        $('#hiddenShipType').show();
                     } else {
                         $('#insurance').val(lcinfo['insurance']).change();
+                        $('#hiddenShipType').hide();
                     }
                     if(u == const_role_LC_Approvar_5.toString()){
                         $('#insuranceOld').val($('#insurance :selected').text());
@@ -370,6 +373,14 @@ function validate(){
             alertify.error("Please select an Insurance!");
             $("#insurance").select2('open');
             return false;
+        }
+        if ($('#hiddenShipMode').val() == 'E-DELIVERY'){
+            var hideShip = $('input:radio[name=withLC]:checked').val();
+
+            if (hideShip == undefined) {
+                alertify.error("Please select shipment type option!");
+                return false;
+            }
         }
     }
     return true;

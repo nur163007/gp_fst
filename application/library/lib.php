@@ -1,6 +1,7 @@
 <?php
 require("mail/mail2.php");
 require ("csrf_token.php");
+
 if (isset($_SESSION[session_prefix.'wclogin_userid'])){
     $user_id = $_SESSION[session_prefix . 'wclogin_userid'];
     addActivityLog(fullUrl, "Page browse from " . userAgent, $user_id, 1);
@@ -14,6 +15,7 @@ if (isset($_SESSION[session_prefix.'wclogin_userid'])){
     $res["message"] = 'Session_Error!';
     return json_encode($res);
 }
+
 function html2text($Document) {
     $Rules = array ('@<script[^>]*?>.*?</script>@si',
                     '@<[\/\!]*?[^<>]*?>@si',
@@ -278,7 +280,7 @@ function sendActionEmail($aLogId, $to='', $cc='', $debug=0)
             cr.`certFinalApprover`,
             u3.`email` AS `cfaEmail`
     FROM `wc_t_action_log` l
-    	INNER JOIN `wc_t_po` po ON l.`PO`=po.`poid`
+    	INNER JOIN `wc_t_pi` po ON l.`PO`=po.`poid`
         INNER JOIN `wc_t_users` u1 ON po.`createdby` = u1.id
         INNER JOIN `wc_t_users` u2 ON po.`pruserto` = u2.id
         INNER JOIN `wc_t_action` a1 ON l.`ActionID` = a1.`ID`
@@ -473,7 +475,8 @@ function GetActionRef($ref, $btrcBtn = 0){
                     $adminAction
                     ORDER BY l2.`ID` DESC LIMIT 1) ORDER BY l3.`ID` DESC LIMIT 1) AS `2ndLastAction`,
             (SELECT IFNULL(MAX(s.`shipNo`),0) FROM `wc_t_shipment` s WHERE s.`pono` = l.`PO`) `LastShipment`,
-            (SELECT IFNULL(MAX(e.`endNo`),0)  FROM `wc_t_endorsement` e WHERE e.`pono` = l.`PO`) `LastEndorseNo`
+            (SELECT IFNULL(MAX(e.`endNo`),0)  FROM `wc_t_endorsement` e WHERE e.`pono` = l.`PO`) `LastEndorseNo`,
+            (SELECT `shipmode` FROM `wc_t_pi` pi WHERE pi.`poid` = l.`PO`) `ShipMode`
         FROM `wc_t_action_log` l LEFT JOIN `wc_t_action` a ON l.`ActionID` = a.`ID`
         WHERE l.`ID` = ".$refNum;
     //echo $sql;
@@ -680,7 +683,7 @@ function getLetterreferenceSerial($po, $ship, $orgType='', $orgId='')
             $sql = "SELECT SL
             FROM (SELECT @rownum:=@rownum + 1 AS `SL`, t.* FROM
                     (SELECT  po.poid, lc.lcissuerbank, sh.shipNo 
-                    FROM wc_t_po AS po 
+                    FROM wc_t_pi AS po 
                       INNER JOIN wc_t_lc AS lc ON po.poid = lc.pono
                       LEFT JOIN wc_t_shipment AS sh ON lc.pono = sh.pono
                     WHERE YEAR(sh.inserton) = YEAR(CURRENT_DATE())
@@ -691,7 +694,7 @@ function getLetterreferenceSerial($po, $ship, $orgType='', $orgId='')
             $sql = "SELECT SL
             FROM (SELECT @rownum:=@rownum + 1 AS `SL`, t.* FROM
                     (SELECT  po.poid, lc.lcissuerbank 
-                    FROM wc_t_po AS po 
+                    FROM wc_t_pi AS po 
                       INNER JOIN wc_t_lc AS lc ON po.poid = lc.pono
                     WHERE YEAR(lc.createdon) = YEAR(CURRENT_DATE())
                         AND lc.lcissuerbank = $orgId
@@ -703,7 +706,7 @@ function getLetterreferenceSerial($po, $ship, $orgType='', $orgId='')
             $sql = "SELECT SL
             FROM (SELECT @rownum:=@rownum + 1 AS `SL`, t.* FROM
                     (SELECT  po.poid, lc.lcissuerbank, sh.shipNo 
-                    FROM wc_t_po AS po 
+                    FROM wc_t_pi AS po 
                       INNER JOIN wc_t_lc AS lc ON po.poid = lc.pono
                       LEFT JOIN wc_t_shipment AS sh ON lc.pono = sh.pono
                     WHERE YEAR(sh.inserton) = YEAR(CURRENT_DATE())
@@ -738,7 +741,7 @@ function getPOContacts($po){
         u2.email AS userEmail,
         u2.department AS userDept
     FROM
-        wc_t_po AS po
+        wc_t_pi AS po
             INNER JOIN
         wc_t_users AS u1 ON po.createdby = u1.id
             INNER JOIN
@@ -891,7 +894,7 @@ function addActivityLog($module, $taskMessage, $user, $status)
     $taskMessage = $objdal->sanitizeInput($taskMessage);
     $sql = "INSERT INTO `wc_t_activity_log` SET 
             `module` = '$module', `taskMessage` = '$taskMessage', `user` = '$user', `createdFrom` = '$ip', `status` = $status;";
-    //echo $sql;
+//    echo $sql;
     //var_dump(debug_backtrace());
     $objdal->insert($sql);
     unset($objdal);
@@ -910,7 +913,7 @@ function replaceUIdRegex($string) {
  * Added on: 2020-02-16
  * ************************************************************/
 
-function fileTransferTempToDocs($poNo)
+function fileTransferTempToDocs($poNo, $dontDelete = 0)
 {
 
     $objdal = new dal();
@@ -918,7 +921,7 @@ function fileTransferTempToDocs($poNo)
     $sql = "SELECT 
                 a.`poid`, a.`shipno`, a.`filename`, a.`attachedon`, p.`createdon`
             FROM `wc_t_attachments` a 
-                INNER JOIN `wc_t_po` p ON p.`poid` = a.`poid`
+                INNER JOIN `wc_t_pi` p ON p.`poid` = a.`poid`
             WHERE a.`poid` = '$poNo';";
     $documents = $objdal->read($sql);
 //    var_dump($sql);
@@ -963,7 +966,9 @@ function fileTransferTempToDocs($poNo)
             if (file_exists($old_dir.'/'.$file)) {
                 $copy_status = copy($old_dir.'/'.$file, $target_path_shipNo . '/' . $file);
                 if ($copy_status == 1) {
-                    unlink($old_dir.'/'.$file);
+                    if ($dontDelete == 0) {
+                        unlink($old_dir . '/' . $file);
+                    }
                 }
 
             }
@@ -988,7 +993,7 @@ function fileTransferBtrc($poNo)
     $sql = "SELECT 
                 a.`poid`, a.`shipno`, a.`filename`, a.`attachedon`, p.`createdon`
             FROM `wc_t_attachments` a 
-                INNER JOIN `wc_t_po` p ON p.`poid` = a.`poid`
+                INNER JOIN `wc_t_pi` p ON p.`poid` = a.`poid`
             WHERE a.`poid` = '$poNo';";
     $documents = $objdal->read($sql);
 //    var_dump($sql);
@@ -1150,6 +1155,60 @@ function fileTransferFxRequest($lastFxId){
 
 
 }
+
+//LC PROCESSING DOCUMENTS STORE
+
+function fileTransferLCDocs($lastLCId){
+
+    $objdal = new dal();
+
+    $sql = "SELECT `filename`,`docName`, `updatedDate` FROM `lc_processing_docs` WHERE `id` = $lastLCId;";
+
+    $document = $objdal->getRow($sql);
+
+//    var_dump($documents);
+//    die();
+
+    if ($document['filename']) {
+
+        $d_year = date('Y', strtotime($document['updatedDate']));
+        $d_month = date('M', strtotime($document['updatedDate']));
+        $old_dir = realpath(dirname(__FILE__) . "/../../temp/".$document['filename']);
+
+        $target_dir = realpath(dirname(__FILE__) . "/../../docs/");
+
+        $lcDoc = $document['docName'].$lastLCId;
+
+        $target_dir_fx = $target_dir . '/' . 'LCDocuments';
+        if (!is_dir($target_dir_fx)) {
+            mkdir($target_dir_fx, 0777, true);
+        }
+        $target_path_year = $target_dir_fx . '/' . $d_year;
+        if (!file_exists($target_path_year)) {
+            mkdir($target_path_year, 0777, true);
+        }
+
+        $target_path_month = $target_path_year . '/' . $d_month;
+        if (!file_exists($target_path_month)) {
+            mkdir($target_path_month, 0777, true);
+        }
+
+        $target_path_lcDoc = $target_path_month . '/' . $lcDoc;
+        if (!file_exists($target_path_lcDoc)) {
+            mkdir($target_path_lcDoc, 0777, true);
+        }
+        //
+        if (file_exists($old_dir)) {
+
+            $copy_status = copy($old_dir, $target_path_lcDoc . '/' . $document['filename']);
+            if ($copy_status == 1) {
+                unlink($old_dir);
+            }
+        }
+    }
+
+
+}
 /*!
  * Copy base PO files to new PI directory
  * *****************************************/
@@ -1158,7 +1217,7 @@ function cp_POtoPI($po, $pi){
 
     $target_dir = realpath(dirname(__FILE__) . "/../../docs");
 
-    $query = "SELECT p.`poid`, p.`createdon` FROM `wc_t_po` p WHERE p.`poid` = '$pi';";
+    $query = "SELECT p.`poid`, p.`createdon` FROM `wc_t_pi` p WHERE p.`poid` = '$pi';";
     //echo $query;
     $result = $objdal->getRow($query);
 
@@ -1189,7 +1248,7 @@ function cp_POtoPI($po, $pi){
     $sql = "SELECT 
                 a.`poid`, a.`title`, a.`shipno`, a.`filename`, a.`attachedon`, p.`createdon`
             FROM `wc_t_attachments` a 
-			INNER JOIN `wc_t_po` p ON p.`poid` = a.`poid`
+			INNER JOIN `wc_t_pi` p ON p.`poid` = a.`poid`
             WHERE a.`title` IN ('PO','BOQ') AND a.`poid` = '$po'
             GROUP BY a.`poid`, a.`title` ORDER BY a.`attachedon` DESC;";
     //echo $sql;
@@ -1282,7 +1341,7 @@ function getFolderLocation($attachment, $forZip = 0)
     $sql = "SELECT 
                 CONCAT(DATE_FORMAT(p.`createdon`, '%Y/%b'), '/', a.`poid`, '/', IFNULL(CONCAT(a.`shipno`, '/'), ''), a.`filename`) 
                 AS `folderLocation`, a.`poid`, a.`title`
-            FROM `wc_t_po` p 
+            FROM `wc_t_pi` p 
                 INNER JOIN `wc_t_attachments` a ON a.`poid` = p.`poid`
             $where;";
     //echo $sql;

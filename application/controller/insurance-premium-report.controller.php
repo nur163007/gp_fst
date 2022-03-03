@@ -34,7 +34,7 @@ if (!empty($_GET["action"]) || isset($_GET["action"])){
                 ic.`total` AS `Total`, ic.`capex` AS `Capex`, ic.`vatRebate` AS `VAT Rebate`, ic.`vatPayable` AS `VAT Payable`
             FROM `wc_t_insurance_charge` AS ic 
                 INNER JOIN `wc_t_lc` AS lc ON ic.`ponum` = lc.`pono`
-                INNER JOIN `wc_t_po` AS po ON lc.`pono` = po.`poid`
+                INNER JOIN `wc_t_pi` AS po ON lc.`pono` = po.`poid`
                 INNER JOIN `wc_t_bank_insurance` bi1 ON bi1.`id` = lc.`insurance` 
                 INNER JOIN `wc_t_bank_insurance` bi2 ON bi2.`id` = lc.`lcissuerbank`  $where;";
 

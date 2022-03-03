@@ -74,23 +74,26 @@ $(document).ready(function() {
     
     if($("#lcNumber").val()!=""){
         $("#LcNo").val($("#lcNumber").val());
-        refreshLCInfo($("#LcNo").val()); 
+        refreshLCInfo($("#LcNo").val());
     }
-    
+
     //$("#LcNo").change(function(e){
-//       refreshLCInfo($("#LcNo").val());       
+//       refreshLCInfo($("#LcNo").val());
 //    });
-    
-    $.getJSON("api/bankinsurance?action=4&type=bank", function (list) {
-        $("#LcIssuingBank").select2({
-            data: list,
-            placeholder: "Select a Bank",
-            allowClear: false,
-            width: "100%"
-        });
-        refreshLCInfo($("#LcNo").val()); 
-    });
-    
+
+
+//     $.getJSON("api/company?action=4&type=118", function (list) {
+//
+//         $("#LcIssuingBank").select2({
+//             data: list,
+//             placeholder: "Select a Bank",
+//             allowClear: false,
+//             width: "100%"
+//         });
+//         refreshLCInfo($("#LcNo").val());
+//
+//     });
+
     $.getJSON("api/category?action=4&id=34", function (list) {
         $("#chargeType").select2({
             data: list,
@@ -156,7 +159,7 @@ $(document).ready(function() {
             $("#vatRebateOnPayOrderChargeRate").val(commaSeperatedFormat(row["vatRebateOnPayOrderChargeRate"]));
             $("#totalChargePayOrder").val(commaSeperatedFormat(row["totalChargePayOrder"]));
             $("#payOrderChargeType").val(row["payorderChargeType"]).change();
-            
+
             if(row["attachBankCharge"]!=null) {
                 $("#attachBankChargeOld").val(row["attachBankCharge"]);
                 //$("#attachBankCharge").val(row["attachBankCharge"]);
@@ -175,7 +178,7 @@ $(document).ready(function() {
         } else{
             //alert("api/lc-opening?action=3&po="+$("#pono").val());
             $.get("api/lc-opening?action=3&po="+$("#pono").val(), function (lcInfo){
-                
+
                 if($.trim(lcInfo)!=""){
                     var rowLCInfo = JSON.parse(lcInfo);
                     $("#exchangeRate").val(commaSeperatedFormat(rowLCInfo["xeBDT"]));
@@ -239,7 +242,8 @@ function refreshLCInfo(lc){
         
         var row = JSON.parse(data);
         //alert('row');
-        $("#LcIssuingBank").val(row["lcissuerbank"]).change();
+        $("#LcIssuingBank").val(row["lcBank"]).change();
+        $("#LcIssuingBankHidden").val(row["lcissuerbank"]).change();
 		$("#LcDate").val( Date_toMDY( new Date( row["lcissuedate"] ) ));
 		$("#currency").val(row['currency']);
         $("#currency").selectpicker('refresh');
@@ -247,10 +251,33 @@ function refreshLCInfo(lc){
 		$("#LcValue").val(commaSeperatedFormat(row["lcvalue"]));
 		$("#lcvalueCur").html($("#currency").find('option:selected').text());
 		$("#commissionCur").html($("#lcvalueCur").html());
-        
+
         if(lcocInfo==""){
             CalculateAll();
         }
+
+        var type = $("#LcIssuingBankHidden").val();
+
+        /*-------------------------------------------------------------
+        * Loading PO Information
+        *-------------------------------------------------------------*/
+        $.get('api/lc-opening-bank-charges?action=4&id='+type, function (data) {
+
+            if(!$.trim(data)){
+                $(".panel-body").empty();
+                $(".panel-body").append(`<h4 class="well well-sm well-warning">No data found</h4>`);
+            }else {
+
+                var row = JSON.parse(data);
+                podata = row[0][0];
+
+                // BankCharge info
+                $('#cableCharge').val(commaSeperatedFormat(podata['CableCharge']));
+                $('#otherCharge').val(commaSeperatedFormat(podata['OtherCharge']));
+                $('#nonVAtOtherCharge').val(commaSeperatedFormat(podata['StampCharge']));
+
+            }
+        });
     });
 }
 

@@ -37,7 +37,7 @@ if (!empty($_GET["action"]) || isset($_GET["action"])){
                 FORMAT(ic.`total`,2) AS `Total`, FORMAT(ic.`capex`,2) AS `Capex`, FORMAT(ic.`vatRebateAmount`,2) AS `VAT Rebate`, FORMAT(ic.`vatPayable`,2) AS `VAT Payable`
             FROM `wc_t_insurance_charge` AS ic 
                 INNER JOIN `wc_t_lc` AS lc ON ic.`ponum` = lc.`pono`
-                INNER JOIN `wc_t_po` AS po ON lc.`pono` = po.`poid`
+                INNER JOIN `wc_t_pi` AS po ON lc.`pono` = po.`poid`
                 INNER JOIN `wc_t_bank_insurance` bi1 ON bi1.`id` = lc.`insurance` 
                 INNER JOIN `wc_t_bank_insurance` bi2 ON bi2.`id` = lc.`lcissuerbank`
                 INNER JOIN `wc_t_category` AS c ON po.`currency` = c.`id` $where;";
@@ -49,7 +49,7 @@ if (!empty($_GET["action"]) || isset($_GET["action"])){
                 c.`name` AS `Currency_center`
             FROM `wc_t_insurance_charge` AS ic 
                 INNER JOIN `wc_t_lc` AS lc ON ic.`ponum` = lc.`pono`
-                INNER JOIN `wc_t_po` AS po ON lc.`pono` = po.`poid`
+                INNER JOIN `wc_t_pi` AS po ON lc.`pono` = po.`poid`
                 INNER JOIN `wc_t_bank_insurance` bi1 ON bi1.`id` = lc.`insurance` 
                 INNER JOIN `wc_t_category` AS c ON po.`currency` = c.`id` $where
             GROUP BY bi1.`name`, c.`name` 

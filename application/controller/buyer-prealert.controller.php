@@ -188,7 +188,6 @@ function mailToEATeam(){
     
     global $user_id;
 	global $loginRole;
-    
     $refId = decryptId($_POST["refId"]);
     if(!is_numeric($refId)){
         $res["status"] = 0;
@@ -202,6 +201,7 @@ function mailToEATeam(){
     
     $pono = htmlspecialchars($_POST['pono'],ENT_QUOTES, "ISO-8859-1");
     $shipno = htmlspecialchars($_POST['shipno'],ENT_QUOTES, "ISO-8859-1");
+    $lcbank = htmlspecialchars($_POST['lcbank'],ENT_QUOTES, "ISO-8859-1");
     
     $message = htmlspecialchars($_POST['buyersMsgToEA'],ENT_QUOTES, "ISO-8859-1");
     //------------------------------------------------------------------------------
@@ -210,7 +210,21 @@ function mailToEATeam(){
 	$res["status"] = 0;    // 0 = failed, 1 = success
 	$res["message"] = 'FAILED!';
 	//------------------------------------------------------------------------------
-    
+
+
+    // Action Log --------------------------------//
+    $action = array(
+        'refid' => $refId,
+        'pono' => "'".$pono."'",
+        'shipno' => $shipno,
+        'actionid' => action_Pre_Alert_To_Bank_for_Org_Doc,
+        'pendingtoco' => $lcbank,
+        'msg' => "'Pre alert for Original Document receive against PO# ".$pono." and Shipment # ".$shipno."'",
+        'usermsg' => "'".$message."'",
+    );
+    UpdateAction($action);
+    // End Action Log -----------------------------
+
     // Action Log --------------------------------//    
     $action = array(
         'refid' => $refId,
@@ -268,11 +282,13 @@ function mailToFinance(){
         'refid' => $refId,
         'pono' => "'".$pono."'",
         'shipno' => $shipno,
+        'status' => 1,
         'actionid' => action_Shared_Voucher_info_to_Fin,
         'newstatus' => 1,
         'msg' => "'Acknowledgement'",
     );
     UpdateAction($action);
+    /*
     if($docType=="endorse"){
         $newAction = action_Sent_for_Document_Endorsement;
         $msg = "'Request for endorsed document against PO# ".$pono." and Shipment # ".$shipno."'";
@@ -291,7 +307,7 @@ function mailToFinance(){
         'usermsg' => "'".$message."'",
     );
     UpdateAction($action);
-    // End Action Log -----------------------------
+    // End Action Log -----------------------------*/
     
     $query = "UPDATE `wc_t_shipment` SET 
         `GERPVoucherDate`='$voucherCreateDate', 

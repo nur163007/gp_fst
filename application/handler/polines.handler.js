@@ -1,4 +1,4 @@
-function writeDeliveredPOLones(poid){
+function writeDeliveredPOLines(poid){
     //PO INFO LOAD
     $.get("api/view-po?action=2&id="+poid, function (data) {
         var res = JSON.parse(data);
@@ -21,7 +21,7 @@ function writeDeliveredPOLones(poid){
                     '<td class="text-center">' + d1[i]['lineNo'] + '</td>' +
                     '<td class="text-center">' + d1[i]['itemCode'] + '</td>' +
                     '<td class="text-left">' + d1[i]['itemDesc'] + '</td>' +
-                    '<td class="text-center">' + d1[i]['poDate'] + '</td>' +
+                    '<td class="text-center">' + d1[i]['deliveryDate'] + '</td>' +
                     '<td class="text-center">' + d1[i]['uom'] + '</td>' +
                     '<td class="text-right">' + commaSeperatedFormat(d1[i]['unitPrice'], 4) + '</td>' +
                     '<td class="text-center poBg">' + commaSeperatedFormat(d1[i]['poQty']) + '</td>' +

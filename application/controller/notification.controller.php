@@ -45,7 +45,7 @@ function getNotification(){
             (SELECT `id` `userId`, `username` `user` FROM `wc_t_users` WHERE `id` = $user_id) u1 LEFT JOIN
             (SELECT n1.`ID` `nId`, n1.`PO` `po`, n1.`Msg` `msg`, nl1.`readBy`, a1.`TargetForm` `target`, n1.`ActionOn` `actionOn`, po.`supplier`
              	FROM `wc_t_action_log` n1 LEFT JOIN `wc_t_action` a1 ON n1.`ActionID`=a1.`ID` LEFT JOIN `wc_t_notification_log` nl1 ON n1.id=nl1.actionID
-                LEFT JOIN `wc_t_po` po ON n1.`PO` = po.`poid`
+                LEFT JOIN `wc_t_pi` po ON n1.`PO` = po.`poid`
             	WHERE a1.`ActionPendingTo` = $loginRole) log1
             ON u1.`userId` = log1.`readBy`
             UNION
@@ -53,7 +53,7 @@ function getNotification(){
             (SELECT `id` `userId`, `username` `user` FROM `wc_t_users` WHERE `id` = $user_id) u1 RIGHT JOIN
             (SELECT n1.`ID` `nId`, n1.`PO` `po`, n1.`Msg` `msg`, nl1.`readBy`, a1.`TargetForm` `target`, n1.`ActionOn` `actionOn`, po.`supplier`
              	FROM `wc_t_action_log` n1 LEFT JOIN `wc_t_action` a1 ON n1.`ActionID`=a1.`ID` LEFT JOIN `wc_t_notification_log` nl1 ON n1.id=nl1.actionID
-                LEFT JOIN `wc_t_po` po ON n1.`PO` = po.`poid`
+                LEFT JOIN `wc_t_pi` po ON n1.`PO` = po.`poid`
             	WHERE a1.`ActionPendingTo` = $loginRole) log1
             ON u1.`userId` = log1.`readBy`
         ) res1 WHERE `userId` IS null ".$where." 

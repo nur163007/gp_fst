@@ -53,6 +53,43 @@ $actionLog = GetActionRef($_GET['ref']);
                                 <div class="col-sm-7">
                                     <label class="control-label"><b id="supplier"><img src="assets/images/busy.gif" /></b></label>
                                 </div>
+                                <label class="col-sm-5 control-label">Supplier Address:</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label text-left"><b id="sup_address"><img src="assets/images/busy.gif" /></b></label>
+                                </div>
+                                <label class="col-sm-5 control-label">Contract Ref:</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label"><b id="contractref"><img src="assets/images/busy.gif" /></b></label>
+                                </div>
+                                <label class="col-sm-5 control-label">PR No:</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label"><b id="pr_no"><img src="assets/images/busy.gif" /></b></label>
+                                </div>
+                                <label class="col-sm-5 control-label">Department:</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label"><b id="department"><img src="assets/images/busy.gif" /></b></label>
+                                </div>
+                                <label class="col-sm-5 control-label">Need by Date:</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label"><b id="deliverydate"><img src="assets/images/busy.gif" /></b></label>
+                                </div>
+                                <label class="col-sm-5 control-label">Actual PO Date:</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label"><b id="actualPoDate"><img src="assets/images/busy.gif" /></b></label>
+                                </div>
+                                <label class="col-sm-5 control-label">Implementation by:</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label"><b id="installbysupplier"><img src="assets/images/busy.gif" /></b></label>
+                                </div>
+                                <label class="col-sm-5 control-label">Max shipment allowed:</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label"><b id="nofshipallow"><img src="assets/images/busy.gif" /></b></label>
+                                </div>
+                                <label class="col-sm-5 control-label">Max LC will be issued:</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label"><b id="noflcissue"><img src="assets/images/busy.gif" /></b></label>
+                                </div>
+
                                 <label class="col-sm-5 control-label">LC No.</label>
                                 <div class="col-sm-7">
                                     <label class="control-label text-left" id="lcnum"><img src="assets/images/busy.gif" /></label>
@@ -77,6 +114,18 @@ $actionLog = GetActionRef($_GET['ref']);
                                 <label class="col-sm-5 control-label">PI Value:</label>
                                 <div class="col-sm-7">
                                      <label class="control-label text-left" id="pivalue"><img src="assets/images/busy.gif" /></label>
+                                </div>
+                                <label class="col-sm-5 control-label">PI Description:</label>
+                                <div class="col-sm-7">
+                                     <label class="control-label text-left" id="pi_desc"><img src="assets/images/busy.gif" /></label>
+                                </div>
+                                <label class="col-sm-5 control-label">Product Type:</label>
+                                <div class="col-sm-7">
+                                     <label class="control-label text-left" id="producttype"><img src="assets/images/busy.gif" /></label>
+                                </div>
+                                <label class="col-sm-5 control-label">Import As:</label>
+                                <div class="col-sm-7">
+                                     <label class="control-label text-left" id="importAs"><img src="assets/images/busy.gif" /></label>
                                 </div>
                                 <label class="col-sm-5 control-label">Shipment Mode:</label>
                                 <div class="col-sm-7">
@@ -106,6 +155,14 @@ $actionLog = GetActionRef($_GET['ref']);
                                 <div class="col-sm-7">
                                     <label class="control-label text-left" id="shipport"><img src="assets/images/busy.gif" /></label>
                                 </div>
+                                <label class="col-sm-5 control-label">LC Beneficiary:</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label text-left" id="lcbankaddress"><img src="assets/images/busy.gif" /></label>
+                                </div>
+                                <label class="col-sm-5 control-label">Lead Time(days):</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label text-left" id="productiondays"><img src="assets/images/busy.gif" /></label>
+                                </div>
                             </div>                        
                             
                         </div>
@@ -118,17 +175,8 @@ $actionLog = GetActionRef($_GET['ref']);
                             <div id="usersAttachments">
                     
                             </div>
-                            <?php if($_SESSION[session_prefix.'wclogin_role']==role_Supplier){?>
-                            <hr />
-                            <div class="form-group">
-                                <div class="col-sm-12 text-right">
-                                    <a href="amendment-request" class="btn btn-danger" id="ammendmentRequest_btn"><i class="icon wb-warning"></i> Request For Amendment</a>
-                                    <button type="button" class="btn btn-primary" id="acceptLC_btn"><i class="icon wb-check"></i> Accept LC</button>
-                                </div>
-                            </div>
-                            <?php }?>
                         </div>
-                        <div class="col-xlg-6 col-md-6">
+                        <div class="col-xlg-6 col-md-6 hidden">
                             <h4 class="well well-sm example-title">Approximate Shiping Document sharing Schedule(s)</h4>
                             <?php if($_SESSION[session_prefix.'wclogin_role']==role_Buyer){?>
                             <div class="form-group" id="proposedSchedule">
@@ -179,11 +227,11 @@ $actionLog = GetActionRef($_GET['ref']);
                                             </div>
                                         </div>
                                     </div>
-                                </div>                                
+                                </div>
                                 <div class="col-sm-10">
                                     <button type="button" class="btn pull-right" id="addScheduleRow"><i class="icon wb-plus"></i> Add More Schedule</button>
                                 </div>
-                                
+
                                 <div class="col-sm-10">
                                     <hr />
                                     <button type="button" class="btn btn-primary pull-right" id="scheduleSubmit_btn"><i class="icon wb-check"></i> Submit Sharing Schedule</button>
@@ -192,18 +240,35 @@ $actionLog = GetActionRef($_GET['ref']);
                             <?php }?>
                         </div>
                     </div>
-                    <?php if($_SESSION[session_prefix.'wclogin_role']==role_Supplier){?>
-                    <hr />                    
-                    <div class="row row-lg">
-                        <div class="col-xlg-12 col-md-12">
+                    <hr>
+                    <div class="col-xlg-6 col-md-12 pull-right">
+                        <?php if($_SESSION[session_prefix.'wclogin_role']==role_Supplier){?>
+
                             <div class="form-group">
                                 <div class="col-sm-12 text-right">
-                                    <a href="<?php echo $adminUrl;?>" class="btn btn-default btn-outline">Close</a>
+                                    <a href="amendment-request" class="btn btn-danger" id="ammendmentRequest_btn"><i class="icon wb-warning"></i> Request For Amendment</a>
+                                    <button type="button" class="btn btn-primary" id="acceptLC_btn"><i class="icon wb-check"></i> Accept LC</button>
                                 </div>
                             </div>
-                        </div>
+                        <?php }?>
                     </div>
-                    <?php }?>
+
+                <!--CLOSE BUTTON DISABLED FOR DEVELOP PURPOSES-->
+
+<!---->
+<!--                    --><?php //if($_SESSION[session_prefix.'wclogin_role']==role_Supplier){?>
+<!--                    <hr />                    -->
+<!--                    <div class="row row-lg">-->
+<!--                        <div class="col-xlg-12 col-md-12">-->
+<!--                            <div class="form-group">-->
+<!--                                <div class="col-sm-12 text-right">-->
+<!--                                    <a href="--><?php //echo $adminUrl;?><!--" class="btn btn-default btn-outline">Close</a>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    --><?php //}?>
+
                 </form>
             </div>
         </div>        

@@ -101,7 +101,7 @@ if (!empty($_GET["action"]) || isset($_GET["action"])){
             FROM wc_t_action_log as l INNER JOIN wc_t_action AS a ON l.ActionID = a.ID
             where l.PO = po.`poid` and l.`shipNo` = sh.`shipNo` and l.Status = 0 and a.ActionPending != 'Acknowledgement'
             order by l.ID desc) AS `Status (pending for)`
-        FROM `wc_t_po` po 
+        FROM `wc_t_pi` po 
         LEFT JOIN `wc_t_shipment` AS sh ON po.`poid` = sh.`pono`
         $where        
         ORDER BY po.`poid`, sh.`shipNo`;";

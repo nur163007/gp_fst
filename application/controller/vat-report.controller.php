@@ -50,7 +50,7 @@ if (!empty($_GET["action"]) || isset($_GET["action"])){
         FROM
             `wc_t_insurance_charge` AS ic
                 INNER JOIN
-            `wc_t_po` po ON ic.`ponum` = po.`poid`
+            `wc_t_pi` po ON ic.`ponum` = po.`poid`
                 INNER JOIN
             `wc_t_lc` lc ON po.`poid` = lc.`pono`
                 INNER JOIN

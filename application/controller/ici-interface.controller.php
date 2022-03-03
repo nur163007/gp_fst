@@ -71,9 +71,9 @@ function SendCNToGP(){
     $attachcn = $objdal->sanitizeInput($_POST['attachcn']);
     $attachcnOld = $objdal->sanitizeInput($_POST['attachcnOld']);
     $attachporc = $objdal->sanitizeInput($_POST['attachporc']);
-    $attachporcOLD = $objdal->sanitizeInput($_POST['attachporcOLD']);
+    $attachporcOld = $objdal->sanitizeInput($_POST['attachporcOld']);
     $attachother = $objdal->sanitizeInput($_POST['attachother']);
-    $attachotherOLD = $objdal->sanitizeInput($_POST['attachotherOLD']);
+    $attachotherOld = $objdal->sanitizeInput($_POST['attachotherOld']);
 
     $ip = $_SERVER['REMOTE_ADDR'];
 
@@ -90,11 +90,13 @@ function SendCNToGP(){
     // insert attachment
     $res["message"] = 'Failed to save attachments!';
 
-
+// insert attachment
+    //------------------------------
     if($attachcn!=''){
         if($attachcnOld==''){
-            $query = "INSERT INTO `wc_t_attachments`(`poid`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`) VALUES 
-        ('$po', 'Insurance Cover Note', '$attachcn', $user_id, '$ip', $loginRole)";
+            $query = "INSERT INTO `wc_t_attachments`
+                (`poid`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`) VALUES 
+                ('$po', 'Insurance Cover Note', '$attachcn', $user_id, '$ip', $loginRole);";
             $objdal->insert($query);
         } else {
             $query = "UPDATE `wc_t_attachments` SET
@@ -105,46 +107,38 @@ function SendCNToGP(){
             $objdal->update($query);
         }
     }
-
     if($attachporc!=''){
-        if($attachporcOLD==''){
-            $query = "INSERT INTO `wc_t_attachments`(`poid`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`) VALUES 
-        ('$po', 'Pay Order Receive Copy', '$attachporc', $user_id, '$ip', $loginRole)";
+        if($attachporcOld==''){
+            $query = "INSERT INTO `wc_t_attachments`
+                (`poid`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`) VALUES 
+                ('$po', 'Pay Order Receive Copy', '$attachporc', $user_id, '$ip', $loginRole);";
             $objdal->insert($query);
         } else {
             $query = "UPDATE `wc_t_attachments` SET
                 `filename`='$attachporc',
                 `replacedby`=$user_id,
                 `replacedfrom`='$ip'
-                WHERE `poid` = '$po' AND `title`='Pay Order Receive Copy' AND `filename` = '$attachporcOLD'";
+                WHERE `poid` = '$po' AND `title`='Pay Order Receive Copy' AND `filename` = '$attachporcOld'";
             $objdal->update($query);
         }
     }
-
     if($attachother!=''){
-        if($attachotherOLD==''){
-            $query = "INSERT INTO `wc_t_attachments`(`poid`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`) VALUES 
-        ('$po', 'Insurance Other Doc', '$attachother', $user_id, '$ip', $loginRole)";
+        if($attachotherOld==''){
+            $query = "INSERT INTO `wc_t_attachments`
+                (`poid`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`) VALUES 
+                ('$po', 'Insurance Other Doc', '$attachother', $user_id, '$ip', $loginRole);";
             $objdal->insert($query);
         } else {
             $query = "UPDATE `wc_t_attachments` SET
                 `filename`='$attachother',
                 `replacedby`=$user_id,
                 `replacedfrom`='$ip'
-                WHERE `poid` = '$po' AND `title`='Insurance Other Doc' AND `filename` = '$attachotherOLD'";
+                WHERE `poid` = '$po' AND `title`='Insurance Other Doc' AND `filename` = '$attachotherOld'";
             $objdal->update($query);
         }
     }
+    //------------------------------
 
-//
-//    if($attachporc!=''){
-//        $query .= ",('$po', 'Pay Order Receive Copy', '$attachporc', $user_id, '$ip', $loginRole);";
-//    }
-//    if($attachother!=''){
-//        $query .= ",('$po', 'Insurance Other Doc', '$attachother', $user_id, '$ip', $loginRole);";
-//    }
-//    $objdal->insert($query);
-    //echo($query);
     //Transfer file from 'temp' directory to respective 'docs' directory
     $res["message"] = 'Failed to move attachments';
     fileTransferTempToDocs($po);
@@ -156,48 +150,104 @@ function SendCNToGP(){
     return json_encode($res);
 }
 
-function submitCN(){
+function submitCN()
+{
+    /*echo json_encode($_POST);
+    var_dump();
+    exit;*/
     $refId = decryptId($_POST["refId1"]);
     global $user_id;
     global $loginRole;
+
     $objdal = new dal();
     $po = $objdal->sanitizeInput($_POST['po']);
     $cn_no = $objdal->sanitizeInput($_POST['cn_number']);
     $cn_date = $objdal->sanitizeInput($_POST['cn_date']);
     $cn_date = date('Y-m-d', strtotime($cn_date));
     $pay_order_amount = $objdal->sanitizeInput($_POST['pay_order_amount']);
-    $pay_order_amount = str_replace(",","", $pay_order_amount);
-    $pay_order_charge = $objdal->sanitizeInput($_POST['pay_order_charge']);
-    $pay_order_charge = str_replace(",","", $pay_order_charge);
+    $pay_order_amount = str_replace(",", "", $pay_order_amount);
+      $pay_order_charge = $objdal->sanitizeInput($_POST['pay_order_charge']);
+//    $pay_order_charge = str_replace(",", "", $pay_order_charge);
 
     // attachment data in an 3D array
     $attachcn = $objdal->sanitizeInput($_POST['attachcn']);
+    $attachcnOld = $objdal->sanitizeInput($_POST['attachcnOld']);
     $attachporc = $objdal->sanitizeInput($_POST['attachporc']);
+    $attachporcOld = $objdal->sanitizeInput($_POST['attachporcOld']);
     $attachother = $objdal->sanitizeInput($_POST['attachother']);
+    $attachotherOld = $objdal->sanitizeInput($_POST['attachotherOld']);
 
     $ip = $_SERVER['REMOTE_ADDR'];
 
-        // updated exist cn
-        $query = "UPDATE `cn_request` SET
+    // updated exist cn
+    $query = "UPDATE `cn_request` SET
             `cn_no` = '$cn_no',
             `cn_date` = '$cn_date',
             `pay_order_amount` = $pay_order_amount,
-            `pay_order_charge` = $pay_order_charge,
             `created_by` = $user_id
             where `po_no`='$po';";
 //    echo $query;
 //    die();
-        $objdal->update($query, "Could not updated CN Request data");
+    $objdal->update($query, "Could not updated CN Request data");
 
     // insert attachment
-    $res["message"] = 'Failed to save attachments!';
+    //------------------------------
+    if($attachcn!=''){
+        if($attachcnOld==''){
+            $query = "INSERT INTO `wc_t_attachments`
+                (`poid`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`) VALUES 
+                ('$po', 'Insurance Cover Note', '$attachcn', $user_id, '$ip', $loginRole);";
+            $objdal->insert($query);
+        } else {
+            $query = "UPDATE `wc_t_attachments` SET
+                `filename`='$attachcn',
+                `replacedby`=$user_id,
+                `replacedfrom`='$ip'
+                WHERE `poid` = '$po' AND `title`='Insurance Cover Note' AND `filename` = '$attachcnOld'";
+            $objdal->update($query);
+        }
+    }
+    if($attachporc!=''){
+        if($attachporcOld==''){
+            $query = "INSERT INTO `wc_t_attachments`
+                (`poid`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`) VALUES 
+                ('$po', 'Insurance Cover Note', '$attachporc', $user_id, '$ip', $loginRole);";
+            $objdal->insert($query);
+        } else {
+            $query = "UPDATE `wc_t_attachments` SET
+                `filename`='$attachporc',
+                `replacedby`=$user_id,
+                `replacedfrom`='$ip'
+                WHERE `poid` = '$po' AND `title`='Insurance Cover Note' AND `filename` = '$attachporcOld'";
+            $objdal->update($query);
+        }
+    }
+    if($attachother!=''){
+        if($attachotherOld==''){
+            $query = "INSERT INTO `wc_t_attachments`
+                (`poid`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`) VALUES 
+                ('$po', 'Insurance Cover Note', '$attachother', $user_id, '$ip', $loginRole);";
+            $objdal->insert($query);
+        } else {
+            $query = "UPDATE `wc_t_attachments` SET
+                `filename`='$attachother',
+                `replacedby`=$user_id,
+                `replacedfrom`='$ip'
+                WHERE `poid` = '$po' AND `title`='Insurance Cover Note' AND `filename` = '$attachotherOld'";
+            $objdal->update($query);
+        }
+    }
+    //------------------------------
+
+
+    /*$res["message"] = 'Failed to save attachments!';
     $query = "INSERT INTO `wc_t_attachments`(`poid`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`) VALUES 
         ('$po', 'Insurance Cover Note', '$attachcn', $user_id, '$ip', $loginRole),
         ('$po', 'Pay Order Receive Copy', '$attachporc', $user_id, '$ip', $loginRole)";
 
-    if($attachother!=''){
+    if ($attachother != '') {
         $query .= ",('$po', 'Insurance Other Doc', '$attachother', $user_id, '$ip', $loginRole);";
-    }
+    }*/
     $objdal->insert($query);
     //echo($query);
     //Transfer file from 'temp' directory to respective 'docs' directory
@@ -206,10 +256,10 @@ function submitCN(){
 
     $action = array(
         'refid' => $refId,
-        'pono' => "'".$po."'",
+        'pono' => "'" . $po . "'",
         'actionid' => action_CN_Issued_by_IC,
         'status' => 1,
-        'msg' => "'Cover Note Accepted against PO# ".$po."'",
+        'msg' => "'Cover Note Accepted against PO# " . $po . "'",
     );
     UpdateAction($action);
     unset($objdal);
@@ -246,9 +296,10 @@ function submitInsPolicy(){
     $action = array(
         'refid' => $refId,
         'pono' => "'".$po."'",
-        'actionid' => action_Ins_Policy_sent_by_IC,
+        'actionid' => action_Ins_Policy_Sent_by_IC,
         'status' => 1,
-        'msg' => "'Insurace Policy Accepted against PO# ".$po."'",
+        'newstatus' => 1,
+        'msg' => "'Acknowledgement'",
     );
     UpdateAction($action);
     unset($objdal);
@@ -271,7 +322,7 @@ function GetPODetail($id, $forPI=0, $shipno=0)
 
     //$response = ["status" => 0, "message" => "Invalid request access-denied"];
     if ($loginRole == role_Supplier) {
-        $strQuery = $objdal->getRow("SELECT `supplier` FROM `wc_t_po` WHERE `poid` = '$id';");
+        $strQuery = $objdal->getRow("SELECT `supplier` FROM `wc_t_pi` WHERE `poid` = '$id';");
         $supplier = $strQuery['supplier'];
         if ($supplier != $companyId) {
             $response = ["status" => 0, "message" => "Invalid request"];
@@ -284,7 +335,7 @@ function GetPODetail($id, $forPI=0, $shipno=0)
 
     if($forPI==1){
 
-        $sql = "SELECT `poid` FROM `wc_t_po` WHERE `poid` LIKE '".$id."%' ORDER BY `createdon` desc LIMIT 1;";
+        $sql = "SELECT `poid` FROM `wc_t_pi` WHERE `poid` LIKE '".$id."%' ORDER BY `createdon` desc LIMIT 1;";
         $objdal->read($sql);
 
         if(!empty($objdal->data)){
@@ -320,7 +371,7 @@ function GetPODetail($id, $forPI=0, $shipno=0)
             (SELECT a1.`filename` FROM `wc_t_attachments` a1 WHERE a1.`poid`='$id' AND a1.`title`='Insurance Cover Note' ORDER BY a1.`id` DESC LIMIT 1) AS `attachCNCopy`,
             (SELECT a1.`filename` FROM `wc_t_attachments` a1 WHERE a1.`poid`='$id' AND a1.`title`='Pay Order Receive Copy' ORDER BY a1.`id` DESC LIMIT 1) AS `attachPORC`,
             (SELECT a1.`filename` FROM `wc_t_attachments` a1 WHERE a1.`poid`='$id' AND a1.`title`='Insurance Other Doc' ORDER BY a1.`id` DESC LIMIT 1) AS `attachIOD`
-            FROM `wc_t_po` p 
+            FROM `wc_t_pi` p 
                 INNER JOIN `wc_t_category` c1 ON p.`currency` = c1.`id` 
                 INNER JOIN `wc_t_company` c2 ON p.`supplier` = c2.`id`
                 LEFT JOIN `wc_t_lc` l ON p.`poid` = l.`pono`
@@ -328,7 +379,7 @@ function GetPODetail($id, $forPI=0, $shipno=0)
                 LEFT JOIN `cn_request` cn ON cn.`po_no` = p.`poid`
                 
             WHERE p.`poid` = '$id';";
-    //echo $sql;
+//    echo $sql;
     $objdal->read($sql);
 
     if(!empty($objdal->data)){
@@ -342,9 +393,9 @@ function GetPODetail($id, $forPI=0, $shipno=0)
     unset($objdal->data);
 
     // attachments
-    if(in_array(action_Final_PI_Sent_for_PR_Feedback, $allStatus)){
+    if(in_array(action_Requested_for_Ins_Policy_by_TFO, $allStatus)){
 //    if($status > action_Final_PI_Sent_for_PR_Feedback){
-        $skipDraft = "  AND a2.`title` IN('CI Scan Copy','CN Copy','AWB/BL Scan Copy') ";
+        $skipDraft = "  AND a2.`title` IN('CI Scan Copy','Insurance Cover Note','AWB/BL Scan Copy') ";
     } else {
         $skipDraft = "";
     }
@@ -352,7 +403,7 @@ function GetPODetail($id, $forPI=0, $shipno=0)
         $shipSql = " AND (a2.`shipno` is null OR a2.`shipno` = $shipno) ";
     }
 
-    $sql = "SELECT a.`id`, a.`poid`, a.`title`, a.`filename`, a.`attachedon`, r.`name` AS `rolename`, 
+    $sqlQuery = "SELECT a.`id`, a.`poid`, a.`title`, a.`filename`, a.`attachedon`, r.`name` AS `rolename`, 
         SUBSTRING(a.`filename`, LENGTH(a.`filename`)-(INSTR(REVERSE(a.`filename`), '.')-2)) `ext`
         FROM `wc_t_attachments` a 
             INNER JOIN `wc_t_users` u ON a.`attachedby` = u.`id` 
@@ -363,8 +414,22 @@ function GetPODetail($id, $forPI=0, $shipno=0)
              ORDER BY a2.`attachedon` DESC
              LIMIT 1)
         ORDER BY a.`attachedby`, a.`id`;";
-    //echo $sql;
-    $objdal->read($sql);
+//    echo $sql;
+
+    $objdal->read($sqlQuery);
+
+//    $attach = (array) null;
+//
+//    if(is_null($objdal->data)!=1){
+//        //echo 1;
+//        foreach($objdal->data as $val){
+//            $attach[$i] = $val;
+//            $i++;
+//            //extract($res[1]);
+//        }
+//    }
+    //echo 121;
+
     if(!empty($objdal->data)) {
         foreach ($objdal->data as $val) {
             //extract($val);
@@ -398,7 +463,7 @@ function GetCNDetail($id, $forPI=0, $shipno=0)
 
     //$response = ["status" => 0, "message" => "Invalid request access-denied"];
     if ($loginRole == role_Supplier) {
-        $strQuery = $objdal->getRow("SELECT `supplier` FROM `wc_t_po` WHERE `poid` = '$id';");
+        $strQuery = $objdal->getRow("SELECT `supplier` FROM `wc_t_pi` WHERE `poid` = '$id';");
         $supplier = $strQuery['supplier'];
         if ($supplier != $companyId) {
             $response = ["status" => 0, "message" => "Invalid request"];
@@ -411,7 +476,7 @@ function GetCNDetail($id, $forPI=0, $shipno=0)
 
     if($forPI==1){
 
-        $sql = "SELECT `poid` FROM `wc_t_po` WHERE `poid` LIKE '".$id."%' ORDER BY `createdon` desc LIMIT 1;";
+        $sql = "SELECT `poid` FROM `wc_t_pi` WHERE `poid` LIKE '".$id."%' ORDER BY `createdon` desc LIMIT 1;";
         $objdal->read($sql);
 
         if(!empty($objdal->data)){

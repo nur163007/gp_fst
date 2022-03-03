@@ -27,9 +27,10 @@ $actionLog = GetActionRef($_GET['ref'], 1);
                     <input name="postatus" id="postatus" type="hidden" value="<?php echo $actionLog['ActionID']; ?>" />
                     <input name="postatus" id="postatus" type="hidden" value="" />
                     <input name="userAction" id="userAction" type="hidden" value="" />
+
                     <div class="row row-lg">
                         <div class="col-xlg-6 col-md-6">
-                            <h4 class="well well-sm example-title">Order Information</h4>
+                            <h4 class="well well-sm example-title">PO Information</h4>
                             <div class="form-group">
                                 <label class="col-sm-5 control-label">PO No:</label>
                                 <div class="col-sm-7">
@@ -39,15 +40,15 @@ $actionLog = GetActionRef($_GET['ref'], 1);
                                 <div class="col-sm-7">
                                     <label class="control-label" id="povalue"><img src="assets/images/busy.gif" /></label>
                                 </div>
+                                <label class="col-sm-5 control-label">PO Date:</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label"><b id="actualPoDate"><img src="assets/images/busy.gif" /></b></label>
+                                </div>
                                 <label class="col-sm-5 control-label">Description:</label>
                                 <div class="col-sm-7">
                                     <label class="control-label text-left" id="podesc"><img src="assets/images/busy.gif" /></label>
                                 </div>
                                 <?php if($_SESSION[session_prefix.'wclogin_role']==role_Buyer){?>
-                                <label class="col-sm-5 control-label">L/C Description:</label>
-                                <div class="col-sm-7">
-                                    <label class="control-label text-left" id="lcdesc"><img src="assets/images/busy.gif" /></label>
-                                </div>
                                 <label class="col-sm-5 control-label">Supplier:</label>
                                 <div class="col-sm-7">
                                     <label class="control-label"><b id="supplier"><img src="assets/images/busy.gif" /></b></label>
@@ -62,11 +63,11 @@ $actionLog = GetActionRef($_GET['ref'], 1);
                                 </div>
                                 <label class="col-sm-5 control-label">PR No:</label>
                                 <div class="col-sm-7">
-                                    <label class="control-label"><b id="pr_no"><img src="assets/images/busy.gif" /></b></label>
+                                    <label class="control-label text-left" id="pr_no"><img src="assets/images/busy.gif" /></label>
                                 </div>
                                 <label class="col-sm-5 control-label">Department:</label>
                                 <div class="col-sm-7">
-                                    <label class="control-label"><b id="department"><img src="assets/images/busy.gif" /></b></label>
+                                    <label class="control-label text-left" id="department"><img src="assets/images/busy.gif" /></label>
                                 </div>
                                 <label class="col-sm-5 control-label">Need by Date:</label>
                                 <div class="col-sm-7">
@@ -76,15 +77,16 @@ $actionLog = GetActionRef($_GET['ref'], 1);
                                 <div class="col-sm-7">
                                     <label class="control-label"><b id="installbysupplier"><img src="assets/images/busy.gif" /></b></label>
                                 </div>
-                                <label class="col-sm-5 control-label">Buyer's Contact:</label>
+                                <label class="col-sm-5 control-label">Max. shipment allowed:</label>
                                 <div class="col-sm-7">
-                                    <label class="control-label text-left" id="buyercontact"><img src="assets/images/busy.gif" /></label>
+                                    <label class="control-label" id="nofshipallow"><img src="assets/images/busy.gif" /></label>
                                 </div>
-                                <label class="col-sm-5 control-label">Technical Contact:</label>
+                                <label class="col-sm-5 control-label">Max. LC will be issued:</label>
                                 <div class="col-sm-7">
-                                    <label class="control-label text-left" id="techcontact"><img src="assets/images/busy.gif" /></label>
+                                    <label class="control-label" id="noflcissue"><img src="assets/images/busy.gif" /></label>
                                 </div>
                             </div>
+
                             
                             <h4 class="well well-sm example-title">PI Information</h4>
                             <div class="form-group">
@@ -140,6 +142,18 @@ $actionLog = GetActionRef($_GET['ref'], 1);
                                 <div class="col-sm-7">
                                     <label class="control-label text-left" id="productiondays"><img src="assets/images/busy.gif" /></label>
                                 </div>
+                                <label class="col-sm-5 control-label">LC Description:</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label text-left" id="lcdesc"><img src="assets/images/busy.gif" /></label>
+                                </div>
+                                <label class="col-sm-5 control-label">Buyer's Contact:</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label text-left" id="buyercontact"><img src="assets/images/busy.gif" /></label>
+                                </div>
+                                <label class="col-sm-5 control-label">Technical Contact:</label>
+                                <div class="col-sm-7">
+                                    <label class="control-label text-left" id="techcontact"><img src="assets/images/busy.gif" /></label>
+                                </div>
                                 <?php }?>
                             </div>
                             
@@ -161,78 +175,66 @@ $actionLog = GetActionRef($_GET['ref'], 1);
                             
                         </div>
                     </div>
+
                     <hr />
-                    <!--LINE WAYS PO-->
 
+                    <!--Start PO Lines-->
                     <div class="row row-lg">
-                        <!--PO Lines-->
                         <div class="col-xlg-12 col-md-12 margin-bottom-20">
-                            <h4 class="well well-sm example-title" style="background-color: #BFEDD8;">PO Lines
-                                <!--<span class="pull-right">
-                                    <button class="btn btn-primary btn-xs" style="margin-top: -5px;" id="btnLoadPoLines"><i class="icon wb-refresh" aria-hidden="true"></i> Reload PO Lines</button>
-                                </span>-->
+                            <h4 class="well well-sm example-title">PO Lines
+                                <span class="pull-right" style="margin-top: 0;">
+                                    Delivered Number of Line: <label style="font-weight: bold" id="delivCount1">0</label>
+                                </span>
                             </h4>
-                            <div class="nav-tabs-horizontal">
-                                <ul class="nav nav-tabs" data-plugin="nav-tabs" role="tablist">
-                                    <li role="presentation" class="active"><a data-toggle="tab" href="#tabDelivered" aria-controls="tabDelivered" role="tab"><span class="text-primary">Delivered <span id="delivCount1">(0)</span></span></a></li>
-                                </ul>
-                            </div>
-                            <div class="tab-content padding-top-20">
-                                <!--Delivered PO Lines-->
-                                <div class="tab-pane active" id="tabDelivered" role="tabpanel">
-                                    <table class="table table-bordered table-striped table-highlight order margin-0 small" id="dtPOLinesDelivered">
-                                        <thead>
-                                        <tr>
-                                            <th style="width:5%" class="text-center" rowspan="2">Line #</th>
-                                            <th style="width:10%" class="text-center" rowspan="2">Item</th>
-                                            <th style="width:24%" class="text-center" rowspan="2">Item Description</th>
-                                            <th style="width:10%" class="text-center" rowspan="2">Delivery Date</th>
-                                            <th style="width:5%" class="text-center" rowspan="2">UOM</th>
-                                            <th style="width:10%" class="text-center" rowspan="2">Unit Price</th>
-                                            <th style="width:10%" class="text-center poBg" colspan="2">PO</th>
-                                            <th style="width:5%" class="text-center delivBg" colspan="2">Delivered</th>
-                                            <!--<th style="width:5%" class="text-center" rowspan="2">LD</th>-->
-                                        </tr>
-                                        <tr>
-                                            <th style="width:5%" class="text-center poBg">Qty.</th>
-                                            <th style="width:10%" class="text-center poBg">Total Price</th>
-                                            <th style="width:5%" class="text-cente delivBg">Qty.</th>
-                                            <th style="width:10%" class="text-center delivBg">Total Price</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr>
-                                            <td class="text-center"></td>
-                                            <td class="text-left"></td>
-                                            <td class="text-left"></td>
-                                            <td class="text-left"></td>
-                                            <td class="text-left"></td>
-                                            <td class="text-right"></td>
-                                            <td class="text-right poBg"></td>
-                                            <td class="text-right poBg"></td>
-                                            <td class="text-right delivBg"></td>
-                                            <td class="text-right delivBg"></td>
-                                            <!--<td class="text-right"></td>-->
-                                        </tr>
-                                        </tbody>
-                                        <tfoot>
-                                        <tr style="font-weight: bolder;">
-                                            <th colspan="6" class="text-right padding-top-15" style="font-weight: bold; font-size: inherit">Total: </th>
-                                            <th class="text-center poBg padding-top-15" id="poQtyTotal" style="font-weight: bold; font-size: inherit"></th>
-                                            <th class="text-right poBg padding-top-15" id="grandTotal" style="font-weight: bold; font-size: inherit"></th>
-                                            <th class="text-center delivBg padding-top-15" id="dlvQtyTotal" style="font-weight: bold; font-size: inherit"></th>
-                                            <th class="text-right delivBg padding-top-15" id="dlvGrandTotal" style="font-weight: bold; font-size: inherit"></th>
-                                            <!--<th class="text-right" id="ldAmntTotal"></th>-->
-                                        </tr>
-                                        </tfoot>
-                                    </table>
-                                </div>
-                            </div>
-
+                            <table class="table table-bordered table-striped table-highlight order margin-0 small" id="dtPOLinesDelivered">
+                                <thead>
+                                <tr>
+                                    <th style="width:5%" class="text-center" rowspan="2">Line #</th>
+                                    <th style="width:10%" class="text-center" rowspan="2">Item</th>
+                                    <th style="width:24%" class="text-center" rowspan="2">Item Description</th>
+                                    <th style="width:10%" class="text-center" rowspan="2">Delivery Date</th>
+                                    <th style="width:5%" class="text-center" rowspan="2">UOM</th>
+                                    <th style="width:10%" class="text-center" rowspan="2">Unit Price</th>
+                                    <th style="width:10%" class="text-center poBg" colspan="2">PO</th>
+                                    <th style="width:5%" class="text-center delivBg" colspan="2">Delivered</th>
+                                    <!--<th style="width:5%" class="text-center" rowspan="2">LD</th>-->
+                                </tr>
+                                <tr>
+                                    <th style="width:5%" class="text-center poBg">Qty.</th>
+                                    <th style="width:10%" class="text-center poBg">Total Price</th>
+                                    <th style="width:5%" class="text-cente delivBg">Qty.</th>
+                                    <th style="width:10%" class="text-center delivBg">Total Price</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td class="text-center"></td>
+                                    <td class="text-left"></td>
+                                    <td class="text-left"></td>
+                                    <td class="text-left"></td>
+                                    <td class="text-left"></td>
+                                    <td class="text-right"></td>
+                                    <td class="text-right poBg"></td>
+                                    <td class="text-right poBg"></td>
+                                    <td class="text-right delivBg"></td>
+                                    <td class="text-right delivBg"></td>
+                                    <!--<td class="text-right"></td>-->
+                                </tr>
+                                </tbody>
+                                <tfoot>
+                                <tr style="font-weight: bolder;">
+                                    <th colspan="6" class="text-right padding-top-15" style="font-weight: bold; font-size: inherit">Total: </th>
+                                    <th class="text-center poBg padding-top-15" id="poQtyTotal" style="font-weight: bold; font-size: inherit"></th>
+                                    <th class="text-right poBg padding-top-15" id="grandTotal" style="font-weight: bold; font-size: inherit"></th>
+                                    <th class="text-center delivBg padding-top-15" id="dlvQtyTotal" style="font-weight: bold; font-size: inherit"></th>
+                                    <th class="text-right delivBg padding-top-15" id="dlvGrandTotal" style="font-weight: bold; font-size: inherit"></th>
+                                    <!--<th class="text-right" id="ldAmntTotal"></th>-->
+                                </tr>
+                                </tfoot>
+                            </table>
                         </div>
                     </div>
-
-                    <!--End PO Information-->
+                    <!--End PO Lines-->
 
                     <hr/>
                     <div class="row row-lg">
@@ -318,7 +320,7 @@ The Technical justification is attached for your reference. For any further tech
                                             <?php }
                                         }
                                         if ($_SESSION[session_prefix . 'wclogin_role'] == role_LC_Approvar_3) { ?>
-                                            <button type="button" class="btn btn-success" id="BTRCProcessApproved_btn"><i class="icon wb-check"></i> Approved &amp; Send to Corporate Affairs</button>
+                                            <button type="button" class="btn btn-success" id="BTRCProcessApproved_btn"><i class="icon wb-check"></i> Approved &amp; Send to Technology Approver</button>
                                         <?php } ?>
                                     <?php } elseif ($_SESSION[session_prefix . 'wclogin_role'] == role_Buyer){ ?>
                                         <button type="button" class="btn btn-warning" id="btnSendForPREAFeedback">Re Send to PR User &amp; EA Team for Feedback</button>

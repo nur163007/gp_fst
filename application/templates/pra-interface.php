@@ -105,37 +105,36 @@ require_once(LIBRARY_PATH . "/lib.php");
                             <button  type="submit" id="submit" name="createzip" class="btn btn-primary hidden" ><i class="icon fa-download" aria-hidden="true"></i> Download All Shipment Documents</button>
                         </form>
 
-                        <div class="panel nav-tabs-horizontal">
+                        <div class="panel nav-tabs-horizontal padding-15">
                             <ul class="nav nav-tabs nav-tabs-line" data-plugin="nav-tabs" role="tablist">
                                 <li class="active dropdown" role="presentation">
-                                    <a data-toggle="tab" href="#myPendings" aria-controls="myPendings" role="tab"><span class="hot">PENDING</span></a>
+                                    <a data-toggle="tab" href="#myPendings" aria-controls="myPendings" role="tab"><span class="hot">Pending for Send to BTRC</span></a>
                                 </li>
                                 <li role="presentation">
-                                    <a data-toggle="tab" href="#otherPendings" aria-controls="otherPendings" role="tab">SUBMITTED</a>
+                                    <a data-toggle="tab" href="#otherPendings" aria-controls="otherPendings" role="tab">Sent for BTRC NOC</a>
                                 </li>
                             </ul>
                             <form class="form-horizontal" id=btrc-form" name="btrc-form" method="post" autocomplete="off" action="">
                                 <input name="userAction" id="userAction" type="hidden" value="" />
                                 <input name="usertype" id="usertype" type="hidden" value="<?php echo $_SESSION[session_prefix.'wclogin_role']; ?>" />
 
-                                <div class="tab-content padding-top-5">
+                                <div class="tab-content padding-top-20">
 
                                     <div class="tab-pane active" id="myPendings" role="tabpanel">
-                                        <div class="row">
-                                            <div class="col-xs-12">
-                                                <table class="table text-center" id="dtMyInbox" >
+                                        <div class="row row-lg">
+                                            <div class="col-xlg-12 col-md-12 margin-bottom-20">
+                                                <table class="table table-bordered table-striped table-highlight order margin-0 text-center small" id="dtMyInbox" >
                                                     <thead >
                                                     <tr >
-                                                        <!--<th>ID</th>-->
-                                                        <th class="text-center">CARef</th>
-                                                        <th class="text-center">PONo(s)</th>
-                                                        <th class="text-center">Attachments</th>
-<!--                                                        <th>PO</th>-->
-<!--                                                        <th>BOQ</th>-->
-<!--                                                        <th>Justification</th>-->
-<!--                                                        <th>Catalog</th>-->
+                                                        <th class="text-center">TA Ref#</th>
+                                                        <th class="text-center">PO#</th>
+                                                        <th class="text-center">PI#</th>
+                                                        <th class="text-center">Date</th>
+                                                        <th class="text-center">Amount</th>
+                                                        <th class="text-center">Documents</th>
                                                         <th class="text-center">Action</th>
                                                         <th class="text-center">Download</th>
+                                                        <th class="text-center" style="width: 200px;">Attachment</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody id="myTable">
@@ -146,7 +145,7 @@ require_once(LIBRARY_PATH . "/lib.php");
                                         </div>
                                         <hr>
                                         <div class="text-right" style="margin-top: 40px!important;">
-                                            <button type="button" class="btn btn-success padding-6 margin-15" id="btnPRASubmit" >Send to BTRC For NOC</button>
+                                            <button type="button" class="btn btn-success padding-6 margin-15" id="btnPRASubmit">Send to BTRC For NOC</button>
                                         </div>
 
                                     </div>

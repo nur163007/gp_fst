@@ -43,15 +43,20 @@ $(document).ready(function() {
                 $('#pr_no').html(podata['pr_no']);
                 $('#department').html(podata['department']);
                 $('#deliverydate').html(Date_toDetailFormat(new Date(podata['deliverydate'])));
+                $('#actualPoDate').html(Date_toDetailFormat(new Date(podata['actualPoDate'])));
                 $('#buyercontact').html(podata['buyersName']);
                 $('#techcontact').html(podata['prName']);
                 $('#installbysupplier').html(getImplementedBy(podata["installbysupplier"]));
-
+                $('#noflcissue').html(podata['noflcissue']);
+                $('#nofshipallow').html(podata['nofshipallow']);
 
                 // PI info
                 $('#pinum').html(podata['pinum']);
+                $('#piReqNoText').html(podata['PIReqNo']);
                 $('#pivalue').html('<b>' + commaSeperatedFormat(podata['pivalue']) + '</b> ' + podata['curname']);
                 $('#pi_desc').html(podata['pidesc']);
+                $('#producttype').html(podata['producttypeName']);
+                $('#importAs').html(podata['importAsName']);
                 $('#shipmode').html(podata['shipmode'].toUpperCase());
 
                 if (podata['shipmode'] == 'sea') {
@@ -80,8 +85,6 @@ $(document).ready(function() {
 
                 attachmentLogScript(attach, '#usersAttachments');
                 commentsLogScript(comments, '#buyersmsg', '#suppliersmsg');
-
-
             }
         });
     }
@@ -273,7 +276,7 @@ $(document).ready(function() {
                     '<td class="text-center">' + d1[i]['lineNo'] + '</td>' +
                     '<td class="text-center">' + d1[i]['itemCode'] + '</td>' +
                     '<td class="text-left">' + d1[i]['itemDesc'] + '</td>' +
-                    '<td class="text-center">' + d1[i]['poDate'] + '</td>' +
+                    '<td class="text-center">' + d1[i]['deliveryDate'] + '</td>' +
                     '<td class="text-center">' + d1[i]['uom'] + '</td>' +
                     '<td class="text-right">' + commaSeperatedFormat(d1[i]['unitPrice'], 4) + '</td>' +
                     '<td class="text-center poBg">' + commaSeperatedFormat(d1[i]['poQty']) + '</td>' +

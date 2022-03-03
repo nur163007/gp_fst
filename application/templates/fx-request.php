@@ -207,11 +207,11 @@
                     <div class="row">
                         <div class="col-sm-10">
                             <div class="btn-group">
-                                <button type="button" class="btn btn-primary dropdown-toggle" id="exampleAnimationDropdown1" data-toggle="dropdown" aria-expanded="false">RFQ Status
-                                    <span class="caret"></span>
+                                <button type="button" class="btn btn-primary dropdown-toggle" id="exampleAnimationDropdown1" data-toggle="dropdown" aria-expanded="false">
+                                    RFQ Pending <span class="caret"></span>
                                 </button>
                                 <ul class="dropdown-menu animate" aria-labelledby="exampleAnimationDropdown1" role="menu">
-                                    <li role="presentation" value="1"><a href="javascript:FxRequestDataGet(0)" role="menuitem">Pending</a></li>
+                                    <li role="presentation" value="1"><a href="javascript:FxRequestDataGet(0)" role="menuitem">RFQ Pending</a></li>
                                     <li role="presentation" value="2"><a href="javascript:FxRequestDataGet(1)" role="menuitem">RFQ Done</a></li>
                                     <li role="presentation" value="3"><a href="javascript:FxRequestDataGet(2)" role="menuitem">RFQ Closed</a></li>
                                     <li role="presentation" value="4"><a href="javascript:FxRequestDataGet(3)" role="menuitem">Processing</a></li>

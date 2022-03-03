@@ -47,7 +47,7 @@ if (!empty($_GET["action"]) || isset($_GET["action"])){
                 (SELECT `username` FROM `wc_t_users` WHERE id = po.`createdby`) AS `PO Buyer`,
                 (SELECT `name` FROM `wc_t_company` WHERE id = po.`supplier`) AS `Supplier`,
                 `podesc` AS `PO Description`,
-                (SELECT MAX(DATE_FORMAT(`ActionOn`,'%d-%M-%Y')) FROM `wc_t_action_log` log1 WHERE log1.`PO`=po.`poid` AND log1.`ActionID`=".action_New_PO_Initiated.") AS `PO & BOQ Sent to Vendor`,
+                (SELECT MAX(DATE_FORMAT(`ActionOn`,'%d-%M-%Y')) FROM `wc_t_action_log` log1 WHERE log1.`PO`=po.`poid` AND log1.`ActionID`=".action_New_PO_Issued.") AS `PO & BOQ Sent to Vendor`,
                 DATE_FORMAT(`deliverydate`,'%d-%M-%Y') AS `PO Need by Date`,
                 (SELECT MAX(DATE_FORMAT(`ActionOn`,'%d-%M-%Y')) FROM `wc_t_action_log` log1 WHERE log1.`PO`=po.`poid` AND log1.`ActionID`=".action_Draft_PI_Submitted.") AS `PI & BOQ Receive Date`,                
                 `productiondays` AS `Lead Time`,
@@ -68,7 +68,7 @@ if (!empty($_GET["action"]) || isset($_GET["action"])){
                 (SELECT DATE_FORMAT(`GERPVoucherDate`,'%d-%M-%Y') FROM `wc_t_shipment` WHERE pono = po.`poid` limit 1) AS `V Creation Date`,
                 (SELECT DATE_FORMAT(`scheduleETA`,'%d-%M-%Y') FROM `wc_t_shipment` WHERE pono = po.`poid` limit 1) AS `ETA`,
                 (SELECT DATE_FORMAT(`whArrivalDate`,'%d-%M-%Y') FROM `wc_t_shipment` WHERE pono = po.`poid` limit 1) AS `Actual Arrival at WH`
-            FROM `wc_t_po` po $where;";
+            FROM `wc_t_pi` po $where;";
 //    echo $query;
     $objdal->read(trim($query));
     $rows = array();

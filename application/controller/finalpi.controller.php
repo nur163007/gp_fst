@@ -110,7 +110,7 @@ function SubmitFinalPIBOQ()
 	$res["message"] = 'FAILED!';
 	//------------------------------------------------------------------------------
 	// update new po
-    $query = "UPDATE `wc_t_po` SET 
+    $query = "UPDATE `wc_t_pi` SET 
 		`pinum` = '$pinum',
         `pivalue` = $pivalue,
         `hscode` = '$hscode',

@@ -28,7 +28,7 @@ if (!empty($_POST)){
 function executeQuery($po, $noship){
 
     $objdal = new dal();
-    $query = "update wc_t_po set nofshipallow = $noship where poid='$po';";
+    $query = "update wc_t_pi set nofshipallow = $noship where poid='$po';";
     $objdal->update($query);
 
     $query_1 = "insert into wc_t_shipment_ETA (pono, lcNo, shipNo, shipmode, scheduleETA, insertby, inserton, insertfrom, status)

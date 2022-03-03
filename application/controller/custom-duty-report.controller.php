@@ -49,7 +49,7 @@ if (!empty($_GET["action"]) || isset($_GET["action"])){
         FROM
             `wc_t_custom_duty` AS c
                 LEFT JOIN
-            `wc_t_po` AS po ON c.`poid` = po.`poid`
+            `wc_t_pi` AS po ON c.`poid` = po.`poid`
                 LEFT JOIN
             `wc_t_shipment` AS sh ON c.`poid` = sh.`pono` AND c.`shipNo` = sh.`shipNo` 
         $where

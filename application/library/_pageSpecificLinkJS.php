@@ -329,7 +329,7 @@ if(isset($_REQUEST['q'])) {
                 '<script src="assets/js/components/icheck.js"></script>',
                 '<script src="assets/js/components/bootstrap-tokenfield.js"></script>',
                 '<script src="assets/js/components/asspinner.js"></script>',
-                '<script src="application/handler/purchaseorder.handler.js?v=' . $jsVersion . '"></script>'
+                '<script src="application/handler/new-po.handler.js?v=' . $jsVersion . '"></script>'
             );
             $page_specific_jsfunc = array("<script>
                 $(document).ready(function ($) {
@@ -2011,7 +2011,21 @@ if(isset($_REQUEST['q'])) {
             $page_specific_jsfunc = array('');
             break;
 
-            case "fx_request_primary":
+        case "fx-request-primary":
+            $page_specific_js = array(
+                '<script src="assets/vendor/datatables/jquery.dataTables.min.js"></script>',
+                '<script src="assets/vendor/datatables-bootstrap/dataTables.bootstrap.js"></script>',
+                '<script src="assets/vendor/datatables/dataTables.buttons.min.js"></script>',
+                '<script src="assets/vendor/datatables/dataTables.fixedColumns.min.js"></script>',
+                '<script src="assets/vendor/datatables/buttons.html5.min.js"></script>',
+            );
+            $page_specific_js1 = array(
+                '<script src="assets/js/components/asspinner.js"></script>',
+                '<script src="application/handler/fx-request-primary.handler.js?v=' . $jsVersion . '"></script>'
+            );
+            $page_specific_jsfunc = array('');
+            break;
+        case "doc-notifications-bank":
             $page_specific_js = array(
                 '<script src="assets/vendor/bootstrap-datepicker/bootstrap-datepicker.js"></script>',
                 '<script src="assets/vendor/daterangepicker/moment.js"></script>',
@@ -2033,7 +2047,61 @@ if(isset($_REQUEST['q'])) {
                 '<script src="assets/js/components/asspinner.js"></script>',
                 '<script src="assets/js/fupload/ajaxupload.js" type="text/javascript"></script>',
                 '<script src="assets/js/fupload/jquery.ajax_upload.0.6.min.js" type="text/javascript"></script>',
-                '<script src="application/handler/fx_request_primary.handler.js?v=' . $jsVersion . '"></script>'
+                '<script src="application/handler/doc-notifications-bank.handler.js?v=' . $jsVersion . '"></script>'
+            );
+            $page_specific_jsfunc = array('');
+            break;
+        case "bank-document-receive":
+            $page_specific_js = array(
+                '<script src="assets/vendor/bootstrap-datepicker/bootstrap-datepicker.js"></script>',
+                '<script src="assets/vendor/daterangepicker/moment.js"></script>',
+                '<script src="assets/vendor/daterangepicker/daterangepicker.js"></script>',
+                '<script src="assets/vendor/select2/select2.min.js"></script>',
+                '<script src="assets/vendor/bootstrap-select/bootstrap-select.js"></script>',
+                '<script src="assets/vendor/datatables/jquery.dataTables.min.js"></script>',
+                '<script src="assets/vendor/datatables-bootstrap/dataTables.bootstrap.js"></script>',
+                '<script src="assets/vendor/datatables/dataTables.buttons.min.js"></script>',
+                '<script src="assets/vendor/datatables/dataTables.fixedColumns.min.js"></script>',
+                '<script src="assets/vendor/icheck/icheck.min.js"></script>',
+                '<script src="assets/vendor/jszip/jszip.min.js"></script>',
+                '<script src="assets/vendor/datatables/buttons.html5.min.js"></script>',
+            );
+            $page_specific_js1 = array(
+                '<script src="assets/js/components/bootstrap-datepicker.js"></script>',
+                '<script src="assets/js/components/select2.js"></script>',
+                '<script src="assets/js/components/bootstrap-select.js"></script>',
+                '<script src="assets/js/components/icheck.js"></script>',
+                '<script src="assets/js/components/asspinner.js"></script>',
+                '<script src="assets/js/fupload/ajaxupload.js" type="text/javascript"></script>',
+                '<script src="assets/js/fupload/jquery.ajax_upload.0.6.min.js" type="text/javascript"></script>',
+                '<script src="application/handler/bank-document-receive.handler.js?v=' . $jsVersion . '"></script>'
+            );
+            $page_specific_jsfunc = array('');
+            break;
+        case "fx-settelment-pending-fn":
+            $page_specific_js = array(
+                '<script src="assets/vendor/bootstrap-datepicker/bootstrap-datepicker.js"></script>',
+                '<script src="assets/vendor/daterangepicker/moment.js"></script>',
+                '<script src="assets/vendor/daterangepicker/daterangepicker.js"></script>',
+                '<script src="assets/vendor/select2/select2.min.js"></script>',
+                '<script src="assets/vendor/bootstrap-select/bootstrap-select.js"></script>',
+                '<script src="assets/vendor/datatables/jquery.dataTables.min.js"></script>',
+                '<script src="assets/vendor/datatables-bootstrap/dataTables.bootstrap.js"></script>',
+                '<script src="assets/vendor/datatables/dataTables.buttons.min.js"></script>',
+                '<script src="assets/vendor/datatables/dataTables.fixedColumns.min.js"></script>',
+                '<script src="assets/vendor/icheck/icheck.min.js"></script>',
+                '<script src="assets/vendor/jszip/jszip.min.js"></script>',
+                '<script src="assets/vendor/datatables/buttons.html5.min.js"></script>',
+            );
+            $page_specific_js1 = array(
+                '<script src="assets/js/components/bootstrap-datepicker.js"></script>',
+                '<script src="assets/js/components/select2.js"></script>',
+                '<script src="assets/js/components/bootstrap-select.js"></script>',
+                '<script src="assets/js/components/icheck.js"></script>',
+                '<script src="assets/js/components/asspinner.js"></script>',
+                '<script src="assets/js/fupload/ajaxupload.js" type="text/javascript"></script>',
+                '<script src="assets/js/fupload/jquery.ajax_upload.0.6.min.js" type="text/javascript"></script>',
+                '<script src="application/handler/fx-settelment-pending-fn.handler.js?v=' . $jsVersion . '"></script>'
             );
             $page_specific_jsfunc = array('');
             break;
@@ -2065,6 +2133,165 @@ if(isset($_REQUEST['q'])) {
             $page_specific_jsfunc = array('');
 
             break;
+
+        case "po-history":
+            $page_specific_js = array(
+                '<script src="assets/vendor/bootstrap-datepicker/bootstrap-datepicker.js"></script>',
+                '<script src="assets/vendor/daterangepicker/moment.js"></script>',
+                '<script src="assets/vendor/daterangepicker/daterangepicker.js"></script>',
+                '<script src="assets/vendor/select2/select2.min.js"></script>',
+                '<script src="assets/vendor/bootstrap-select/bootstrap-select.js"></script>',
+                '<script src="assets/vendor/datatables/jquery.dataTables.min.js"></script>',
+                '<script src="assets/vendor/datatables-bootstrap/dataTables.bootstrap.js"></script>',
+                '<script src="assets/vendor/datatables/dataTables.buttons.min.js"></script>',
+                '<script src="assets/vendor/datatables/dataTables.fixedColumns.min.js"></script>',
+                '<script src="assets/vendor/jszip/jszip.min.js"></script>',
+                '<script src="assets/vendor/datatables/buttons.html5.min.js"></script>',
+            );
+            $page_specific_js1 = array(
+                '<script src="assets/js/components/bootstrap-datepicker.js"></script>',
+                '<script src="assets/js/components/select2.js"></script>',
+                '<script src="assets/js/components/bootstrap-select.js"></script>',
+                '<script src="assets/js/components/icheck.js"></script>',
+                '<script src="assets/js/components/asspinner.js"></script>',
+                '<script src="assets/js/fupload/ajaxupload.js" type="text/javascript"></script>',
+                '<script src="assets/js/fupload/jquery.ajax_upload.0.6.min.js" type="text/javascript"></script>',
+                '<script src="application/handler/po-history.handler.js?v=' . $jsVersion . '"></script>'
+            );
+            $page_specific_jsfunc = array('');
+
+            break;
+
+        case "edelivery-doc-request":
+            $page_specific_js = array(
+                '<script src="assets/vendor/select2/select2.min.js"></script>',
+                '<script src="assets/vendor/bootstrap-select/bootstrap-select.js"></script>',
+            );
+            $page_specific_js1 = array(
+                '<script src="assets/js/components/select2.js"></script>',
+                '<script src="assets/js/components/bootstrap-select.js"></script>',
+                '<script src="assets/js/components/asspinner.js"></script>',
+                '<script src="assets/js/fupload/ajaxupload.js" type="text/javascript"></script>',
+                '<script src="application/handler/edelivery-doc-request.handler.js?v=' . $jsVersion . '"></script>'
+            );
+            $page_specific_jsfunc = array('');
+
+            break;
+
+        case "workflow-procedure":
+            $page_specific_js = array(
+                '<script src="assets/vendor/bootstrap-datepicker/bootstrap-datepicker.js"></script>',
+                '<script src="assets/vendor/daterangepicker/moment.js"></script>',
+                '<script src="assets/vendor/daterangepicker/daterangepicker.js"></script>',
+                '<script src="assets/vendor/select2/select2.min.js"></script>',
+                '<script src="assets/vendor/bootstrap-select/bootstrap-select.js"></script>',
+                '<script src="assets/vendor/datatables/jquery.dataTables.min.js"></script>',
+                '<script src="assets/vendor/datatables-bootstrap/dataTables.bootstrap.js"></script>',
+                '<script src="assets/vendor/datatables/dataTables.buttons.min.js"></script>',
+                '<script src="assets/vendor/datatables/dataTables.fixedColumns.min.js"></script>',
+                '<script src="assets/vendor/jszip/jszip.min.js"></script>',
+                '<script src="assets/vendor/datatables/buttons.html5.min.js"></script>',
+            );
+            $page_specific_js1 = array(
+                '<script src="assets/js/components/bootstrap-datepicker.js"></script>',
+                '<script src="assets/js/components/select2.js"></script>',
+                '<script src="assets/js/components/bootstrap-select.js"></script>',
+                '<script src="assets/js/components/icheck.js"></script>',
+                '<script src="assets/js/components/asspinner.js"></script>',
+                '<script src="assets/js/fupload/ajaxupload.js" type="text/javascript"></script>',
+                '<script src="assets/js/fupload/jquery.ajax_upload.0.6.min.js" type="text/javascript"></script>',
+                '<script src="application/handler/workflow-procedure.handler.js?v=' . $jsVersion . '"></script>'
+            );
+            $page_specific_jsfunc = array('');
+
+            break;
+
+        case "shipment-schedule":
+            $page_specific_js = array(
+                '<script src="assets/vendor/bootstrap-datepicker/bootstrap-datepicker.js"></script>',
+                '<script src="assets/vendor/daterangepicker/moment.js"></script>',
+                '<script src="assets/vendor/daterangepicker/daterangepicker.js"></script>',
+                '<script src="assets/vendor/select2/select2.min.js"></script>',
+                '<script src="assets/vendor/bootstrap-select/bootstrap-select.js"></script>',
+                '<script src="assets/vendor/datatables/jquery.dataTables.min.js"></script>',
+                '<script src="assets/vendor/datatables-bootstrap/dataTables.bootstrap.js"></script>',
+                '<script src="assets/vendor/datatables/dataTables.buttons.min.js"></script>',
+                '<script src="assets/vendor/datatables/dataTables.fixedColumns.min.js"></script>',
+                '<script src="assets/vendor/jszip/jszip.min.js"></script>',
+                '<script src="assets/vendor/datatables/buttons.html5.min.js"></script>',
+            );
+            $page_specific_js1 = array(
+                '<script src="assets/js/components/bootstrap-datepicker.js"></script>',
+                '<script src="assets/js/components/select2.js"></script>',
+                '<script src="assets/js/components/bootstrap-select.js"></script>',
+                '<script src="assets/js/components/icheck.js"></script>',
+                '<script src="assets/js/components/asspinner.js"></script>',
+                '<script src="assets/js/fupload/ajaxupload.js" type="text/javascript"></script>',
+                '<script src="assets/js/fupload/jquery.ajax_upload.0.6.min.js" type="text/javascript"></script>',
+                '<script src="application/handler/shipment-schedule.handler.js?v=' . $jsVersion . '"></script>'
+            );
+            $page_specific_jsfunc = array('');
+
+            break;
+
+            case "lc-processing-docs":
+            $page_specific_js = array(
+                '<script src="assets/vendor/bootstrap-datepicker/bootstrap-datepicker.js"></script>',
+                '<script src="assets/vendor/daterangepicker/moment.js"></script>',
+                '<script src="assets/vendor/daterangepicker/daterangepicker.js"></script>',
+                '<script src="assets/vendor/select2/select2.min.js"></script>',
+                '<script src="assets/vendor/bootstrap-select/bootstrap-select.js"></script>',
+                '<script src="assets/vendor/datatables/jquery.dataTables.min.js"></script>',
+                '<script src="assets/vendor/datatables-bootstrap/dataTables.bootstrap.js"></script>',
+                '<script src="assets/vendor/datatables/dataTables.buttons.min.js"></script>',
+                '<script src="assets/vendor/datatables/dataTables.fixedColumns.min.js"></script>',
+                '<script src="assets/vendor/jszip/jszip.min.js"></script>',
+                '<script src="assets/vendor/datatables/buttons.html5.min.js"></script>',
+            );
+            $page_specific_js1 = array(
+                '<script src="assets/js/components/bootstrap-datepicker.js"></script>',
+                '<script src="assets/js/components/select2.js"></script>',
+                '<script src="assets/js/components/bootstrap-select.js"></script>',
+                '<script src="assets/js/components/icheck.js"></script>',
+                '<script src="assets/js/components/asspinner.js"></script>',
+                '<script src="assets/js/fupload/ajaxupload.js" type="text/javascript"></script>',
+                '<script src="assets/js/fupload/jquery.ajax_upload.0.6.min.js" type="text/javascript"></script>',
+                '<script src="application/handler/lc-processing-docs.handler.js?v=' . $jsVersion . '"></script>'
+            );
+            $page_specific_jsfunc = array('');
+
+            break;
+
+
+            case "bank-charge":
+            $page_specific_js = array(
+                '<script src="assets/vendor/bootstrap-datepicker/bootstrap-datepicker.js"></script>',
+                '<script src="assets/vendor/daterangepicker/moment.js"></script>',
+                '<script src="assets/vendor/daterangepicker/daterangepicker.js"></script>',
+                '<script src="assets/vendor/select2/select2.min.js"></script>',
+                '<script src="assets/vendor/bootstrap-select/bootstrap-select.js"></script>',
+                '<script src="assets/vendor/datatables/jquery.dataTables.min.js"></script>',
+                '<script src="assets/vendor/datatables-bootstrap/dataTables.bootstrap.js"></script>',
+                '<script src="assets/vendor/datatables/dataTables.buttons.min.js"></script>',
+                '<script src="assets/vendor/datatables/dataTables.fixedColumns.min.js"></script>',
+                '<script src="assets/vendor/jszip/jszip.min.js"></script>',
+                '<script src="assets/vendor/datatables/buttons.html5.min.js"></script>',
+            );
+            $page_specific_js1 = array(
+                '<script src="assets/js/components/bootstrap-datepicker.js"></script>',
+                '<script src="assets/js/components/select2.js"></script>',
+                '<script src="assets/js/components/bootstrap-select.js"></script>',
+                '<script src="assets/js/components/icheck.js"></script>',
+                '<script src="assets/js/components/asspinner.js"></script>',
+                '<script src="assets/js/fupload/ajaxupload.js" type="text/javascript"></script>',
+                '<script src="assets/js/fupload/jquery.ajax_upload.0.6.min.js" type="text/javascript"></script>',
+                '<script src="application/handler/bank-charge.handler.js?v=' . $jsVersion . '"></script>'
+            );
+            $page_specific_jsfunc = array('');
+
+            break;
+
+
 
         default:
             $page_specific_js = array();

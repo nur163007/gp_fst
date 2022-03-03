@@ -65,6 +65,7 @@ $title="User Profile";
 
                             <form class="form-horizontal" id="formProfile" name="formProfile" method="post" autocomplete="off">
                                 <input type="hidden" name="action" value="2" />
+                                <input type="hidden" id="image_col" name="image_col" value="" />
                                 <input type="hidden" name="csrf_token" value="<?php echo generateToken('formProfile'); ?>"/>
                                 <div class="row row-lg">
 
@@ -105,6 +106,23 @@ $title="User Profile";
                                             <button type="button" class="btn btn-primary" id="btnProfileSave" ><i class="icon fa-save" aria-hidden="true"></i> Save</button>
                                         </div>
 
+                                    </div>
+
+                                    <div class="col-xlg-6 col-md-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">Profile Picture: </label>
+                                            <div class="col-sm-4" id="upload">
+
+                                                <button type="button" id="btnPictureUpload" class="btn btn-icon btn-primary btn-outline btn-round" style="position:absolute; right:28px; top:10px;">
+                                                    <i class="icon wb-plus" aria-hidden="true"></i>
+                                                </button>
+                                                <button type="button" id="btnPictureDelete" class="btn btn-icon btn-danger btn-outline btn-round hidden" style="position:absolute; right:28px; top:10px;">
+                                                    <i class="icon wb-minus" aria-hidden="true"></i>
+                                                </button>
+                                                <div style="border:1px dashed #cacaca; overflow:hidden;">Loading...</div>
+                                                <span class="comment-meta">For best fit use 300 x 300 px image</span>
+                                            </div>
+                                        </div>
                                     </div>
 
                                 </div>

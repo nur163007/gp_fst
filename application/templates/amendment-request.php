@@ -53,7 +53,7 @@ if(!empty($_GET['ref'])){
                     <input name="amndId" id="amndId" type="hidden" value="" />
                     <div id="PO_submit_error" style="display:none;"></div>
                     <div class="row row-lg">
-                        <div class="col-xlg-5 col-md-5" id="forLCOper">
+                        <div class="col-xlg-6 col-md-6" id="forLCOper">
                             <h4 class="well well-sm example-title">Amendment Fields</h4>
                             <div class="form-group">
                                 <label class="col-sm-4 control-label">PO No:</label>
@@ -130,22 +130,35 @@ if(!empty($_GET['ref'])){
                             <hr>
                             <div class="form-group text-right">
                                 <div class="col-sm-12">
+                                    <?php if ($actionLog['ActionID']> action_Amendment_Request_By_TFO) {?>
                                     <button type="button" class="btn btn-primary" id="SaveAmendmentCharge_btn"><i class="icon fa-save" aria-hidden="true"></i> Save Amendment Charge</button>
+                                <?php } ?>
                                 </div>
                             </div>
                             <?php }?>
+                            <?php if($_SESSION[session_prefix.'wclogin_role']==role_bank_lc){ ?>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Amendment Charge:</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="bankAmendCharge" name="bankAmendCharge" placeholder="0.00" />
+                                    </div>
+                                </div>
+                            <?php }?>
+
+                            <span id="attachAmendmentOpenRequestLink"></span>
+
                         </div>
-                        <div class="col-xlg-7 col-md-7">
+                        <div class="col-xlg-6 col-md-6">
                             <h4 class="well well-sm example-title">Amendment Details</h4>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">Amendment No:</label>
-                                <div class="col-sm-4">
+                                <label class="col-sm-4 control-label">Amendment No:</label>
+                                <div class="col-sm-8">
                                     <input type="text" class="form-control" id="amendNo" name="amendNo" value="" readonly="" />
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">Amendment Reason:</label>
-                                <div class="col-sm-9">
+                                <label class="col-sm-4 control-label">Amendment Reason:</label>
+                                <div class="col-sm-8">
                                     <input type="text" class="form-control" id="amendReason" name="amendReason" value="" />
                                 </div>
                             </div>
@@ -231,18 +244,49 @@ if(!empty($_GET['ref'])){
                             </div-->
                             <!-- End Panel Products Sales -->
                             <?php //}?>
-                            <?php if($_SESSION[session_prefix.'wclogin_role']==role_LC_Operation){?>
+                            <?php if($_SESSION[session_prefix.'wclogin_role']==role_LC_Operation && $actionLog['ActionID']< action_Amendment_Process_Done_By_Bank){?>
                             <div class="form-group">
                                 <div class="col-sm-12 text-right">
                                     <button type="button" class="btn btn-success" id="btnGenerateAmndInstructionLetter"><i class="icon fa-file-word-o" aria-hidden="true"></i> Generate Amendment Instruction Letter</button>
                                 </div>
                             </div>
+
+
+                                <h4 class="well well-sm example-title">Attachments</h4>
+
+                                <div class="form-group">
+                                    <label class="col-sm-5 control-label">Amendment Instruction Letter: </label>
+                                    <div class="col-sm-7">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="attachAmendmentLetter" id="attachAmendmentLetter" readonly placeholder=".pdf, .docx, .jpg, .png" />
+                                            <span class="input-group-btn">
+                                            <button type="button" id="btnUploadAmendmentLetter" class="btn btn-outline"><i class="icon wb-upload" aria-hidden="true"></i></button>
+                                        </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-sm-12 text-right">
+                                        <button type="button" class="btn btn-info" id="btnAmendmentSendToBank"><i class="icon fa-send-o" aria-hidden="true"></i>Send to Bank</button>
+                                    </div>
+                                </div>
+
+                            <?php }?>
+
+                            <?php if($_SESSION[session_prefix.'wclogin_role']==role_LC_Operation && $actionLog['ActionID']== action_Amendment_Process_Done_By_Bank){?>
+                                <h4 class="well well-sm example-title">Remarks</h4>
+                                <div class="form-group">
+                                    <div class="col-sm-12">
+                                        <textarea class="form-control" name="remarks" id="remarks" cols="30" rows="3"></textarea>
+                                    </div>
+                                </div>
                             <?php }?>
                         </div>
                     </div>
                     <hr/>
                     <div class="row row-lg">
-                        <?php if($_SESSION[session_prefix.'wclogin_role']==role_LC_Operation){?>
+                        <?php if($_SESSION[session_prefix.'wclogin_role']==role_bank_lc && $actionLog['ActionID'] == action_Amendment_Request_By_TFO ){?>
                         <div class="col-xlg-6 col-md-6">
                             <h4 class="well well-sm example-title">Attachments</h4>
                             <div class="form-group">
@@ -268,9 +312,56 @@ if(!empty($_GET['ref'])){
                                 </div>
                             </div>
                         </div>
+                        <div class="col-xlg-6 col-md-6">
+                            <h4 class="well well-sm example-title">Remarks</h4>
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <textarea class="form-control" name="remarks" id="remarks" cols="30" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                            <hr />
                         <?php }?>
 
-                        <?php if(in_array($_SESSION[session_prefix.'wclogin_role'],array(role_Buyer, role_Supplier))){?>
+                        <?php if($_SESSION[session_prefix.'wclogin_role']==role_LC_Operation && $actionLog['ActionID'] == action_Amendment_Request_By_TFO ){?>
+                            <div class="col-xlg-6 col-md-6">
+                                <h4 class="well well-sm example-title">Attachments</h4>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Amendment Copy: </label>
+                                    <div class="col-sm-6">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="attachAmendmentCopy" id="attachAmendmentCopy" readonly placeholder=".pdf, .docx, .jpg, .png" />
+                                            <span class="input-group-btn">
+                                            <button type="button" id="btnUploadAmendmentCopy" class="btn btn-outline"><i class="icon wb-upload" aria-hidden="true"></i></button>
+                                        </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Advice Note: </label>
+                                    <div class="col-sm-6">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="attachAdviceNote" id="attachAdviceNote" readonly placeholder=".pdf, .docx, .jpg, .png" />
+                                            <span class="input-group-btn">
+                                            <button type="button" id="btnUploadAdviceNote" class="btn btn-outline"><i class="icon wb-upload" aria-hidden="true"></i></button>
+                                        </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xlg-6 col-md-6">
+                                <h4 class="well well-sm example-title">Remarks</h4>
+                                <div class="form-group">
+                                    <div class="col-sm-12">
+                                        <textarea class="form-control" name="remarks" id="remarks" cols="30" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr />
+                        <?php }?>
+
+
+                        <?php if(in_array($_SESSION[session_prefix.'wclogin_role'],array(role_Supplier))){?>
                         <div class="col-xlg-6 col-md-6">
                             <h4 class="well well-sm example-title">Attachments</h4>
                             <div class="form-group">
@@ -292,9 +383,8 @@ if(!empty($_GET['ref'])){
                                 role_LC_Approvar_1,
                                 role_LC_Approvar_2,
                                 role_LC_Approvar_4,
-                                role_LC_Approvar_5,
-                                role_LC_Operation))){?>
-                        <div class="col-xlg-6 col-md-6">
+                                role_LC_Approvar_5))){?>
+                        <div class="col-xlg-6 col-md-6 pull-right">
                             <h4 class="well well-sm example-title">Remarks</h4>
                             <div class="form-group">
                                 <div class="col-sm-12">
@@ -302,9 +392,10 @@ if(!empty($_GET['ref'])){
                                 </div>
                             </div>
                         </div>
+<!--                            <hr />-->
                         <?php }?>
                     </div>
-                    <hr />
+
                     <div class="row row-lg">
                         <div class="col-xlg-12 col-md-12">
                             <div class="form-group">
@@ -313,7 +404,9 @@ if(!empty($_GET['ref'])){
                                     <button type="button" class="btn btn-warning" id="SendAmendmentRequest_btn"><i class="icon fa-send" aria-hidden="true"></i> Send Amendment Request</button><?php }?>
                                     <?php if(in_array($_SESSION[session_prefix.'wclogin_role'],array(role_Buyer,role_LC_Approvar_1,role_LC_Approvar_2,role_LC_Approvar_4,role_LC_Approvar_5))){?><button type="button" class="btn btn-success" id="acceptRequest_btn">Accept Request</button>
                                     <button type="button" class="btn btn-danger" id="rejectRequest_btn">Reject Request</button><?php }?>
-                                    <?php if($_SESSION[session_prefix.'wclogin_role']==role_LC_Operation){?><button type="button" class="btn btn-primary" id="SendAmendmentCopy_btn"><i class="icon fa-send" aria-hidden="true"></i> Send Amendment Copy</button>
+                                    <?php if($_SESSION[session_prefix.'wclogin_role']==role_LC_Operation && $actionLog['ActionID'] == action_Amendment_Process_Done_By_Bank ){?><button type="button" class="btn btn-primary" id="SendAmendmentCopy_btn"><i class="icon fa-send" aria-hidden="true"></i> Send Amendment Copy</button>
+                                    <?php }?>
+                                    <?php if($_SESSION[session_prefix.'wclogin_role']==role_bank_lc){?><button type="button" class="btn btn-primary" id="SendAmendmentToTFO_btn"><i class="icon fa-send" aria-hidden="true"></i> Send Amendment Copy To TFO</button>
                                     <?php }?>
                                     <a href="<?php echo $adminUrl;?>" class="btn btn-default btn-outline">Cancel</a>
                                 </div>

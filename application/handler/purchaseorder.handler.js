@@ -507,18 +507,7 @@ function dataLoadCall(){
         }
     });
 
-    $.getJSON("api/category?action=4&id=56", function (list) {
-        //alert('sds')
-        $("#importAs").select2({
-            data: list,
-            placeholder: "select a import as",
-            allowClear: false,
-            width: "100%"
-        });
-        if(poid!=""){
-            $('#importAs').val(podata['importAs']).change();
-        }
-    });
+
     
     $.get("api/category?action=8&id=17", function (list) {
         $("#currency").html('<option value="" data-icon="" data-hidden="true"></option>').append(list);
@@ -556,11 +545,6 @@ function validate() {
     if ($("#poid1").val() == "") {
         $("#poid1").focus();
         alertify.error("PO Number is required!");
-        return false;
-    }
-    if ($("#importAs").val() == "") {
-        $("#importAs").focus();
-        alertify.error("Please select Import As!");
         return false;
     }
     if ($("#podesc").val() == "") {
@@ -666,33 +650,6 @@ function validate() {
         alertify.error("Please select Implement by option!");
         return false;
     }
-
-    if ($("#attachpo").val() == "") {
-        $("#attachpo").focus();
-        alertify.error("Attach Purchase Order Documents!");
-        return false;
-    } else {
-        if (!validAttachment($("#attachpo").val())) {
-            alertify.error('Invalid File Format.');
-            return false;
-        }
-    }
-    if ($("#attachboq").val() == "") {
-        $("#attachboq").focus();
-        alertify.error("Attach BOQ Documents!");
-        return false;
-    } else {
-        if (!validAttachment($("#attachboq").val())) {
-            alertify.error('Invalid File Format.');
-            return false;
-        }
-    }
-    if ($("#attachother").val() != "") {
-        if (!validAttachment($("#attachother").val())) {
-            alertify.error('Invalid File Format.');
-            return false;
-        }
-    }
     return true;
 }
 
@@ -741,7 +698,6 @@ $(function () {
     });
 });
 
-
 $(function () {
 
     var button = $('#btnUploadBoq'), interval;
@@ -773,7 +729,6 @@ $(function () {
         }
     });
 });
-
 
 $(function () {
 
@@ -853,7 +808,6 @@ function validatePONumber(){
     	 }
     });
 }
-
 
 function vatAmount(pa, vr) {
     return pa*(vr/100);

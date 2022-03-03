@@ -22,144 +22,168 @@ $(document).ready(function (e) {
                 var caRefColumn = '';
                 var downloadColumn = '';
                 var letter = '';
-                // var attachTitle = [];
+                var attachControl = [];
+
                 for (let i = 0; i < response.length; ++i) {
 
-                    var div= response[i].btrc_division;
+                    var btrcDiv= response[i].btrc_division;
 
-                    if(div == 115){
-                        letter = '<a href="javascript:void(0)" style="text-decoration: none" onclick="downloadApp_eo_letter('+div+')"><i class="icon fa-file-word-o" aria-hidden="true"></i> Eo</a>&nbsp;&nbsp;' +
-                                 '<a href="javascript:void(0)" style="text-decoration: none" onclick="downloadApp_equipment_letter('+div+')"><i class="icon fa-file-word-o" aria-hidden="true"></i> Eqp</a><br>' +
-                                 '<a href="javascript:void(0)" style="text-decoration: none;color: red;" onclick="downloadEOZip('+response[i].pra_ref+')"><i class="fa fa-file-zip-o text-danger" aria-hidden="true"></i> Download zip</a>';
+                    if(btrcDiv == btrc_division_ENO){
+                        letter = '<a href="javascript:void(0)" style="text-decoration: none" onclick="downloadApp_eo_letter('+btrcDiv+')"><i class="icon fa-file-word-o" aria-hidden="true"></i> EO</a>&nbsp;&nbsp;' +
+                                 '<a href="javascript:void(0)" style="text-decoration: none" onclick="downloadApp_equipment_letter('+btrcDiv+')"><i class="icon fa-file-word-o" aria-hidden="true"></i> Equip</a><br>' +
+                                 '<a href="javascript:void(0)" style="text-decoration: none" onclick="downloadEOZip('+response[i].pra_ref+')"><i class="fa fa-file-zip-o text-danger" aria-hidden="true"></i> Download Zip</a>';
+
+                        attachmentColumn = '<td rowspan="' + response[i].poCount + '">' +
+                            '<div class="input-group small col-sm-12">' +
+                            '   <input type="hidden" name="attachRefNo[]" id="attachRefNo' + i + '" value="' + response[i].pra_ref + '" />' +
+                            '   <input type="text" class="form-control attachEODoc input-sm" name="attachEODoc[]" id="attachEODoc' + i + '" readonly placeholder="EO.docx" />' +
+                            '   <span class="input-group-btn">' +
+                            '       <button type="button" id="btnUploadAttachEODoc' + i + '" class="btn btn-outline btn-sm"><i class="icon wb-upload" aria-hidden="true"></i></button>' +
+                            '   </span>' +
+                            '</div>' +
+                            '<div class="input-group small col-sm-12">' +
+                            '   <input type="text" class="form-control attachEquipDoc input-sm" name="attachEquipDoc[]" id="attachEquipDoc' + i + '" readonly placeholder="Equip.docx" />' +
+                            '   <span class="input-group-btn">' +
+                            '       <button type="button" id="btnUploadAttachEquipDoc' + i + '" class="btn btn-outline btn-sm"><i class="icon wb-upload" aria-hidden="true"></i></button>' +
+                            '   </span>' +
+                            '</div>' +
+                            '</td>';
                     }
-                    else if(div == 116){
-                        letter = '<a href="javascript:void(0)" style="text-decoration: none" onclick="downloadApp_spectrum_letter('+div+')"><i class="icon fa-file-word-o" aria-hidden="true"></i> Spec</a>&nbsp;&nbsp;'+
-                                 '<a href="javascript:void(0)" style="text-decoration: none" onclick="downloadApp_equipment_letter('+div+')"><i class="icon fa-file-word-o" aria-hidden="true"></i> Equip</a>&nbsp;&nbsp;'+
-                                 '<a href="javascript:void(0)" style="text-decoration: none" onclick="downloadApp_quantity_letter('+div+')"><i class="icon fa-file-word-o" aria-hidden="true"></i> Qty</a><br>' +
-                                 '<a href="javascript:void(0)" style="text-decoration: none;color: red;" onclick="downloadSMZip('+response[i].pra_ref+')"><i class="fa fa-file-zip-o text-danger" aria-hidden="true"></i> Download zip</a>';
+                    else if(btrcDiv == btrc_division_SM){
+                        letter = '<a href="javascript:void(0)" style="text-decoration: none" onclick="downloadApp_spectrum_letter('+btrcDiv+')"><i class="icon fa-file-word-o" aria-hidden="true"></i> Spec</a>&nbsp;&nbsp;'+
+                                 '<a href="javascript:void(0)" style="text-decoration: none" onclick="downloadApp_equipment_letter('+btrcDiv+')"><i class="icon fa-file-word-o" aria-hidden="true"></i> Equip</a>&nbsp;&nbsp;'+
+                                 '<a href="javascript:void(0)" style="text-decoration: none" onclick="downloadApp_quantity_letter('+btrcDiv+')"><i class="icon fa-file-word-o" aria-hidden="true"></i> Qty</a><br>' +
+                                 '<a href="javascript:void(0)" style="text-decoration: none" onclick="downloadSMZip('+response[i].pra_ref+')"><i class="fa fa-file-zip-o text-danger" aria-hidden="true"></i> Download Zip</a>';
 
-                        // letter = '<a href="#" id="btnGenerate_SpectrumLetter" style="text-decoration: none;"><i class="icon fa-file-word-o" aria-hidden="true"></i> Spectrum Letter</a> &nbsp;&nbsp;' +
-                        //     '<a href="#" id="btnGenerate_EquipmentLetter" style="text-decoration: none;"><i class="icon fa-file-word-o" aria-hidden="true"></i> Equipment List</a> &nbsp;&nbsp;' +
-                        //     '<a href="#" id="btnGenerate_QuantityLetter" style="text-decoration: none;"><i class="icon fa-file-word-o" aria-hidden="true"></i> Equipment Quantity</a>';
+                        attachmentColumn = '<td rowspan="' + response[i].poCount + '">' +
+                            '<div class="input-group small col-sm-12">' +
+                            '   <input type="hidden" name="attachRefNo[]" id="attachRefNo' + i + '" value="' + response[i].pra_ref + '" />' +
+                            '   <input type="text" class="form-control attachSpecDoc input-sm" name="attachSpecDoc[]" id="attachSpecDoc' + i + '" readonly placeholder="Spec.docx" />' +
+                            '   <span class="input-group-btn">' +
+                            '       <button type="button" id="btnUploadAttachSpecDoc' + i + '" class="btn btn-outline btn-sm"><i class="icon wb-upload" aria-hidden="true"></i></button>' +
+                            '   </span>' +
+                            '</div>' +
+                            '<div class="input-group small col-sm-12">' +
+                            '   <input type="text" class="form-control attachEquipDoc input-sm" name="attachEquipDoc[]" id="attachEquipDoc' + i + '" readonly placeholder="Equip.docx" />' +
+                            '   <span class="input-group-btn">' +
+                            '       <button type="button" id="btnUploadAttachEquipDoc' + i + '" class="btn btn-outline btn-sm"><i class="icon wb-upload" aria-hidden="true"></i></button>' +
+                            '   </span>' +
+                            '</div>' +
+                            '<div class="input-group small col-sm-12">' +
+                            '   <input type="text" class="form-control attachQtyDoc input-sm" name="attachQtyDoc[]" id="attachQtyDoc' + i + '" readonly placeholder="Qty.docx" />' +
+                            '   <span class="input-group-btn">' +
+                            '       <button type="button" id="btnUploadAttachQtyDoc' + i + '" class="btn btn-outline btn-sm"><i class="icon wb-upload" aria-hidden="true"></i></button>' +
+                            '   </span>' +
+                            '</div>' +
+                            '</td>';
                     }
 
                     if(caRef != response[i].pra_ref) {
-                        caRefColumn = '<td rowspan="' + response[i].poCount + '">' + response[i].pra_ref + '</br> (' + response[i].division + ') </td>';
-                        downloadColumn = '<td rowspan="' + response[i].poCount + '">' + letter +'</td>';
+                        caRefColumn = '<td rowspan="' + response[i].poCount + '">' + response[i].pra_ref + '</br> (' + response[i].division + ') ' +
+                            '<input type="hidden" class="btrcDivision" id="btrcDivision' + i + '" value="' + btrcDiv + '" /></td>';
+                        downloadColumn = '<td rowspan="' + response[i].poCount + '">' + letter + '</td>'
                         caRef = response[i].pra_ref;
 
-                        // $('#docId' + response[i].pra_ref).val('sdfsff').change();
-
+                        /*-------------------------------------------------------------------------------------
+                        * Keeping attachment element names in array to bind function after HTML append
+                        * -------------------------------------------------------------------------------------*/
+                        let arrCount = attachControl.length;
+                        if(btrcDiv == btrc_division_ENO){
+                            attachControl[arrCount] = "attachEODoc" + i + "|btnUploadAttachEODoc" + i +
+                                ",attachEquipDoc" + i + "|btnUploadAttachEquipDoc" + i;
+                        } else if(btrcDiv == btrc_division_SM) {
+                            attachControl[arrCount] = "attachSpecDoc" + i + "|btnUploadAttachSpecDoc" + i +
+                                ",attachEquipDoc" + i + "|btnUploadAttachEquipDoc" + i +
+                                ",attachQtyDoc" + i + "|btnUploadAttachQtyDoc" + i;
+                        }
+                        /*-------------------------------------------------------------------------------------*/
                     }
                     else {
                         caRefColumn = '';
                         downloadColumn = '';
+                        attachmentColumn = '';
                     }
+
                     get_data +='<tr>'+
-                        //'<td'+colspan+'>' +response[i].pra_ref+ '</td>'+
                         caRefColumn +
                         '<td>' +response[i].pono+ '</td>'+
-                        '<td>' +'<a href="download-attachment/'+response[i].PO.split(',',2)[1]+'" style="text-decoration: none;" target="_blank"><i class="icon fa-'+response[i].extpo+'"></i>&nbsp;PO</a>&nbsp;&nbsp;&nbsp;' +
-                        '<a href="download-attachment/'+response[i].BOQ.split(',',2)[1]+'" style="text-decoration: none;" target="_blank"><i class="icon fa-'+response[i].extboq+'"></i>&nbsp;BOQ</a>&nbsp;&nbsp;&nbsp;' +
-                        '<a href="download-attachment/'+response[i].Justification.split(',',2)[1]+'" style="text-decoration: none;" target="_blank"><i class="icon fa-'+response[i].extjust+'"></i>&nbsp;Justification</a>&nbsp;&nbsp;&nbsp;' +
-                        '<a href="download-attachment/'+response[i].Catalog.split(',',2)[1]+'" style="text-decoration: none;" target="_blank"><i class="icon fa-'+response[i].extcat+'"></i>&nbsp;Catalog</a>' +
+                        '<td>' +response[i].pinum+ '</td>'+
+                        '<td>' +response[i].pidate+ '</td>'+
+                        '<td>' +response[i].pivalue+ '</td>'+
+                        '<td>'+
+                            '<a href="download-attachment/'+response[i].PO.split(',',2)[1]+'" style="text-decoration: none;" target="_blank"><i class="icon fa-'+response[i].extpo+'"></i>&nbsp;PO</a>&nbsp;&nbsp;&nbsp;' +
+                            '<a href="download-attachment/'+response[i].BOQ.split(',',2)[1]+'" style="text-decoration: none;" target="_blank"><i class="icon fa-'+response[i].extboq+'"></i>&nbsp;BOQ</a>&nbsp;&nbsp;&nbsp;' +
+                            '<a href="download-attachment/'+response[i].Justification.split(',',2)[1]+'" style="text-decoration: none;" target="_blank"><i class="icon fa-'+response[i].extjust+'"></i>&nbsp;Justification</a>&nbsp;&nbsp;&nbsp;' +
+                            '<a href="download-attachment/'+response[i].Catalog.split(',',2)[1]+'" style="text-decoration: none;" target="_blank"><i class="icon fa-'+response[i].extcat+'"></i>&nbsp;Catalog</a>' +
                         '</td>'+
-                        '<td>' + '<input type="checkbox" id="AllPra" name="AllPra[]" value="'+response[i].actionRef+'">' +
-                        '<button type="button" class="btn btn-sm btn-icon btn-flat btn-default" style="margin-top: -6px;" data-target="#praRejectForm" data-toggle="modal" onclick="DeletePRA(' + response[i].id +')"><i class="icon wb-close text-danger" aria-hidden="true"></i></button>' +
+                        '<td>'+
+                            '<input type="checkbox" id="AllPra" name="AllPra[]" value="'+response[i].actionRef+'" title="Accept">' +
+                            '<button type="button" class="btn btn-sm btn-icon btn-flat btn-default" title="Reject" style="margin-top: -6px;" data-target="#praRejectForm" data-toggle="modal" onclick="DeletePRA(' + response[i].id +')"><i class="icon wb-close text-danger" aria-hidden="true"></i></button>'+
                         '</td>'+
-                        downloadColumn+
+                        downloadColumn + attachmentColumn +
                         '</tr>';
-
-                      // attachTitle += response[i].PO;
-                    // alert('filesToZip' + response[i].pra_ref);
-//'div[id^="tag"]'
-
-                   /* $('div#filesToZip').append(
-                        $('<input>').attr({
-                            'type': 'checkbox',
-                            'name': 'files[]',
-                            'value': response[i].PO.split(',',2)[0],
-                            'checked': '""',
-                            'hidden': '""'
-                        })
-                    );
-                    $('div#filesToZip').append(
-                        $('<input>').attr({
-                            'type': 'checkbox',
-                            'name': 'files[]',
-                            'value': response[i].BOQ.split(',',2)[0],
-                            'checked': '""',
-                            'hidden': '""'
-                        })
-                    );
-                    $('div#filesToZip').append(
-                        $('<input>').attr({
-                            'type': 'checkbox',
-                            'name': 'files[]',
-                            'value': response[i].Justification.split(',',2)[0],
-                            'checked': '""',
-                            'hidden': '""'
-                        })
-                    );
-                    $('div#filesToZip').append(
-                        $('<input>').attr({
-                            'type': 'checkbox',
-                            'name': 'files[]',
-                            'value': response[i].Catalog.split(',',2)[0],
-                            'checked': '""',
-                            'hidden': '""'
-                        })
-                    );*/
                 }
 
-                $("#myTable").html(get_data);
+                $("#myTable").append(get_data);
+                /*---------------------------------------------------------------------------------
+                * Binding function to control
+                *---------------------------------------------------------------------------------*/
+                //alert(attachControl.length);
+                for (let c = 0; c < attachControl.length; ++c) {
+
+                    //alert(attachControl);
+                    var aValRow = attachControl[c].split(",");
+                    //alert(aValRow.length);
+
+                    for (let d = 0; d < aValRow.length; ++d) {
+
+                        var aVal = aValRow[d].split("|");
+
+                        //alert(aVal[0]);
+                        //alert(aVal[1]);
+
+                        $(function () {
+                            var button = $('#' + aVal[1]), interval;
+                            var txtbox = $('#' + aVal[0]);
+
+                            if (!$(button).is(':disabled')) {
+
+                                new AjaxUpload(button, {
+                                    action: 'application/library/uploadhandler.php',
+                                    name: 'upl',
+                                    onComplete: function (file, response) {
+                                        var res = JSON.parse(response);
+                                        txtbox.val(res['filename']);
+                                        window.clearInterval(interval);
+                                    },
+                                    onSubmit: function (file, ext) {
+                                        if (!(ext && /^(doc|docx|pdf)$/i.test(ext))) {
+                                            alert('Invalid File Format.');
+                                            return false;
+                                        }
+                                        txtbox.val("Uploading...");
+                                        // Uploding -> Uploading. -> Uploading...
+                                        interval = window.setInterval(function () {
+                                            var text = txtbox.val();
+                                            if (txtbox.val().length < 13) {
+                                                txtbox.val(txtbox.val() + '.');
+                                            } else {
+                                                txtbox.val('Uploading');
+                                            }
+                                        }, 200);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+                //---------------------------------------------------------------------------------
             },
             error:function (err) {
                 console.log(err);
             }
         });
     }
-
-
-    // $('#dtMyInbox').dataTable({
-    //     "ajax": "api/pra-interface?action=1&my=true",
-    //     "columns": [
-    //         { "data": "id", "visible": false },
-    //         { "data": "pra_ref"},
-    //         { "data": "pono"},
-    //
-    //         // { "data": null, "class": "padding-6", "sortable": false,
-    //         //     "render": function(data, type, full) {
-    //         //         return '<button type="button" class="btn btn-sm btn-icon btn-flat btn-default" data-target="#praRejectForm" data-toggle="modal" onclick="DeletePRA('+data.id+')"><i class="icon wb-close text-danger" aria-hidden="true"></i></button>';
-    //         //     }
-    //         // }
-    //
-    //         { "data": null, "class": "padding-6",
-    //             "render": function(data, type, full) {
-    //                 return '<div id="attachmentPRA"><a href="download-attachment/'+full["PO"]+'" style="text-decoration: none;" target="_blank"><i class="icon fa-'+full['extpo']+'"></i>&nbsp;PO</a>&nbsp;&nbsp;&nbsp;' +
-    //                     '<a href="download-attachment/'+full["BOQ"]+'" style="text-decoration: none;" target="_blank"><i class="icon fa-'+full['extboq']+'"></i>&nbsp;BOQ</a>&nbsp;&nbsp;&nbsp;' +
-    //                     '<a href="download-attachment/'+full["Justification"]+'" style="text-decoration: none;" target="_blank"><i class="icon fa-'+full['extjust']+'"></i>&nbsp;Justification</a>&nbsp;&nbsp;&nbsp;' +
-    //                     '<a href="download-attachment/'+full["Catalog"]+'" style="text-decoration: none;" target="_blank"><i class="icon fa-'+full['extcat']+'"></i>&nbsp;Catalog</a>' +
-    //                     '</div>';
-    //             }
-    //         },
-    //         { "data": null, "class": "padding-6",
-    //             "render": function(data, type, full) {
-    //                 return '<span>' +
-    //                     '<input type="checkbox" id="AllPra" name="AllPra[]" value='+full["actionRef"]+'>&nbsp;&nbsp;' +
-    //                     '<button type="button" class="btn btn-sm btn-icon btn-flat btn-default" style="margin-top: -6px;" data-target="#praRejectForm" data-toggle="modal" onclick="DeletePRA(\'+data.id+\')"><i class="icon wb-close text-danger" aria-hidden="true"></i></button>' +
-    //                     '</span>';
-    //             }
-    //         }
-    //
-    //     ],
-    //     // "order": [[ 7, "desc" ]],
-    //     "sDom": 'frtip',
-    //     "bProcessing": true,
-    //     "bStateSave": false,
-    //     "autoWidth": false
-    // });
-
 
     otherIndex();
     function otherIndex() {
@@ -197,40 +221,6 @@ $(document).ready(function (e) {
             }
         });
     }
-    // $('#dtOtherInbox').dataTable({
-    //     "ajax": "api/pra-interface?action=1&my=false",
-    //     "columns": [
-    //         { "data": "id", "visible": false },
-    //         { "data": "pra_ref"},
-    //         { "data": "pono"},
-    //       /*{ "data": null, "class": "padding-6", "sortable": false,
-    //             "render": function(data, type, full) {
-    //                 return '<div class="input-group">\n' +
-    //                     ' <input type="text" class="form-control" name="attachBTRCNOC" id="'+'att'+data.id+'" readonly placeholder=".pdf, .docx, .jpg, .png" />\n' +
-    //                     ' <span class="input-group-btn"> <input type="file" oninput="fileUpload('+data.id+')" class="hidden" name="attach_file" id="'+'file'+data.id+'">\n' +
-    //                     ' <button type="button"  onclick="UpdateAttached('+data.id+')" class="btn btn-outline"><i class="icon wb-upload" aria-hidden="true"></i></button>\n' +
-    //                     ' </span>\n' +
-    //                     ' </div>';
-    //             }
-    //         },*/
-    //         { "data": null, "class": "padding-6",
-    //             "render": function(data, type, full) {
-    //                 return '<input type="checkbox" id="submitPRA" name="submitPRA[]" value='+full["actionRef"]+' >';
-    //             }
-    //         },
-    //         { "data": null, "class": "padding-6", "sortable": false,
-    //             "render": function(data, type, full) {
-    //                 return '<button type="button" class="btn btn-sm btn-icon btn-flat btn-default" data-target="#btrcRejectForm" data-toggle="modal" onclick="DeleteBTRC('+data.id+')"><i class="icon wb-close text-danger" aria-hidden="true"></i></button>';
-    //             }
-    //         }
-    //
-    //     ],
-    //     // "order": [[ 7, "desc" ]],
-    //     "sDom": 'frtip',
-    //     "bProcessing": true,
-    //     "bStateSave": false,
-    //     "autoWidth": false
-    // });
 
     // STRAT REQUEST SENT FROM PRA TO BTRC
 
@@ -240,48 +230,98 @@ $(document).ready(function (e) {
 
     var getCheckData = function (refid) {
         var val = [];
-        $(':checkbox:checked').each(function(i){
-            val[i] = $(this).val();
-        });
-     /*   if (val.checked == false){
+        var attach = '';
 
-        }*/
         if ($("input[name='AllPra[]']").filter(":checked").length < 1){
             alertify.error('Please checked at least one');
             return false;
         }
         else {
-            alertify.confirm( 'Are you sure you want submit?', function () {
-                $.ajax({
-                    type: "POST",
-                    url: "api/pra-interface?action=3",
-                    dataType: "JSON",
-                    data:{
-                        val:val
-                    },
-                    cache: false,
-                    success: function (result) {
-                        console.log(result);
-                        // $('.table').DataTable().ajax.reload();
-                        if (result['status'] == 1) {
-                            alertify.success(result['message']);
-                            location.reload(true);
-                           /* var mtable = $('#dtMyInbox').dataTable();
-                            mtable.api().ajax.reload();
-                            var otable = $('#dtOtherInbox').dataTable();
-                            otable.api().ajax.reload();*/
-                        } else {
-                            alertify.error(result['message']);
-                            return false;
-                        }
-                    },
-                    error: function (xhr) {
-                        console.log('Error: ' + xhr);
-                    }
-                });
-            });
-        }
 
+            var finalDocs = "";
+            var btrcDivision = "";
+            $("input[name='AllPra[]']").filter(":checked").each(function(i){
+
+                /* ---------------------------------------------------------------------------------
+                 * Why using this condition here?
+                 * When we run a loop for each row of a table, the element found in
+                 * undefined state which are inside a marged row cell. Here in case of 'TA Ref' and
+                 * 'Attachment' columns we can not find it's inside element from each rows
+                 * related to those elements except first row.
+                 *---------------------------------------------------------------------------------*/
+                if($(this).closest("tr").find("input.btrcDivision").val()!==undefined){
+                    btrcDivision = $(this).closest("tr").find("input.btrcDivision").val();
+                }
+
+                if(btrcDivision==btrc_division_ENO){
+                    if ($(this).closest("tr").find("input.attachEODoc").val() === "" ||
+                        $(this).closest("tr").find("input.attachEquipDoc").val() === "") {
+                        alertify.error('Please attach all required documents');
+                        return false;
+                    } else {
+                        /*
+                         * For the same reason as above
+                         */
+                        if($(this).closest("tr").find("input.attachSpecDoc").val()!==undefined) {
+                            finalDocs = $(this).closest("tr").find("input.attachSpecDoc").val() + "," +
+                                $(this).closest("tr").find("input.attachEquipDoc").val() + "," +
+                                $(this).closest("tr").find("input.attachQtyDoc").val();
+                        }
+                        val[i] = $(this).val() + "|" + finalDocs;
+                    }
+                } else if(btrcDivision==btrc_division_SM)
+                {
+                    if ($(this).closest("tr").find("input.attachSpecDoc").val() === "" ||
+                        $(this).closest("tr").find("input.attachEquipDoc").val() === "" ||
+                        $(this).closest("tr").find("input.attachQtyDoc").val() === "") {
+                        alertify.error('Please attach all required documents');
+                        return false;
+                    } else {
+                        /*
+                         * For the same reason as above
+                         */
+                        if($(this).closest("tr").find("input.attachSpecDoc").val()!==undefined) {
+                            finalDocs = $(this).closest("tr").find("input.attachSpecDoc").val() + "," +
+                                $(this).closest("tr").find("input.attachEquipDoc").val() + "," +
+                                $(this).closest("tr").find("input.attachQtyDoc").val();
+                        }
+                        val[i] = $(this).val() + "|" + finalDocs;
+                    }
+                }
+            });
+            alert(val);
+            if(val.length>0){
+                alertify.confirm( 'Are you sure you want submit?', function () {
+                    $.ajax({
+                        type: "POST",
+                        url: "api/pra-interface?action=3",
+                        dataType: "JSON",
+                        data:{
+                            val:val
+                        },
+                        cache: false,
+                        success: function (result) {
+                            console.log(result);
+                            // $('.table').DataTable().ajax.reload();
+                            if (result['status'] == 1) {
+                                alertify.success(result['message']);
+                                location.reload(true);
+                                /* var mtable = $('#dtMyInbox').dataTable();
+                                 mtable.api().ajax.reload();
+                                 var otable = $('#dtOtherInbox').dataTable();
+                                 otable.api().ajax.reload();*/
+                            } else {
+                                alertify.error(result['message']);
+                                return false;
+                            }
+                        },
+                        error: function (xhr) {
+                            console.log('Error: ' + xhr);
+                        }
+                    });
+                });
+            }
+        }
     }
 
 // END REQUEST SENT FROM PRA TO BTRC
@@ -604,7 +644,7 @@ function validate() {
 
 $(function () {
 
-    if($("#usertype").val()==role_public_regulatory_affairs){
+    if($("#usertype").val()==const_role_public_regulatory_affairs){
 
         var button = $('#btnUploadBTRCNOC'), interval;
         var txtbox = $('#attachBTRCNOC');
@@ -732,14 +772,14 @@ function downloadApp_equipment_letter(ref){
                 for (var i=0; i < poData.length;i++){
 
                     html += '<tr style="border: 1px solid black;border-collapse: collapse;">\n' +
-                        '        <td style="width: 5%;border-collapse: collapse;border: 1px solid black; font-size: 12px;">'+ i +'</td>\n' +
-                        '        <td style="width: 15%;border-collapse: collapse;border: 1px solid black; font-size: 12px;">'+poData[i]["supplier"]+'</td>\n' +
-                        '        <td style="width: 15%;border-collapse: collapse;border: 1px solid black; font-size: 12px;">'+poData[i]["poNo"]+'</td>\n' +
-                        '        <td style="width: 15%;border-collapse: collapse;border: 1px solid black; font-size: 12px;">'+poData[i]["pinum"]+'</td>\n' +
-                        '        <td style="width: 15%;border-collapse: collapse;border: 1px solid black; font-size: 12px;">'+poData[i]["pidate"]+'</td>\n' +
-                        '        <td style="width: 24%;border-collapse: collapse;border: 1px solid black; font-size: 12px;">'+poData[i]["itemDesc"]+'</td>\n' +
-                        '        <td style="width: 15%;border-collapse: collapse;border: 1px solid black; font-size: 12px;">'+poData[i]["poTotal"]+'</td>\n' +
-                        '        <td style="width: 15%;border-collapse: collapse;border: 1px solid black; font-size: 12px;">'+poData[i]["currency"]+'</td>\n' +
+                        '        <td style="border-collapse: collapse;border: 1px solid black; font-size: 10px;">'+ (i+1) +'</td>\n' +
+                        '        <td style="border-collapse: collapse;border: 1px solid black; font-size: 10px;">'+poData[i]["supplier"]+'</td>\n' +
+                        '        <td style="border-collapse: collapse;border: 1px solid black; font-size: 10px;">'+poData[i]["poNo"]+'</td>\n' +
+                        '        <td style="border-collapse: collapse;border: 1px solid black; font-size: 10px;">'+poData[i]["pinum"]+'</td>\n' +
+                        '        <td style="border-collapse: collapse;border: 1px solid black; font-size: 10px;">'+poData[i]["pidate"]+'</td>\n' +
+                        '        <td style="border-collapse: collapse;border: 1px solid black; font-size: 10px;">'+poData[i]["itemDesc"]+'</td>\n' +
+                        '        <td style="border-collapse: collapse;border: 1px solid black; font-size: 10px;">'+poData[i]["poTotal"]+'</td>\n' +
+                        '        <td style="border-collapse: collapse;border: 1px solid black; font-size: 10px;">'+poData[i]["currency"]+'</td>\n' +
                         '    </tr>'
                     // temp = temp.replace('##itemDesc##', poData[i]["itemDesc"]);
                     // temp = temp.replace('##summary##', poData[i]["justification"]);
@@ -812,9 +852,9 @@ function  downloadApp_quantity_letter(ref) {
                 for (var i=0; i < poData.length;i++){
 
                     html += '<tr style="border: 1px solid black;border-collapse: collapse;">\n' +
-                        '        <td style="width: 10%;border-collapse: collapse;border: 1px solid black; font-size: 12px;">'+ i +'</td>\n' +
-                        '        <td style="width: 75%;border-collapse: collapse;border: 1px solid black; font-size: 12px;text-align: left;">'+poData[i]["itemDesc"]+'</td>\n' +
-                        '        <td style="width: 15%;border-collapse: collapse;border: 1px solid black; font-size: 12px;">'+poData[i]["poQty"]+'</td>\n' +
+                        '        <td style="border-collapse: collapse;border: 1px solid black; font-size: 10px;">'+ (i+1) +'</td>\n' +
+                        '        <td style="border-collapse: collapse;border: 1px solid black; font-size: 10px;text-align: left;">'+poData[i]["itemDesc"]+'</td>\n' +
+                        '        <td style="border-collapse: collapse;border: 1px solid black; font-size: 10px;">'+poData[i]["poQty"]+'</td>\n' +
                         '    </tr>'
                     // temp = temp.replace('##itemDesc##', poData[i]["itemDesc"]);
                     // temp = temp.replace('##summary##', poData[i]["justification"]);

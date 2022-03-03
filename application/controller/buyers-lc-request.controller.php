@@ -344,7 +344,7 @@ function SubmitLCRequest()
     */
     
     if($_POST["installBy"]!=$_POST["installByOld"]){
-        $query = "UPDATE `wc_t_po` SET `installbysupplier` = ".$_POST["installBy"]." WHERE `poid`='$pono';";
+        $query = "UPDATE `wc_t_pi` SET `installbysupplier` = ".$_POST["installBy"]." WHERE `poid`='$pono';";
         $objdal->update($query);
     }
     

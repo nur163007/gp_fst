@@ -39,17 +39,18 @@ function getPOLines($id){
      * Query for Delivered PO Lines
      * **********************************/
     $sql = "SELECT 
-            d.`id`, d.`poNo`, d.`poDate`, d.`needByDate`, d.`itemCode`, REPLACE(d.`poDesc`, CHAR(194), '') AS `poDesc`, REPLACE(d.`itemDesc`, CHAR(194), '') AS `itemDesc`, 
+            d.`id`, d.`poNo`, DATE_FORMAT(d.`poDate`, '%Y-%m-%d') `poDate`, DATE_FORMAT(d.`needByDate`, '%Y-%m-%d') `needByDate`, 
+            d.`itemCode`, REPLACE(d.`poDesc`, CHAR(194), '') AS `poDesc`, REPLACE(d.`itemDesc`, CHAR(194), '') AS `itemDesc`, 
             d.`currency`, d.`lineNo`, d.`uom`, d.`unitPrice`, d.`poQty`, AVG(d.`poTotal`) `poTotal`,
-            IFNULL(d.`poDate`, '') AS `poDate`,l.`reqId`,l.`status`,
+            IFNULL(d.`poDate`, '') AS `poDate`,l.`PIReqNo`,l.`status`,
             SUM(IFNULL(IF(l.`status` = 0, l.`delivQty`, 0), 0)) AS `delivQty`,
             SUM(IFNULL(IF(l.`status` = 0, l.`delivTotal`, 0), 0)) AS `delivTotal`
         FROM
-            `wc_t_po_dump` d left join `wc_t_po_line` l on (d.`poNo` = l.`poNo` and d.`lineNo` = l.`lineNo`)
+            `wc_t_po_dump` d left join `pi_lines` l on (d.`poNo` = l.`poNo` and d.`lineNo` = l.`lineNo`)
         WHERE
             d.`poNo` = '$id' AND NOT l.`reqId` IS NULL
         GROUP BY d.`id`, d.`poNo`, d.`poDate`, d.`needByDate`, d.`itemCode`, d.`itemDesc`, d.`currency`, d.`lineNo`, 
-                 d.`uom`, d.`unitPrice`, d.`poQty`, d.`poTotal`,l.`reqId`,l.`status`;";
+                 d.`uom`, d.`unitPrice`, d.`poQty`, d.`poTotal`,l.`PIReqNo`,l.`status`;";
     //echo $sql;
     $objdal->read($sql);
 
@@ -67,19 +68,20 @@ function getPOLines($id){
 
     $sql = "SELECT * FROM 
         (SELECT 
-            d.`id`, d.`poNo`, d.`poDate`, d.`needByDate`, d.`itemCode`, REPLACE(d.`poDesc`, CHAR(194), '') AS `poDesc`, REPLACE(d.`itemDesc`, CHAR(194), '') AS `itemDesc`, 
+            d.`id`, d.`poNo`, DATE_FORMAT(d.`poDate`, '%Y-%m-%d') `poDate`, DATE_FORMAT(d.`needByDate`, '%Y-%m-%d') `needByDate`, 
+            d.`itemCode`, REPLACE(d.`poDesc`, CHAR(194), '') AS `poDesc`, REPLACE(d.`itemDesc`, CHAR(194), '') AS `itemDesc`, 
             d.`currency`, d.`lineNo`, d.`uom`, d.`unitPrice`, d.`poQty`, CAST((d.`unitPrice` * d.`poQty`) AS DECIMAL(11,2)) `poTotal`,
-            IFNULL(d.`projCode`, '') AS `projCode`, l.`reqId`, l.`status`,
+            IFNULL(d.`projCode`, '') AS `projCode`, l.`PIReqNo`, l.`status`,
             SUM(IFNULL(IF(l.`status` = 0, l.`delivQty`, 0), 0)) AS `delivQty`,
             SUM(IFNULL(IF(l.`status` = 0, l.`delivTotal`, 0), 0)) AS `delivTotal`,
             (d.poQty-SUM(IFNULL(IF(l.`status` = 0, l.`delivQty`, 0),0))) AS `delivQtyValid`, 
             CAST(((d.poQty-SUM(IFNULL(IF(l.`status` = 0, l.`delivQty`, 0), 0))) * d.unitPrice) AS DECIMAL(11,2)) AS `delivAmountValid`
         FROM
-            `wc_t_po_dump` d left join `wc_t_po_line` l on (d.`poNo` = l.`poNo` and d.`lineNo` = l.`lineNo`)
+            `wc_t_po_dump` d left join `pi_lines` l on (d.`poNo` = l.`poNo` and d.`lineNo` = l.`lineNo`)
         WHERE
             d.`poNo` = '$id'
         GROUP BY d.`id`, d.`poNo`, d.`poDate`, d.`needByDate`, d.`itemCode`, d.`itemDesc`, d.`currency`, d.`lineNo`, 
-                 d.`uom`, d.`unitPrice`, d.`poQty`, d.`poTotal`,l.`reqId`,l.`status`) x
+                 d.`uom`, d.`unitPrice`, d.`poQty`, d.`poTotal`,l.`PIReqNo`,l.`status`) x
         WHERE `poQty` > `delivQty`;";
     //echo $sql;
     $objdal->read($sql);
@@ -100,7 +102,7 @@ function getPOLines($id){
     $sql = "SELECT 
             `poNo`, GROUP_CONCAT(`lineNo`) AS `rejectedlines`
         FROM
-            `wc_t_po_line`
+            `pi_lines`
         WHERE
             `poNo` = '$id' AND `status` = 1
         GROUP BY `poNo`";

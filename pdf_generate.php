@@ -22,7 +22,8 @@ $dompdf->setPaper('A4', 'portrait');
 $dompdf->render();
 
 /* Output the generated PDF to Browser */
-$output_file_name = 'top_sheet_'.trim($_POST['ponum']).'_'.trim($_POST['srnum']).'.pdf';
+
+$output_file_name = trim($_POST['ponum']).'.pdf';
 
 //$dompdf->stream($output_file_name);
 

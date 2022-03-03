@@ -45,9 +45,12 @@ if (!empty($_GET["action"]) || isset($_GET["action"]))
                 echo GetLCTFOComments($_GET["id"]);
             }
             break;
-//        case 5:
-//            echo checkStepOver($_GET["po"], $_GET["step"]);
-//            break;
+        case 5:
+            echo GetBankNotification();
+            break;
+        case 6:
+            echo GetFinFXSettlePending();
+            break;
         default:
             break;
     }
@@ -83,6 +86,12 @@ if (!empty($_POST)){
             }
             break;
 
+        case 6:
+            if(!empty($_POST["LcNo1"]) || isset($_POST["LcNo1"])){
+                echo SubmitODocReceiptNotification();
+            }
+            break;
+
         default:
             break;
     }
@@ -90,7 +99,6 @@ if (!empty($_POST)){
 }
 
 //SUBMIT LC COPY TO TFO
-
 function submitLCToTFO()
 {
 
@@ -133,6 +141,26 @@ function submitLCToTFO()
         WHERE `pono` = '$po';";
 
         $objdal->update($query);
+
+        // Checking if this data is already exist
+        $query = "SELECT COUNT(*) AS `exist` FROM `wc_t_lc_opening_bank_charge` WHERE `LcNo` = '$lcno';";
+        $objdal->read($query);
+
+        $obcExist = 0;
+        if(!empty($objdal->data)){
+            $res = $objdal->data[0];
+            extract($res);
+            $obcExist = $res['exist'];
+        }
+
+        if($obcExist==0) {
+            $taskMessage = 'Insert new data';
+            $query = "INSERT INTO `wc_t_lc_opening_bank_charge` SET 
+			`LcNo` = '$lcno';";
+
+            $objdal->insert($query);
+
+        }
     }
 
     $ip = $_SERVER['REMOTE_ADDR'];
@@ -144,10 +172,10 @@ function submitLCToTFO()
         $query = "INSERT INTO `wc_t_attachments`(`poid`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`) VALUES 
         ('$po', 'Draft LC Copy', '$attachLC', $user_id, '$ip', $loginRole)";
     } elseif ($actionID == 402) {
-        $query = "INSERT INTO `wc_t_attachments`(`poid`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`) VALUES 
-        ('$po', 'Final LC Copy', '$attachLC', $user_id, '$ip', $loginRole),
-        ('$po', 'Bank Received Copy', '$attachBRC', $user_id, '$ip', $loginRole),
-        ('$po', 'Bank Charge Advice', '$attachBCA', $user_id, '$ip', $loginRole)";
+        $query = "INSERT INTO `wc_t_attachments`(`poid`, `lcno`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`) VALUES 
+        ('$po','$lcno', 'Final LC Copy', '$attachLC', $user_id, '$ip', $loginRole),
+        ('$po','$lcno', 'Bank Received Copy', '$attachBRC', $user_id, '$ip', $loginRole),
+        ('$po','$lcno', 'Bank Charge Advice', '$attachBCA', $user_id, '$ip', $loginRole)";
     }
     $objdal->insert($query);
     //echo($query);
@@ -305,7 +333,6 @@ function feedbackSupplier(){
 }
 
 //SUBMIT LC COPY TO TFO
-
 function AcceptFeedback(){
 
     $refId = decryptId($_POST["refId2"]);
@@ -348,7 +375,7 @@ function GetPODetail($id, $forPI=0, $shipno=0)
 
     //$response = ["status" => 0, "message" => "Invalid request access-denied"];
     if ($loginRole == role_Supplier) {
-        $strQuery = $objdal->getRow("SELECT `supplier` FROM `wc_t_po` WHERE `poid` = '$id';");
+        $strQuery = $objdal->getRow("SELECT `supplier` FROM `wc_t_pi` WHERE `poid` = '$id';");
         $supplier = $strQuery['supplier'];
         if ($supplier != $companyId) {
             $response = ["status" => 0, "message" => "Invalid request"];
@@ -361,7 +388,7 @@ function GetPODetail($id, $forPI=0, $shipno=0)
 
     if($forPI==1){
 
-        $sql = "SELECT `poid` FROM `wc_t_po` WHERE `poid` LIKE '".$id."%' ORDER BY `createdon` desc LIMIT 1;";
+        $sql = "SELECT `poid` FROM `wc_t_pi` WHERE `poid` LIKE '".$id."%' ORDER BY `createdon` desc LIMIT 1;";
         $objdal->read($sql);
 
         if(!empty($objdal->data)){
@@ -394,7 +421,7 @@ function GetPODetail($id, $forPI=0, $shipno=0)
     $sql = "SELECT p.`poid`, p.`povalue`, p.`lcdesc`, c2.`name` `supname`,c1.`name` `curname`,p.`pinum`, p.`shipmode`,
             (SELECT `ActionID` FROM `wc_t_action_log` WHERE `PO` = '$id' ORDER BY `ID` DESC Limit 1) `status`,
             i.`name` AS `insurancebank`
-            FROM `wc_t_po` p 
+            FROM `wc_t_pi` p 
                 INNER JOIN `wc_t_category` c1 ON p.`currency` = c1.`id` 
                 INNER JOIN `wc_t_company` c2 ON p.`supplier` = c2.`id`
                 LEFT JOIN `wc_t_lc` l ON p.`poid` = l.`pono`
@@ -437,9 +464,11 @@ function GetPODetail($id, $forPI=0, $shipno=0)
              ORDER BY a2.`attachedon` DESC
              LIMIT 1)
         ORDER BY a.`attachedby`, a.`id`;";
+
     //echo $sql;
     $objdal->read($sql);
-    if(!empty($objdal->data)) {
+
+    if(!empty($objdal->data[0])) {
         foreach ($objdal->data as $val) {
             //extract($val);
             array_push($val, encryptId($val['id']));
@@ -543,7 +572,6 @@ function GetLCattach($id, $forPI=0, $shipno=0)
 }
 
 //FEEDBACK COMMENTS FOR BANK MODULE
-
 function GetLCComments($id, $forPI=0, $shipno=0)
 {
     global $user_id;
@@ -587,11 +615,14 @@ function GetLCComments($id, $forPI=0, $shipno=0)
                 INNER JOIN `wc_t_action` as a ON pl.`ActionID` = a.`ID`
                 LEFT JOIN `wc_t_roles` as r1 ON a.`ActionPendingTo` = r1.`id` 
             WHERE `PO` = '$id' $shipSql AND pl.`ActionID` IN(407,408) AND a.`stage`='LC' ORDER BY pl.`ID` DESC;";
-//    echo $sql;
-//    ECHO 2;
-    $objdal->read($sql);
-    if(!empty($objdal->data)){
-//        echo 1;
+
+    $objdal->getRow($sql);
+
+    // echo is_null($objdal->data);
+    $msg = (array) null;
+
+    if(is_null($objdal->data)!=1){
+        //echo 1;
         foreach($objdal->data as $val){
             $msg[$i] = $val;
             $i++;
@@ -600,11 +631,10 @@ function GetLCComments($id, $forPI=0, $shipno=0)
     }
     unset($objdal);
 
-        return json_encode(array($msg));
+    return json_encode($msg);
 }
 
 //FEEDBACK COMMENTS FOR BANK MODULE
-
 function GetLCTFOComments($id, $forPI=0, $shipno=0)
 {
     global $user_id;
@@ -663,3 +693,206 @@ function GetLCTFOComments($id, $forPI=0, $shipno=0)
 
     return json_encode(array($msg));
 }
+
+function GetBankNotification(){
+
+    $user_company = $_SESSION[session_prefix.'wclogin_company'];
+    //$loginRole = $_SESSION[session_prefix.'wclogin_role'];
+    $objdal = new dal();
+    $query = "SELECT al.`ID`, al.`PO`, al.`shipNo`, al.`ActionID`, po.`povalue`, po.`podesc`, 
+                ct.name as `Cur`, lc.`lcno`, lc.`lcdesc`, format(sh.`ciAmount`,2) `ciAmount`, sh.`ciDate`, sh.`ciNo`,
+                format(lc.lcvalue, 2) `lcvalue`, date_format(lc.lcissuedate,'%d-%b-%Y') `lcdate`
+            FROM wc_t_action_log al 
+                INNER JOIN wc_t_pi po ON al.PO = po.poid 
+                INNER JOIN wc_t_category ct ON po.currency = ct.id
+                INNER JOIN wc_t_lc lc ON po.poid = lc.pono
+                INNER JOIN wc_t_shipment sh ON (al.PO = sh.pono and al.shipNo = sh.shipNo)
+            WHERE al.ActionID = ".action_Pre_Alert_To_Bank_for_Org_Doc." AND al.PendingToCo = $user_company AND al.`Status` = 0;";
+//    echo $query;
+    $objdal->read($query);
+
+    $rows = array();
+    if (!empty($objdal->data)) {
+        foreach ($objdal->data as $row) {
+            $row['ID'] = encryptId($row['ID']);
+            $rows[] = $row;
+        }
+    }
+    unset($objdal);
+    $json = json_encode($rows);
+    if ($json == "" || $json == 'null') {
+        $json = "[]";
+    }
+    $table_data = '{"data": ' . $json . '}';
+    //return $table_data;
+    return $table_data;
+
+}
+
+function SubmitODocReceiptNotification()
+{
+    global $user_id;
+    global $loginRole;
+
+    $refId = decryptId($_POST["refId"]);
+    if(!is_numeric($refId)){
+        $res["status"] = 0;
+        $res["message"] = 'Invalid reference code.';
+        return json_encode($res);
+    }else{
+        //$res["status"] = 0;
+        //$res["message"] = 'Valid reference code.'.$refId;
+        //return json_encode($res);
+    }
+
+    $LcNo = htmlspecialchars($_POST['LcNo1'],ENT_QUOTES, "ISO-8859-1");
+    $PoNo = htmlspecialchars($_POST['PoNo'],ENT_QUOTES, "ISO-8859-1");
+    $shipno = htmlspecialchars($_POST['shipno'],ENT_QUOTES, "ISO-8859-1");
+    $discStatus = htmlspecialchars($_POST['discStatus'],ENT_QUOTES, "ISO-8859-1");
+    $discrepancyList = htmlspecialchars($_POST['discrepancyList'],ENT_QUOTES, "ISO-8859-1");
+//    $bankNotifyDate = htmlspecialchars($_POST['bankNotifyDate'],ENT_QUOTES, "ISO-8859-1");
+//    $bankNotifyDate = date('Y-m-d', strtotime($bankNotifyDate));
+
+    $shipNo = htmlspecialchars($_POST['shipno'],ENT_QUOTES, "ISO-8859-1");
+
+    $ip = htmlspecialchars($_SERVER['REMOTE_ADDR'],ENT_QUOTES, "ISO-8859-1");
+
+    $objdal = new dal();
+    //------------------------------------------------------------------------------
+
+    //---return array---------------------------------------------------------------
+    $res["status"] = 0;    // 0 = Failed, 1 = Success
+    $res["message"] = 'FAILED!';
+    //------------------------------------------------------------------------------
+
+    $query = "INSERT INTO `wc_t_original_doc` SET 
+        `lcno` = '$LcNo',
+        `shipno` = '$shipNo',
+        `status` = $discStatus,
+        `discrepancy` = '$discrepancyList',
+        `banknotifydate` = NOW(),
+        `submittedby` = $user_id,
+        `submittedfrom` = '$ip'";
+
+    $objdal->insert($query);
+
+    $attachOriginalDoc = htmlspecialchars($_POST['attachOriginalDoc'],ENT_QUOTES, "ISO-8859-1");
+    $attachOriginalDocOld = htmlspecialchars($_POST['attachOriginalDocOld'],ENT_QUOTES, "ISO-8859-1");
+
+    if($attachOriginalDoc!=''){
+        if($attachOriginalDocOld==''){
+            $query = "INSERT INTO `wc_t_attachments`
+                (`poid`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`, `lcno`, `shipno`) VALUES 
+                ('$PoNo', 'Original Bank Document', '$attachOriginalDoc', $user_id, '$ip', $loginRole, '$LcNo', $shipno);";
+            $objdal->insert($query);
+        } else {
+            $query = "UPDATE `wc_t_attachments` SET
+                `filename`='$attachOriginalDoc',
+                `replacedby`=$user_id,
+                `replacedfrom`='$ip'
+                WHERE `poid` = '$PoNo' AND `title`='Original Bank Document' AND `filename` = '$attachOriginalDocOld'";
+            $objdal->update($query);
+        }
+        //Transfer file from 'temp' directory to respective 'docs' directory
+        fileTransferTempToDocs($PoNo);
+    }
+    //echo('success 1');
+    //$objdal->LastInsertId();
+    if($discStatus==1) {
+        $userMsg = "Discrepancy Status: YES\n";
+    }else{
+        $userMsg = "Discrepancy Status: NO\n";
+    }
+
+    /*if($docType=="endorse"){
+        $newAction = action_Sent_for_Document_Endorsement;
+        $msg = "'Request for endorsed document against PO# ".$pono." and Shipment # ".$shipno."'";
+    } elseif($docType=="original"){
+        $newAction = action_Requested_to_Collect_Original_Doc;
+        $msg = "'Request for original document against PO# ".$pono." and Shipment # ".$shipno."'";
+    }*/
+    $msg = "'Notification of original document receive against PO# ".$PoNo." and Shipment # ".$shipNo."'";
+    // Action Log --------------------------------//
+    $action = array(
+        'refid' => $refId,
+        'pono' => "'".$PoNo."'",
+        'shipno' => $shipNo,
+        'actionid' => action_Requested_to_Collect_Original_Doc,
+        'status' => 1,
+        'msg' => $msg,
+        'usermsg' => "'".$userMsg." ".$discrepancyList."'",
+    );
+//    var_dump($action);
+    UpdateAction($action);
+//    echo("success 2");
+    // End Action Log -----------------------------
+
+    /*// Action Log --------------------------------//
+    $action = array(
+        'refid' => $refId,
+        'pono' => "'".$PoNo."'",
+        'actionid' => action_Sent_for_Original_Document_Accpetance,
+        'status' => 1,
+        'shipno' => $shipNo,
+        'msg' => "'Request for Original Document acceptance against PO#".$PoNo." and Ship# " . $shipNo . "'",
+        'usermsg' => "'".$userMsg." ".$discrepancyList."'",
+    );
+    UpdateAction($action);
+    // End Action Log -----------------------------*/
+
+    unset($objdal);
+
+    $res["status"] = 1;
+    $res["message"] = 'Request submitted successfully!';
+    return json_encode($res);
+
+}
+
+function GetFinFXSettlePending() {
+
+    $objdal = new dal();
+    $strQuery = "SELECT 
+            f.`id`,
+            f.`pono`,
+            f.`shipment`,
+            c1.name AS `docname`,
+            CONCAT(f.`percentage`, '%') `percentage`,
+            FORMAT(f.`amount`, 2) `amount`,
+            FORMAT(f.`ciamount`, 2) `ciamount`,
+            f.`lcno`,
+            f.`status`,
+            c2.`name` AS `currency`,
+            co.`name` `lcbankaddress`
+        FROM
+            `fx_settelment_pending_fn` f
+                INNER JOIN
+            `wc_t_pi` po ON f.`pono` = po.`poid`
+                INNER JOIN
+            `wc_t_category` c1 ON f.`partname` = c1.id
+                INNER JOIN
+            `wc_t_category` c2 ON po.`currency` = c2.`id`
+                INNER JOIN
+            `wc_t_lc` lc ON po.`poid` = lc.`pono`
+                INNER JOIN
+            `wc_t_company` co ON lc.`lcissuerbank` = co.`id`
+        WHERE f.`status` = 0;";
+
+    $objdal->read($strQuery);
+
+    $rows = array();
+    if (!empty($objdal->data)) {
+        foreach ($objdal->data as $row) {
+            $rows[] = $row;
+        }
+    }
+    unset($objdal);
+    $json = json_encode($rows);
+    if ($json == "" || $json == 'null') {
+        $json = "[]";
+    }
+    $table_data = '{"data": ' . $json . '}';
+    //return $table_data;
+    return $table_data;
+
+}
+

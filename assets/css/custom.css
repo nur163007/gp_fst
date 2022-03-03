@@ -1,3 +1,62 @@
+body {
+    color: #4f5963;
+}
+a {
+    color: #3a94e9;
+}
+.btn-primary {
+    background-color: #298ae5;
+}
+
+.form-control {
+    color: #4f5963;
+    border: 1px solid #c4cccf;
+}
+.required{
+    color: #ff0000;
+    font-size: large;
+}
+/*input[required], select[required], textarea[required] {
+    background-image: url('../images/star.png');
+    background-repeat: no-repeat;
+    background-position-x: right;
+}*/
+.readonly{
+    background-color: #f3f7f9;
+    opacity: 1;
+}
+
+.required-field:after{
+    content:" *";
+    color: #ff0000;
+    font-size: large;
+}
+.has-txt-error{
+    color: #ff0000;
+}
+
+.has-txt-okay{
+    color: #0fb70f;
+}
+.select2-container--default .select2-selection {
+    border: 1px solid #c4cccf;
+}
+.input-group-btn {
+    border: solid 1px #c4cccf;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+.input-group-btn .btn {
+    padding: 5px 10px;
+}
+.input-group-btn-left {
+    border: solid 1px #c4cccf;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+.input-group-addon {
+    border: 1px solid #c4cccf;
+}
 .modal {
     z-index: 2000;
 }
@@ -28,7 +87,9 @@
                 50% 50% 
                 no-repeat;
 }
-
+table.table-bordered th:last-child, table.table-bordered td:last-child {
+    border-right-width: 1px;
+}
 
 .page {
   position: relative;

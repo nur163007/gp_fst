@@ -54,7 +54,7 @@ if (!empty($_GET["action"]) || isset($_GET["action"]))
 function getPoList()
 {
     $objdal=new dal();
-    $sql = "SELECT `poid` FROM `wc_t_po` GROUP BY `poid`;";
+    $sql = "SELECT `poid` FROM `wc_t_pi` GROUP BY `poid`;";
     $objdal->read($sql);
     // json
     $jsondata = '[';
@@ -149,7 +149,7 @@ function getPayMaturity($startDate, $endDate, $poNo)
                 `wc_t_payment_terms` pt
                 INNER JOIN `wc_t_lc` lc ON pt.`pono` = lc.`pono`
                 INNER JOIN `wc_t_category` c ON c.`id` = pt.`partname`
-                INNER JOIN `wc_t_po` po ON po.`poid` = pt.`pono`
+                INNER JOIN `wc_t_pi` po ON po.`poid` = pt.`pono`
                 INNER JOIN `wc_t_category` c1 ON c1.`id` = po.`currency`
                 INNER JOIN `wc_t_shipment` sh ON lc.`lcno` = sh.`lcNo`
             $where

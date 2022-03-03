@@ -22,11 +22,18 @@ if (!empty($_GET["action"]) || isset($_GET["action"]))
             break;
         case 2:	// edit cn request info
             if (!empty($_GET["id"])) {
-                echo GetCn($_GET["id"]);
+                echo GetCnInfoByRequestId($_GET["id"]);
             }
             break;
         case 3:	// delete cn request
-            if(!empty($_GET["id"])) { echo DeleteCn($_GET["id"]); } else { echo 0; };
+            if(!empty($_GET["id"])) {
+                echo DeleteCn($_GET["id"]);
+            } else { echo 0; };
+            break;
+        case 4:	// delete cn request
+            if(!empty($_GET["poid"])) {
+                echo GetCNInfoByPO($_GET["poid"]);
+            };
             break;
         default:
             break;
@@ -149,7 +156,7 @@ function GetAllCnReq()
 }
 
 //edit cn request
-function GetCn($id){
+function GetCnInfoByRequestId($id){
     $objdal = new dal();
     $query = "SELECT 
 			       `id`, `po_no`, `cn_no`,DATE_FORMAT(`cn_date`, '%d-%M-%Y')AS `cn_date`,FORMAT(`pay_order_amount`, 2) AS pay_order_amount, FORMAT(`pay_order_charge`, 2) AS pay_order_charge
@@ -202,6 +209,26 @@ function GetCn($id){
 //    die();
 
     return json_encode([$res, $attachments,$cn_copy,$porc,$cod]);
+}
+
+function GetCNInfoByPO($poid)
+{
+    $objdal = new dal();
+    $query = "SELECT 
+			       `id`, `po_no`, 
+			       `cn_no`,
+			       `cn_date`,
+			       FORMAT(`pay_order_amount`, 2) AS pay_order_amount, 
+			       FORMAT(`pay_order_charge`, 2) AS pay_order_charge,
+                   (SELECT `filename` FROM `wc_t_attachments` WHERE `poid`='$poid' AND `title`='Insurance Cover Note' ORDER BY ID DESC limit 1) `attachInsCoverNote`,
+                   (SELECT `filename` FROM `wc_t_attachments` WHERE `poid`='$poid' AND `title`='Pay Order Receive Copy' ORDER BY ID DESC limit 1) `attachPayOrderReceivedCopy`,
+                   (SELECT `filename` FROM `wc_t_attachments` WHERE `poid`='$poid' AND `title`='Insurance Other Doc' ORDER BY ID DESC limit 1) `attachInsChargeOther`
+			  FROM `cn_request`
+              WHERE 
+                   `po_no` = '$poid';";
+//    echo $query;
+    $cnInfo = $objdal->read($query);
+    return json_encode($cnInfo);
 }
 
 //Delete fx request

@@ -36,6 +36,7 @@ if (!empty($_GET["action"]) || isset($_GET["action"]))
 	}
 }
 
+
 if (!empty($_POST)){
     
     switch($_POST["userAction"]){
@@ -85,9 +86,7 @@ if (!empty($_POST)){
             }
             break;
         case 10:
-            if(!empty($_POST["pono"]) || isset($_POST["pono"])){
-                echo submitBCSEx();
-            }
+            echo submitBCSEx();
             break;
         default:
             break;
@@ -174,8 +173,10 @@ function GetLCInfoByLC($lcno)
         `insurance`, lc.`producttype`, lc.`cocorigin`, lc.`iplbltolcbank`, lc.`delivcertify`, lc.`qualitycertify`, 
         `advshipdoc`, lc.`advshipdocwithbl`, lc.`addconfirmation`, lc.`preshipinspection`, lc.`transshipment`, 
         `partship`, lc.`confchargeatapp`, lc.`ircno`, lc.`imppermitno`, lc.`tinno`, lc.`vatregno`, lc.`customername`, 
-        `customeraddress`, (SELECT po.`currency` FROM `wc_t_po` po WHERE po.`poid` = lc.`pono`) `currency`
-        FROM `wc_t_lc` lc WHERE lc.`lcno` = '$lcno';";
+        lc.`customeraddress`, co.`name` AS `lcBank`, (SELECT po.`currency` FROM `wc_t_pi` po WHERE po.`poid` = lc.`pono`) `currency`
+        FROM `wc_t_lc` lc 
+        LEFT JOIN `wc_t_company` co ON lc.`lcissuerbank` = co.`id`
+        WHERE lc.`lcno` = '$lcno';";
 	$objdal->read($query);
 	if(!empty($objdal->data)){
 		$res = $objdal->data[0];
@@ -195,7 +196,7 @@ function GetLCInfoByPO($pono)
         `partship`, lc.`confchargeatapp`, lc.`ircno`, lc.`imppermitno`, lc.`tinno`, lc.`vatregno`, lc.`customername`, 
         `customeraddress`, po.`currency`, c.`name` `curname`, ic.`coverNoteNo`
         FROM `wc_t_lc` lc 
-            LEFT JOIN `wc_t_po` po ON lc.`pono` = po.`poid`
+            LEFT JOIN `wc_t_pi` po ON lc.`pono` = po.`poid`
 			LEFT JOIN `wc_t_category` c ON c.`id` = po.`currency`
             LEFT JOIN `wc_t_insurance_charge` ic ON lc.`pono` = ic.`ponum`
         WHERE `pono` = '$pono';";
@@ -614,7 +615,7 @@ function GetBankCo($bankId, $po)
 {
 	$objdal = new dal();
 	$query = "select co2.`name`, co2.`address`, co1.`name` as `coname`, co1.`address` as `coaddress` 
-                from `wc_t_po` po 
+                from `wc_t_pi` po 
                     inner join `wc_t_company` co1 on po.`supplier` = co1.`id`
                     inner join `wc_t_lc` lc on lc.`pono` = po.`poid`
                     inner join `wc_t_company` co2 on co2.`id` = lc.`lcissuerbank`
@@ -804,7 +805,7 @@ function submitLCRequestToBank()
             'pono' => "'".$pono."'",
             'actionid' => action_Draft_LC_Request_sent_to_Bank,
             'pendingtoco' => $lcissuerbank,
-            'msg' => "'Draft LC attachment sent to Bank against PO# ".$pono."'",
+            'msg' => "'Draft LC request sent to Bank against PO# ".$pono."'",
         );
     }
     elseif ($lcRequestType==1){
@@ -812,9 +813,10 @@ function submitLCRequestToBank()
         $action = array(
             'refid' => $refId,
             'pono' => "'".$pono."'",
+            'status' => 1,
             'actionid' => action_Final_LC_Request_sent_to_Bank,
             'pendingtoco' => $lcissuerbank,
-            'msg' => "'Final LC attachment sent to Bank against PO# ".$pono."'",
+            'msg' => "'Final LC request sent to Bank against PO# ".$pono."'",
         );
     }
     UpdateAction($action);
@@ -847,54 +849,70 @@ function submitLCRequestToBank()
 
 function SubmitBCSEx()
 {
-
     global $user_id;
     global $loginRole;
 
-    $refId = decryptId($_POST["refId1"]);
+    $ids = $_POST['chkLine'];
+    $valueDates = $_POST['valueDate'];
+    //$ip = htmlspecialchars($_SERVER['REMOTE_ADDR'], ENT_QUOTES, "ISO-8859-1");
 
-    $pono = htmlspecialchars($_POST['pono'],ENT_QUOTES, "ISO-8859-1");
-    $ip = htmlspecialchars($_SERVER['REMOTE_ADDR'],ENT_QUOTES, "ISO-8859-1");
-    $objdal=new dal();
+    $objdal = new dal();
+    $i = 0;
 
-    $query = "SELECT l.`lcno`,l.`lcvalue`,l.`lcissuedate`,l.`lcissuerbank`,ct.`id` as `currency`
+    foreach ($ids as $value) {
+
+        $id = $value;
+
+        $valueDate = htmlspecialchars($valueDates[$i], ENT_QUOTES, "ISO-8859-1");
+        $valueDate = date('Y-m-d', strtotime($valueDate));
+
+        $query = "SELECT l.`lcno`,l.`lcvalue`,'$valueDate' `valueDate`,l.`lcissuerbank`,ct.`id` as `currency`, p.`poid`
               from `wc_t_lc` l
-              LEFT JOIN `wc_t_po` p ON l.`pono` = p.`poid`
+              LEFT JOIN `wc_t_pi` p ON l.`pono` = p.`poid`
               LEFT JOIN `wc_t_category` ct ON p.`currency` = ct.`id`
-              where l.`pono` = '$pono';";
-    $objdal->read($query);
+              where l.`pono` = (SELECT pono FROM fx_settelment_pending_fn where id = $id);";
 
-    $row = '';
-    if (!empty($objdal->data)) {
-        $row = $objdal->data[0];
-        extract($row);
+        $objdal->read($query);
+
+        $row = '';
+        if (!empty($objdal->data)) {
+            $row = $objdal->data[0];
+            extract($row);
+        }
+        unset($objdal->data);
+
+        $req_type = requisition_type;
+        $lcno = $row['lcno'];
+        $bankid = $row['lcissuerbank'];
+        $lcval = $row['lcvalue'];
+        $lcdate = $row['valueDate'];
+        $lcdate = date('Y-m-d', strtotime($lcdate));
+        $cur = $row['currency'];
+        $pono = $row['poid'];
+
+        $sql = "INSERT INTO `fx_request_primary` (`requisition_type`,`currency`,`value`,`value_date`,`lcno`,`bankID`) 
+        VALUES ('$req_type','$cur','$lcval','$lcdate','$lcno','$bankid');";
+
+        $objdal->insert($sql);
+
+        // Action Log --------------------------------//
+        $action = array(
+            'pono' => "'" . $pono . "'",
+            'actionid' => action_fx_request_for_lc,
+            'msg' => "'BCS Ex rate settlement request sent for LC #" . $lcno . "'",
+        );
+        UpdateAction($action);
+
+        // update fs settlement pending table
+        $sql = "UPDATE `fx_settelment_pending_fn` SET `status` = 1 WHERE `id` = $id;";
+        $objdal->update($sql);
+
+        $i++;
     }
-    unset($objdal->data);
-
-    $req_type = requisition_type;
-    $lcno = $row['lcno'];
-    $bankid = $row['lcissuerbank'];
-    $lcval = $row['lcvalue'];
-    $lcdate = $row['lcissuedate'];
-    $lcdate = date('Y-m-d', strtotime($lcdate));
-    $cur = $row['currency'];
-
-    $sql = "INSERT INTO `fx_request` (`requisition_type`,`currency`,`value`,`value_date`,`lcno`,`bankID`) VALUES ('$req_type','$cur','$lcval','$lcdate','$lcno','$bankid');";
-    $objdal->insert($sql);
-
-// Action Log --------------------------------//
-    $action = array(
-        'refid' => $refId,
-        'pono' => "'" . $pono . "'",
-        'actionid' => action_fx_request_for_lc,
-        'msg' => "'BCS Ex rate request sent PO #" . $pono . "'",
-    );
-UpdateAction($action);
-
     unset($objdal);
 
     $res["status"] = 1;
-    $res["message"] = 'LC request sent to Bank SUCCESSFULLY';
+    $res["message"] = 'FX Rate Settlement Requests sent SUCCESSFULLY';
 
     return json_encode($res);
 }

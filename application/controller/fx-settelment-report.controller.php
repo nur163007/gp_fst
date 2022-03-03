@@ -50,12 +50,9 @@ function GetFxSettelmentReport()
     $query = "SELECT
                     fx.`id`,
                     fxr.`RfqDate`,
-                    c.`name` AS supplier_name,
-                    cn.`name` AS nature_of_service,
                     req.`name` AS req_type,
                     wc.`name` AS currency,
                     FORMAT(fx.`value`, 2) AS fx_value,
-                    DATE_FORMAT(fx.`value_date`, '%d-%M-%Y') AS `value_date`,
                     co.`name`,
                     fxr.`FxRate`,
                     fxr.`DealAmount`,
@@ -65,10 +62,6 @@ function GetFxSettelmentReport()
                     `fx_request` fx
                 LEFT JOIN `wc_t_category` wc ON
                     fx.`currency` = wc.`id`
-                LEFT JOIN `wc_t_company` c ON
-                    fx.`supplier_id` = c.`id`
-                LEFT JOIN `wc_t_category` cn ON
-                    fx.`nature_of_service` = cn.`id`
                 LEFT JOIN `wc_t_category` req ON
                     fx.`requisition_type` = req.`id`
                 LEFT JOIN `fx_rfq_request` fxr ON

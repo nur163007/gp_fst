@@ -38,12 +38,14 @@ $(document).ready(function() {
                 // $('#exp_type').val(podata['exp_type']).trigger("change");
                 $('#exp_type').val(podata['exp_type']).change();
                 $('#user_just').html(podata['user_just']);
+                $('#short_prodName').val(podata['short_prod_name']);
                 $('#supplier').html(podata['supname']);
                 $('#sup_address').html(podata['supadd']);
                 $('#contractref').html(podata['contractrefName']);
                 $('#pr_no').html(podata['pr_no']);
                 $('#department').html(podata['department']);
-                $('#deliverydate').html(Date_toMDY(new Date(podata['deliverydate'])));
+                $('#deliverydate').html(Date_toDetailFormat(new Date(podata['deliverydate'])));
+                $('#actualPoDate').html(Date_toDetailFormat(new Date(podata['actualPoDate'])));
                 $('#installbysupplier').html(getImplementedBy(podata["installbysupplier"]));
                 $('#noflcissue').html(podata['noflcissue']);
                 $('#nofshipallow').html(podata['nofshipallow']);
@@ -351,8 +353,8 @@ $(document).ready(function() {
         }
     });
 
-    //PO INFO LOAD
-    writeDeliveredPOLones(poid);
+    //Loading PO Lines
+    writeDeliveredPOLines(poid);
 
     /*//PO LINE LOAD
     $.get("api/view-po?action=2&id="+id, function (data) {
@@ -454,6 +456,11 @@ function validateAccept(){
         if ($("#user_just").val() == "") {
             $("#user_just").focus();
             alertify.error("Add justification!");
+            return false;
+        }
+        if ($("#short_prodName").val() == "") {
+            $("#short_prodName").focus();
+            alertify.error("Add short product name!");
             return false;
         }
     }

@@ -80,11 +80,15 @@ $poContact = getPOContacts($_GET["po"]);
             <div class="panel-body container-fluid">
 
                 <div class="nav-tabs-horizontal">
-                    <ul class="nav nav-tabs" data-plugin="nav-tabs" role="tablist">
-                        <li role="presentation" class="active"><a data-toggle="tab" href="#tabPOInfo" aria-controls="tabPOInfo" role="tab"><span class="text-primary">PO Detail</span></a></li>
-                        <li role="presentation"><a data-toggle="tab" href="#tabAttachmentLog" aria-controls="tabAttachmentLog" role="tab"><span class="text-primary">Attachments &amp; Comments</span></a></li>
-                        <li role="presentation"><a data-toggle="tab" href="#tabLCInfo" aria-controls="tabLCInfo" role="tab"><span class="text-primary">LC Info.</span></a></li>
-                        <li role="presentation"><a data-toggle="tab" href="#tabShipmentInfo" aria-controls="tabShipmentInfo" role="tab"><span class="text-primary">Shipment Info.</span></a></li>
+                    <ul class="nav nav-tabs nav-tabs-line" data-plugin="nav-tabs" role="tablist">
+                        <li class="active" role="presentation">
+                            <a data-toggle="tab" href="#tabPOInfo" aria-controls="tabPOInfo" role="tab">PO &amp; PI Information</a></li>
+                        <li role="presentation">
+                            <a data-toggle="tab" href="#tabAttachmentLog" aria-controls="tabAttachmentLog" role="tab">Attachments &amp; Comments</a></li>
+                        <li role="presentation">
+                            <a data-toggle="tab" href="#tabLCInfo" aria-controls="tabLCInfo" role="tab">LC Info.</a></li>
+                        <li role="presentation">
+                            <a data-toggle="tab" href="#tabShipmentInfo" aria-controls="tabShipmentInfo" role="tab">Shipment Info.</a></li>
                     </ul>
 
                     <div class="tab-content padding-top-20">
@@ -170,6 +174,18 @@ $poContact = getPOContacts($_GET["po"]);
                                                 <div class="col-sm-7">
                                                     <label class="control-label text-left" id="shipmode"><img src="assets/images/busy.gif" /></label>
                                                 </div>
+                                                <label class="col-sm-5 control-label">PI Description: </label>
+                                                <div class="col-sm-7">
+                                                    <label class="control-label text-left" id="pi_desc"><img src="assets/images/busy.gif" /></label>
+                                                </div>
+                                                <label class="col-sm-5 control-label">Product Type:</label>
+                                                <div class="col-sm-7">
+                                                    <label class="control-label text-left" id="producttype"><img src="assets/images/busy.gif" /></label>
+                                                </div>
+                                                <label class="col-sm-5 control-label">Import As: </label>
+                                                <div class="col-sm-7">
+                                                    <label class="control-label text-left" id="importAs"><img src="assets/images/busy.gif" /></label>
+                                                </div>
                                                 <div id="shiphscode">
                                                     <label class="col-sm-5 control-label">HS Code:</label>
                                                     <div class="col-sm-7">
@@ -198,7 +214,7 @@ $poContact = getPOContacts($_GET["po"]);
                                                 <div class="col-sm-7">
                                                     <label class="control-label text-left" id="shipport"><img src="assets/images/busy.gif" /></label>
                                                 </div>
-                                                <label class="col-sm-5 control-label">L/C Beneficiary &amp; Address:</label>
+                                                <label class="col-sm-5 control-label">L/C Beneficiary:</label>
                                                 <div class="col-sm-7">
                                                     <label class="control-label text-left" id="lcbankaddress"><img src="assets/images/busy.gif" /></label>
                                                 </div>
@@ -219,75 +235,63 @@ $poContact = getPOContacts($_GET["po"]);
                             </div>
                             <hr>
 
-                            <!--LINE WAYS PO-->
-
+                            <!--Start PO Lines-->
                             <div class="row row-lg">
-                                <!--PO Lines-->
                                 <div class="col-xlg-12 col-md-12 margin-bottom-20">
-                                    <h4 class="well well-sm example-title" style="background-color: #BFEDD8;">PO Lines
-                                        <!--<span class="pull-right">
-                                            <button class="btn btn-primary btn-xs" style="margin-top: -5px;" id="btnLoadPoLines"><i class="icon wb-refresh" aria-hidden="true"></i> Reload PO Lines</button>
-                                        </span>-->
+                                    <h4 class="well well-sm example-title">PO Lines
+                                        <span class="pull-right" style="margin-top: 0;">
+                                    Delivered Number of Line: <label style="font-weight: bold" id="delivCount1">0</label>
+                                </span>
                                     </h4>
-                                    <div class="nav-tabs-horizontal">
-                                        <ul class="nav nav-tabs" data-plugin="nav-tabs" role="tablist">
-                                            <li role="presentation" class="active"><a data-toggle="tab" href="#tabDelivered" aria-controls="tabDelivered" role="tab"><span class="text-primary">Delivered <span id="delivCount1">(0)</span></span></a></li>
-                                        </ul>
-                                    </div>
-                                    <div class="tab-content padding-top-20">
-                                        <!--Delivered PO Lines-->
-                                        <div class="tab-pane active" id="tabDelivered" role="tabpanel">
-                                            <table class="table table-bordered table-striped table-highlight order margin-0 small" id="dtPOLinesDelivered">
-                                                <thead>
-                                                <tr>
-                                                    <th style="width:5%" class="text-center" rowspan="2">Line #</th>
-                                                    <th style="width:10%" class="text-center" rowspan="2">Item</th>
-                                                    <th style="width:24%" class="text-center" rowspan="2">Item Description</th>
-                                                    <th style="width:10%" class="text-center" rowspan="2">Delivery Date</th>
-                                                    <th style="width:5%" class="text-center" rowspan="2">UOM</th>
-                                                    <th style="width:10%" class="text-center" rowspan="2">Unit Price</th>
-                                                    <th style="width:10%" class="text-center poBg" colspan="2">PO</th>
-                                                    <th style="width:5%" class="text-center delivBg" colspan="2">Delivered</th>
-                                                    <!--<th style="width:5%" class="text-center" rowspan="2">LD</th>-->
-                                                </tr>
-                                                <tr>
-                                                    <th style="width:5%" class="text-center poBg">Qty.</th>
-                                                    <th style="width:10%" class="text-center poBg">Total Price</th>
-                                                    <th style="width:5%" class="text-cente delivBg">Qty.</th>
-                                                    <th style="width:10%" class="text-center delivBg">Total Price</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                <tr>
-                                                    <td class="text-center"></td>
-                                                    <td class="text-left"></td>
-                                                    <td class="text-left"></td>
-                                                    <td class="text-left"></td>
-                                                    <td class="text-left"></td>
-                                                    <td class="text-right"></td>
-                                                    <td class="text-right poBg"></td>
-                                                    <td class="text-right poBg"></td>
-                                                    <td class="text-right delivBg"></td>
-                                                    <td class="text-right delivBg"></td>
-                                                    <!--<td class="text-right"></td>-->
-                                                </tr>
-                                                </tbody>
-                                                <tfoot>
-                                                <tr style="font-weight: bolder;">
-                                                    <th colspan="6" class="text-right padding-top-15" style="font-weight: bold; font-size: inherit">Total: </th>
-                                                    <th class="text-center poBg padding-top-15" id="poQtyTotal" style="font-weight: bold; font-size: inherit"></th>
-                                                    <th class="text-right poBg padding-top-15" id="grandTotal" style="font-weight: bold; font-size: inherit"></th>
-                                                    <th class="text-center delivBg padding-top-15" id="dlvQtyTotal" style="font-weight: bold; font-size: inherit"></th>
-                                                    <th class="text-right delivBg padding-top-15" id="dlvGrandTotal" style="font-weight: bold; font-size: inherit"></th>
-                                                    <!--<th class="text-right" id="ldAmntTotal"></th>-->
-                                                </tr>
-                                                </tfoot>
-                                            </table>
-                                        </div>
-                                    </div>
-
+                                    <table class="table table-bordered table-striped table-highlight order margin-0 small" id="dtPOLinesDelivered">
+                                        <thead>
+                                        <tr>
+                                            <th style="width:5%" class="text-center" rowspan="2">Line #</th>
+                                            <th style="width:10%" class="text-center" rowspan="2">Item</th>
+                                            <th style="width:24%" class="text-center" rowspan="2">Item Description</th>
+                                            <th style="width:10%" class="text-center" rowspan="2">Delivery Date</th>
+                                            <th style="width:5%" class="text-center" rowspan="2">UOM</th>
+                                            <th style="width:10%" class="text-center" rowspan="2">Unit Price</th>
+                                            <th style="width:10%" class="text-center poBg" colspan="2">PO</th>
+                                            <th style="width:5%" class="text-center delivBg" colspan="2">Delivered</th>
+                                            <!--<th style="width:5%" class="text-center" rowspan="2">LD</th>-->
+                                        </tr>
+                                        <tr>
+                                            <th style="width:5%" class="text-center poBg">Qty.</th>
+                                            <th style="width:10%" class="text-center poBg">Total Price</th>
+                                            <th style="width:5%" class="text-cente delivBg">Qty.</th>
+                                            <th style="width:10%" class="text-center delivBg">Total Price</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td class="text-center"></td>
+                                            <td class="text-left"></td>
+                                            <td class="text-left"></td>
+                                            <td class="text-left"></td>
+                                            <td class="text-left"></td>
+                                            <td class="text-right"></td>
+                                            <td class="text-right poBg"></td>
+                                            <td class="text-right poBg"></td>
+                                            <td class="text-right delivBg"></td>
+                                            <td class="text-right delivBg"></td>
+                                            <!--<td class="text-right"></td>-->
+                                        </tr>
+                                        </tbody>
+                                        <tfoot>
+                                        <tr style="font-weight: bolder;">
+                                            <th colspan="6" class="text-right padding-top-15" style="font-weight: bold; font-size: inherit">Total: </th>
+                                            <th class="text-center poBg padding-top-15" id="poQtyTotal" style="font-weight: bold; font-size: inherit"></th>
+                                            <th class="text-right poBg padding-top-15" id="grandTotal" style="font-weight: bold; font-size: inherit"></th>
+                                            <th class="text-center delivBg padding-top-15" id="dlvQtyTotal" style="font-weight: bold; font-size: inherit"></th>
+                                            <th class="text-right delivBg padding-top-15" id="dlvGrandTotal" style="font-weight: bold; font-size: inherit"></th>
+                                            <!--<th class="text-right" id="ldAmntTotal"></th>-->
+                                        </tr>
+                                        </tfoot>
+                                    </table>
                                 </div>
                             </div>
+                            <!--End PO Lines-->
                         </div>
                         <!--End PO Information-->
 

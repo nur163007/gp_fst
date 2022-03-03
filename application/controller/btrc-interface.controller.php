@@ -83,7 +83,7 @@ function SubmitToBTRC()
     }
 
     // update new po table
-    $query = "UPDATE `wc_t_po` SET 
+    $query = "UPDATE `wc_t_pi` SET
         `modifiedby` = $user_id,
         `modifiedfrom` = '$ip'
         WHERE `poid` = '$poid';";
@@ -107,6 +107,8 @@ function SubmitToBTRC()
 
     if($userAction==2){
         // Action Log --------------------------------//
+        /*if()
+        $nextAction = act*/ion_Accepted_by_BTRC;
         $action = array(
             'refid' => $refId,
             'pono' => "'".$poid."'",

@@ -26,6 +26,7 @@ $actionLog = GetActionRef($_GET['ref']);
 
                 <form class="form-horizontal" id="form-cn-request" name="form-cn-request" method="post" autocomplete="off"  >
                     <input name="pono" id="pono" type="hidden" value="<?php if(!empty($_GET['po'])){ echo $_GET['po']; } ?>" />
+                    <input name="shipno" id="shipno" type="hidden" value="<?php if(!empty($_GET['ship'])){ echo $_GET['ship']; } ?>" />
                     <input name="usertype" id="usertype" type="hidden" value="<?php echo $_SESSION[session_prefix.'wclogin_role']; ?>" />
                     <input name="refId1" id="refId1" type="hidden" value="<?php if(!empty($_GET['ref'])){ echo $_GET['ref']; } ?>" />
                     <input name="userAction" id="userAction" type="hidden" value="" />

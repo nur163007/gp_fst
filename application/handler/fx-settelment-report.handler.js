@@ -5,12 +5,9 @@ $(document).ready(function() {
         "columns": [
             { "data": "id" },
             { "data": "RfqDate" },
-            { "data": "supplier_name" },
-            { "data": "nature_of_service" },
             { "data": "req_type" },
             { "data": "currency" },
             { "data": "fx_value" },
-            { "data": "value_date" },
             { "data": "name" },
             { "data": "FxRate" },
             { "data": "DealAmount" },

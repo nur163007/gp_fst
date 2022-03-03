@@ -43,7 +43,7 @@ function GetAllPO()
             (SELECT COUNT(al.`ActionID`) FROM `wc_t_action_log` al WHERE al.`ActionID`=76 AND al.`PO`=al1.`PO` and al.`shipNo`=sh.`shipNo`) `avgCostUpdate`,
             sh.`eaRefNo`, sh.`lcNo`, 
             (SELECT `al2`.`Msg` FROM `wc_t_action_log` as `al2` WHERE `al2`.`PO` = p1.`poid` AND `al2`.`ActionID` IN(150,161) AND IFNULL(`al2`.`shipNo`, 0) = IFNULL(sh.`shipNo`, 0) LIMIT 1) as `remarks`
-        FROM wc_t_po p1 
+        FROM wc_t_pi p1 
         	INNER JOIN `wc_t_action_log` `al1` ON p1.`poid` = al1.`PO` AND al1.`ID` = (SELECT al.`ID` FROM `wc_t_action_log` as al 
         	    INNER JOIN `wc_t_action` as a ON al.`ActionID` = a.`ID` AND a.`ActionPending` !='Acknowledgement' WHERE al.`PO` = al1.`PO` ORDER BY al.`ID` DESC LIMIT 1)
             INNER JOIN `wc_t_action` a1 ON al1.`ActionID` = a1.ID

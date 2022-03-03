@@ -47,11 +47,6 @@ $(document).ready(function() {
             $('#ponum').html(poid);
             $('#povalue').html('<b>' + commaSeperatedFormat(podata['povalue']) + '</b> ' + podata['curname']);
             $('#podesc').html(podata['podesc']);
-            if (lcinfo['lcdesc'] == "") {
-                $('#lcdesc').html(podata['lcdesc']);
-            } else {
-                $('#lcdesc').html(lcinfo['lcdesc']);
-            }
             $('#supplier').html(podata['supname']);
             $('#contractref').html(podata['contractrefName']);
             $('#deliverydate').html(podata['deliverydate']);
@@ -69,7 +64,6 @@ $(document).ready(function() {
             $("#piamount").val(podata['pivalue']);
             $('#pivalue').html(commaSeperatedFormat(podata['pivalue']) + ' ' + podata['curname']);
 
-            $('#shipmode').html(podata['shipmode'].toUpperCase());
             $('#shipmode' + podata['shipmode']).attr('checked', '').parent().addClass('checked');
 
             if (podata['shipmode'] == "sea") {
@@ -93,9 +87,39 @@ $(document).ready(function() {
             $('#techcontact').html(podata['techcontact']);
 
             // LC Info
+
+            $("#hideShipmentType").val(podata['withLC']);
             $("#lcno").val(lcinfo['lcno']);
             $("#lcvalue").val(lcinfo['lcvalue']);
 
+            if (podata['shipmode']=='E-Delivery') {
+                if (podata['withLC']== 1){
+                    $('#lcdesc').html('N/A');
+                    $('#shipmode').html(podata['shipmode'].toUpperCase()+' '+'(Without LC)');
+                    $('#withoutlc').show();
+                    $('#withlc').hide();
+                }
+                else if (podata['withLC']== 0){
+                    if (lcinfo['lcdesc'] == "") {
+                        $('#lcdesc').html(podata['lcdesc']);
+                    } else {
+                        $('#lcdesc').html(lcinfo['lcdesc']);
+                    }
+                    $('#shipmode').html(podata['shipmode'].toUpperCase()+' '+'(With LC)');
+                    $('#withoutlc').hide();
+                    $('#withlc').show();
+                }
+
+            }else{
+                if (lcinfo['lcdesc'] == "") {
+                    $('#lcdesc').html(podata['lcdesc']);
+                } else {
+                    $('#lcdesc').html(lcinfo['lcdesc']);
+                }
+                $('#shipmode').html(podata['shipmode'].toUpperCase());
+                $('#withoutlc').hide();
+                $('#withlc').hide();
+            }
             if (lcinfo['addconfirmation'] == 1) {
                 $('#addconfirmation').removeClass('fa-square-o').addClass('fa-check-square-o');
                 if (lcinfo['confchargeatapp'] == 1) {
@@ -191,12 +215,13 @@ $(document).ready(function() {
         }
     });
 
-    $("#ciAmount").blur(function (e) {
-        validateCIAmount();
-    });
+    // $("#ciAmount").blur(function (e) {
+    //     validateCIAmount();
+    // });
 
     $("#SendShipDoctoGp_btn").click(function (e) {
 
+        // $('#userAction').val('1');
         e.preventDefault();
         if (validate()) {
             alertify.confirm('Are you sure you want to submit shipping docs?', function (e) {
@@ -283,18 +308,81 @@ $(document).ready(function() {
         }
     });
 
-    writeDeliveredPOLones(poid);
+    if(poid!="") {
+
+        LoadPOLines();
+        // }
+        /**
+         * ---------------------------------------------------------------------
+         * Control Events Binding END
+         * ---------------------------------------------------------------------
+         */
+        $(document).on('keyup', '.unitPrice, .poQty', function () {
+            poLineTotal(this);
+            poGrandTotal();
+        });
+
+        $(document).on('keyup blur', '.delivQty', function (e) {
+            //alert(1);
+            poLineDelivTotal(this);
+            poGrandTotal();
+            // calculateInvoiceAmount($("#poNo").val());
+        });
+
+        /*************************************************************************
+         * One click action
+         *************************************************************************/
+        $('#chkAllLine').click(function (e) {
+            if (this.checked) {
+                $('.chkLine').prop('checked', true);
+            } else {
+                $('.chkLine').prop('checked', false);
+            }
+
+            $("#dtPOLines tbody").find('tr').each(function () {
+
+                if ($(this).find('input.chkLine').is(':checked')) {
+                    $(this).find('input.delivQty').val($(this).find('input.delivQtyValid').val());
+                    $(this).find('input.delivTotal').val($(this).find('input.delivAmountValid').val());
+                } else {
+                    $(this).find('input.delivQty').val(0);
+                    $(this).find('input.delivTotal').val(0);
+                }
+            });
+            poGrandTotal();
+            // calculateInvoiceAmount($("#poNo").val());
+        });
+
+        $(document).on('click', '.chkLine', function () {
+            if (!this.checked) {
+                $('#chkAllLine').prop('checked', false);
+                $(this).parent().parent().parent().find('input.delivQty').val(0);
+            } else {
+                var d = $(this).parent().parent().parent().find('input.delivQtyValid').val();
+                $(this).parent().parent().parent().find('input.delivQty').val(d);
+            }
+            poLineWisePoTotal();
+            poGrandTotal();
+
+            $('#reg_fee').val("");
+        });
+
+        $('#reject-message').hide();
+
+    }
 
 });
+
+
 
 $('#scheduleETA,#scheduleETD, #awbOrBlDate, #ciDate')
     .datepicker({
         format: 'MM dd, yyyy',
         todayHighlight: true,
         autoclose: true
-})
+    })
 
-function validateCIAmount() {
+/*function validateCIAmount() {
     $("#ciAmount").val(commaSeperatedFormat($("#ciAmount").val()));
     //$("#basevalue").val(commaSeperatedFormat($("#basevalue").val()));
     var piv = parseToCurrency($("#piamount").val());
@@ -315,7 +403,7 @@ function validateCIAmount() {
         $("#ciAmount").closest("div.form-group").removeClass('has-error');
         $("#ciAmountError").val("0");
     }
-}
+}*/
 
 function validateDHL(){
     if($("#dhlTrackNo").val()==""){
@@ -393,23 +481,7 @@ function validate() {
             alertify.error("Invalid CI amouunt!!");
             return false;
         }
-        /*if(!Number(parseToCurrency($("#ciAmount").val()))){
-            $("#ciAmount").focus();
-            alertify.error("Not a valid amount!");
-            return false;
-	   } else{
-            var piv = parseToCurrency($("#piamount").val());
-            var civ = parseToCurrency($("#ciAmount").val());
 
-            if(civ > piv){
-                $("#ciAmount").focus();
-                $("#ciAmount").closest("div.form-group").addClass('has-error');
-                alertify.error("CI value cannot be greater than PI value!");
-                return false;
-            }else{
-                $("#ciAmount").closest("div.form-group").removeClass('has-error');
-            }
-	   }*/
     }
     if ($("#invoiceQty").val() == "") {
         $("#invoiceQty").focus();
@@ -497,13 +569,18 @@ function validate() {
             }
         }
     }
+    poLineVerify();
+
+    if (!poLinesOkay) {
+        return false;
+    }
     return true;
 }
 
 function ResetForm(){
     $('#shipment-schedule-form')[0].reset();
-	$("#scheduleETA").empty();
-	$("#scheduleETD").empty();
+    $("#scheduleETA").empty();
+    $("#scheduleETD").empty();
 }
 
 $(function () {
@@ -571,7 +648,6 @@ $(function () {
     });
 });
 
-
 $(function () {
 
     var button = $('#btnUploadPackListScanCopy'), interval;
@@ -603,7 +679,6 @@ $(function () {
         }
     });
 });
-
 
 $(function () {
 
@@ -700,3 +775,368 @@ $(function () {
         }
     });
 });
+
+function LoadPOLines(){
+    // alert("api/new-po?action=5&pono=" + pono);
+    $.get("api/shipment?action=15&pono=" + poid +'&ship='+shipno, function (data) {
+        var res = JSON.parse(data);
+        if (res[1].length > 0) {
+            var rejectedLines = (res[1][0]["rejectedlines"]).split(",");
+            /*
+             * Message for rejected lines
+             * */
+            $('#reject-message').show();
+            //document.getElementById("rejected-line").innerHTML = rejectedLines;
+            $("#rejected-line").html(rejectedLines);
+
+        } else {
+            rejectedLines = "";
+            $('#reject-message').hide();
+        }
+        //alert(rejectedLines);
+
+        /**
+         * Deliverable po lines
+         */
+        var d2 = res[0];
+        $("#delivCount2").html('(' + d2.length + ')');
+        if (d2.length > 0) {
+            $("#dtPOLines tbody").empty();
+
+            $('#bpo').val(d2[0]["buyersPo"]);
+            $('#piReqNo').val(d2[0]["PIReqNo"]);
+            $('#ciAmountCur').html(d2[0]["currencyName"]);
+
+            for (var j = 0; j < d2.length; j++) {
+                if (rejectedLines != "") {
+                    if (rejectedLines.indexOf(d2[j]["lineNo"]) < 0) {
+                        addPOLine(d2[j]);
+                    }
+                } else {
+                    addPOLine(d2[j]);
+                }
+            }
+            $('#chkAllLine').prop('checked', true);
+            $('.chkLine').prop('checked', true);
+
+            poGrandTotal();
+        } else {
+            $("#dtPOLines tbody").empty();
+            $("#dtPOLines tbody").append('<tr><td></td><td></td><td></td><td></td><td></td><td></td><td class="poBg"></td><td class="poBg"></td><td class="delivBg"></td><td class="delivBg"></td></tr>');
+        }
+        // ldGrandTotal();
+    });
+}
+
+function LoadDeliveredPOLinesInEditMode(){
+    // alert("api/new-po?action=5&pono=" + pono);
+    $.get("api/shipment?action=15&pono=" + poid +'&ship='+shipno, function (data) {
+        var res = JSON.parse(data);
+        if (res[1].length > 0) {
+            var rejectedLines = (res[1][0]["rejectedlines"]).split(",");
+            /*
+             * Message for rejected lines
+             * */
+            $('#reject-message').show();
+            //document.getElementById("rejected-line").innerHTML = rejectedLines;
+            $("#rejected-line").html(rejectedLines);
+
+        } else {
+            rejectedLines = "";
+            $('#reject-message').hide();
+        }
+        //alert(rejectedLines);
+
+        /**
+         * Deliverable po lines
+         */
+        var d2 = res[0];
+        $("#delivCount2").html('(' + d2.length + ')');
+        if (d2.length > 0) {
+            $("#dtPOLines tbody").empty();
+
+            $('#bpo').val(d2[0]["buyersPo"]);
+            $('#piReqNo').val(d2[0]["PIReqNo"]);
+            $('#ciAmountCur').html(d2[0]["currencyName"]);
+
+            for (var j = 0; j < d2.length; j++) {
+                if (rejectedLines != "") {
+                    if (rejectedLines.indexOf(d2[j]["lineNo"]) < 0) {
+                        addPOLine(d2[j]);
+                    }
+                } else {
+                    addPOLine(d2[j]);
+                }
+            }
+            $('#chkAllLine').prop('checked', true);
+            $('.chkLine').prop('checked', true);
+
+            poGrandTotal();
+        } else {
+            $("#dtPOLines tbody").empty();
+            $("#dtPOLines tbody").append('<tr><td></td><td></td><td></td><td></td><td></td><td></td><td class="poBg"></td><td class="poBg"></td><td class="delivBg"></td><td class="delivBg"></td></tr>');
+        }
+        // ldGrandTotal();
+    });
+}
+
+// function vatAmount(pa, vr) {
+//     return pa*(vr/100);
+// }
+
+function poLineTotal(elm) {
+
+    var linePrice, lineQty, lineTotal;
+
+    linePrice = parseToCurrency($(elm).closest('tr').find('input.unitPrice').val());
+    lineQty = parseToCurrency($(elm).closest('tr').find('input.poQty').val());
+    lineTotal = linePrice * lineQty;
+
+    $(elm).closest('tr').find('input.lineTotal').val(commaSeperatedFormat(lineTotal));
+    $(elm).closest('tr').find('input.lineTotal').attr('title', commaSeperatedFormat(lineTotal));
+
+}
+
+function poLineDelivTotal(elm) {
+    var linePrice, lineDelivQty, lineDelivTotal, lineDelivQtyValid;
+
+    linePrice = parseToCurrency($(elm).closest('tr').find('input.unitPrice').val());
+    lineDelivQty = parseToCurrency($(elm).closest('tr').find('input.delivQty').val());
+    lineDelivQtyValid = parseToCurrency($(elm).closest('tr').find('input.delivQtyValid').val());
+
+    lineDelivTotal = linePrice * lineDelivQty;
+
+    $(elm).closest('tr').find('input.delivTotal').val(lineDelivTotal.toFixed(2));
+    $(elm).closest('tr').find('input.delivTotal').attr('title', lineDelivTotal.toFixed(2));
+    // calculateInvoiceAmount($("#poNo").val());
+
+    if(lineDelivQty>lineDelivQtyValid){
+        $(elm).closest('tr').find('input.delivQty').addClass('has-txt-error');
+        $(elm).closest('tr').find('input.delivQty').focus();
+    } else {
+        $(elm).closest('tr').find('input.delivQty').removeClass('has-txt-error');
+    }
+}
+
+function poLineDelivQty(elm) {
+
+    var lineQty, lineTotal, lineDelivQty, lineDelivTotal;
+
+    lineQty = parseToCurrency($(elm).closest('tr').find('input.poQty').val());
+    lineTotal = parseToCurrency($(elm).closest('tr').find('input.lineTotal').val());
+    lineDelivTotal = parseToCurrency($(elm).closest('tr').find('input.delivTotal').val());
+
+    lineDelivQty = lineQty / (lineTotal / lineDelivTotal);
+    $(elm).closest('tr').find('input.delivQty').val(commaSeperatedFormat(lineDelivQty, 4));
+    $(elm).closest('tr').find('input.delivQty').attr('title', commaSeperatedFormat(lineDelivQty, 4));
+}
+
+function poLineWisePoTotal() {
+
+    $("#dtPOLines tbody").find('tr').each(function (rowIndex, r) {
+
+        poLineDelivTotal(this);
+
+    });
+}
+
+function poGrandTotal() {
+
+    var qty = 0, totalQty = 0, totalPrice = 0, grandTotal = 0, delivQty = 0, totalDelivQty = 0, delivPrice = 0,
+        delivTotal = 0;
+
+    $("#dtPOLines tbody").find('tr').each(function (rowIndex, r) {
+
+        qty = parseToCurrency($(this).find('input.poQty').val());
+        totalQty += qty;
+        $("#poQtyTotal").val(totalQty);
+
+        totalPrice = parseToCurrency($(this).find('input.lineTotal').val());
+        grandTotal += totalPrice;
+        $("#grandTotal").val(+(grandTotal).toFixed(2));
+
+        if ($(this).find('input.chkLine').is(':checked')) {
+            delivQty = parseToCurrency($(this).find('input.delivQty').val());
+        } else {
+            delivQty = 0;
+        }
+        totalDelivQty += delivQty;
+        $("#dlvQtyTotal").val(+(totalDelivQty).toFixed(12));
+        //alert(totalDelivQty);
+
+        if ($(this).find('input.chkLine').is(':checked')) {
+            delivPrice = parseToCurrency($(this).find('input.delivTotal').val());
+        } else {
+            delivPrice = 0;
+        }
+        delivTotal += delivPrice;
+        $("#dlvGrandTotal").val(+(delivTotal).toFixed(2));
+        $("#ciAmount").val(commaSeperatedFormat(delivTotal)).change();
+        // $("#invAmount").val(commaSeperatedFormat(delivTotal));
+        // $('#baseAmount').val(commaSeperatedFormat($("#dlvGrandTotal").val()));
+        //calculateInvoiceAmount()
+    });
+}
+
+function addPOLine(row) {
+    var i = $("#dtPOLines tbody tr").length;
+
+    row = row || '';
+
+    if (row == '') {
+        $("#dtPOLines tbody:last").append('<tr>' +
+            '<td class="text-center"><span class="checkbox-custom checkbox-default">' +
+            '<input type="checkbox" class="chkLine" id="chkLine_' + i + '">' +
+            '<label for="chkLine_' + i + '"></label></span></td>' +
+            '<td><input type="text" class="form-control input-sm text-center poLine" /></td>' +
+            '<td><input type="text" class="form-control input-sm poItem" /></td>' +
+            '<td><input type="text" class="form-control input-sm poDesc" /></td>' +
+            '<td><input type="text" class="form-control input-sm poDate" /></td>' +
+            '<td><input type="text" class="form-control input-sm uom" /></td>' +
+            '<td><input type="text" class="form-control input-sm text-right unitPrice" value="0" /></td>' +
+            '<td class="poBg"><input type="text" class="form-control input-sm text-right poQty" value="0" /></td>' +
+            '<td class="poBg"><input type="text" class="form-control input-sm text-right lineTotal" value="0" readonly /></td>' +
+            '<td class="delivBg"><input type="text" class="form-control input-sm text-right delivQty" value="0" /></td>' +
+            '<td class="delivBg"><input type="text" class="form-control input-sm text-right delivTotal" value="0" readonly /></td>' +
+            '</tr>');
+    } else {
+        //@todo analyze here
+        //console.log(row["status"]);
+        if (!row["status"]) {
+            var addTick = "";
+            /*var voidDelivQty = 0;
+            var voidDelivAmount = 0*/
+            var voidDelivQty = row["delivQtyValid"];
+            var voidDelivAmount = row["delivAmountValid"]
+        } else {
+            addTick = "checked";
+            voidDelivQty = row["delivQtyValid"];
+            voidDelivAmount = row["delivAmountValid"];
+        }
+
+        $("#dtPOLines tbody:last").append('<tr>' +
+            '<td class="text-center"><span class="checkbox-custom checkbox-default">' +
+            '<input type="checkbox" class="chkLine" id="chkLine_' + i + '" ' + addTick + ' disabled>' +
+            '<label for="chkLine_' + i + '"></label></span></td>' +
+            '<td><input type="text" class="form-control input-sm text-center poLine" name="poLine[]" value="' + row["lineNo"] + '" readonly /></td>' +
+            '<td><input type="text" class="form-control input-sm poItem" name="poItem[]" value="' + row["itemCode"] + '" title="' + row["itemCode"] + '" readonly /></td>' +
+            '<td><input type="text" class="form-control input-sm poDesc" name="poDesc[]" value="' + htmlspecialchars_decode(row["itemDesc"]) + '" title="' + row["itemDesc"] + '" readonly /></td>' +
+            '<td><input type="text" class="form-control input-sm poDate" name="poDate[]" value="' + row["deliveryDate"] + '" title="' + row["deliveryDate"] + '" readonly /></td>' +
+            '<td><input type="text" class="form-control input-sm uom" name="uom[]" value="' + row["uom"] + '" title="' + row["uom"] + '" readonly /></td>' +
+            '<td><input type="text" class="form-control input-sm text-right unitPrice" name="unitPrice[]" value="' + row["unitPrice"] + '" readonly /></td>' +
+            '<td class="poBg"><input type="text" class="form-control input-sm text-right poQty" name="poQty[]" value="' + row["poQty"] + '" readonly /></td>' +
+            '<td class="poBg"><input type="text" class="form-control input-sm text-right lineTotal" name="lineTotal[]" value="' + row["poTotal"] + '" readonly /></td>' +
+            '<td class="delivBg"><input type="text" class="form-control input-sm text-right delivQty"  name="delivQty[]" value="' + voidDelivQty + '" title="' + row["delivQtyValid"] + '" readonly /><input type="hidden" class="delivQtyValid" value="' + row["delivQtyValid"] + '" /> <input type="hidden" class="delivAmountValid" value="' + row["delivAmountValid"] + '" /> </td>' +
+            '<td class="delivBg"><input type="text" class="form-control input-sm text-right delivTotal" name="delivTotal[]" value="' + voidDelivAmount + '" title="' + voidDelivAmount + '" readonly /></td>' +
+           '</tr>');
+    }
+}
+
+/*!
+* PO lines verification
+* */
+function poLineVerify() {
+    poLinesOkay = true;
+    $("#consolidatedPoLines").val("");
+    $("#dtPOLines tbody").find('tr').each(function () {
+
+        if ($("#consolidatedPoLines").val() != "") {
+            $("#consolidatedPoLines").val($("#consolidatedPoLines").val() + "|");
+        }
+
+        if ($(this).find('input.chkLine').is(':checked')) {
+
+            if ($(this).find('input.poLine').val() == "") {
+                alertify.error('PO line number missing!');
+                $(this).find('input.poLine').focus();
+                poLinesOkay = false;
+                return false;
+            }
+            if ($(this).find('input.poItem').val() == "") {
+                alertify.error('Item code missing!');
+                $(this).find('input.poItem').focus();
+                poLinesOkay = false;
+                return false;
+            }
+            if ($(this).find('input.poDesc').val() == "") {
+                alertify.error('Item description missing!');
+                $(this).find('input.poDesc').focus();
+                poLinesOkay = false;
+                return false;
+            }
+            /*if ($(this).find('input.projCode').val() == "") {
+             alertify.error('Project code missing!');
+             $(this).find('input.projCode').focus();
+             poLinesOkay = false;
+             return false;
+             }*/
+            if ($(this).find('input.uom').val() == "") {
+                alertify.error('UOM missing!');
+                $(this).find('input.uom').focus();
+                poLinesOkay = false;
+                return false;
+            }
+            /*!
+            * O value allowed in
+            * Unit Price, PO line total, Delivered price
+            * as per the mail ref: FMfcgxwKjKqwmqZcjBQZSfQhhFFQKGSK
+            * *************************************************************/
+            if ($(this).find('input.unitPrice').val() == "" || parseFloat($(this).find('input.unitPrice').val()) < 0) {
+                alertify.error('Unit price missing!');
+                $(this).find('input.unitPrice').focus();
+                poLinesOkay = false;
+                return false;
+            }
+            if ($(this).find('input.poQty').val() == "" || parseFloat($(this).find('input.poQty').val()) <= 0) {
+                alertify.error('PO line qty missing!');
+                $(this).find('input.poQty').focus();
+                poLinesOkay = false;
+                return false;
+            }
+            if ($(this).find('input.lineTotal').val() == "" || parseFloat($(this).find('input.lineTotal').val()) < 0) {
+                alertify.error('PO line total missing!');
+                $(this).find('input.lineTotal').focus();
+                poLinesOkay = false;
+                return false;
+            }
+            if ($(this).find('input.delivQty').val() == "" || parseFloat($(this).find('input.delivQty').val()) <= 0) {
+                alertify.error('Delivered qty missing!');
+                $(this).find('input.delivQty').focus();
+                poLinesOkay = false;
+                return false;
+            }
+            if ($(this).find('input.delivTotal').val() == "" || parseFloat($(this).find('input.delivTotal').val()) < 0) {
+                alertify.error('Delivered price missing!');
+                $(this).find('input.delivTotal').focus();
+                poLinesOkay = false;
+                return false;
+            }
+            if (parseToCurrency($(this).find('input.delivAmountValid').val()) < parseToCurrency($(this).find('input.delivTotal').val())) {
+                //alertify.error('Delivered amount can not be grater then PO amount!');
+                alertify.error('Invalid delivered qty or amount!');
+                $(this).find('input.delivTotal').focus();
+                poLinesOkay = false;
+                return false;
+            }
+            if ($(this).find('input.ldAmnt').val() == "") {
+                $(this).find('input.ldAmnt').val('0');
+            }
+// alert("find");
+            var poDate = ($(this).find('input.poDate').val()) ? $(this).find('input.poDate').val() : "NA";
+            //var projectCode = (1===1) ? 'test' : 'empty' ;
+            $("#consolidatedPoLines").val(
+                $("#consolidatedPoLines").val() + $(this).find('input.poLine').val() + ";" +
+                $(this).find('input.poItem').val() + ";" +
+                $(this).find('input.poDesc').val() + ";" +
+                //$(this).find('input.projCode').val() + ";" +
+                poDate + ";" +
+                $(this).find('input.uom').val() + ";" +
+                $(this).find('input.unitPrice').val() + ";" +
+                $(this).find('input.poQty').val() + ";" +
+                $(this).find('input.lineTotal').val() + ";" +
+                $(this).find('input.delivQty').val() + ";" +
+                $(this).find('input.delivTotal').val()
+            )
+        }
+    });
+}

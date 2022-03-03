@@ -722,7 +722,7 @@ $title="EA Inputs";
                                                         <label class="col-sm-5 control-label">Other Custom's Doc:<br><span class="comment-meta">(If any)</span></label>
                                                         <div class="col-sm-7">
                                                             <div class="input-group">
-                                                                <input type="text" class="form-control" name="attachOtherCustomDoc" id="attachOtherCustomDoc" readonly placeholder=".pdf" />
+                                                                <input type="text" class="form-control" name="attachOtherCustomDoc" id="attachOtherCustomDoc" readonly placeholder=".pdf, .zip" />
                                                                 <input type="hidden" name="attachOtherCustomDocOld" id="attachOtherCustomDocOld" />
                                                                 <span class="input-group-btn">
                                                             <button type="button" id="btnUploadOtherCustomDoc" class="btn btn-outline"><i class="icon wb-upload" aria-hidden="true"></i></button>

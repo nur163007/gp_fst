@@ -33,7 +33,7 @@ if (!empty($_GET["action"]) || isset($_GET["action"])){
             FORMAT(c.`cableCharge`,2) AS `Cable Charge`, FORMAT(c.`otherCharge`,2) AS `Other Charges`, FORMAT(c.`totalCharge`,2) AS `Total Charges`, FORMAT(c.`capex`,2) AS `Capex`, FORMAT(c.`totalRebate`,2) AS `VAT Rebate`
         FROM `wc_t_lc_opening_bank_charge` AS c 
             LEFT JOIN `wc_t_lc` AS lc ON c.`LcNo` = lc.`lcno`
-            LEFT JOIN `wc_t_po` AS po ON lc.`pono` = po.`poid`
+            LEFT JOIN `wc_t_pi` AS po ON lc.`pono` = po.`poid`
             LEFT JOIN `wc_t_bank_insurance` AS bn ON lc.`lcissuerbank` = bn.`id`
             LEFT JOIN `wc_t_category` AS cat ON po.`currency` = cat.`id` $where;";
 

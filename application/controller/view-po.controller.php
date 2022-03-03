@@ -28,6 +28,9 @@ if (!empty($_GET["action"]) || isset($_GET["action"]))
         case 3:
             echo calculateData($_GET["id"]);
             break;
+        case 4:
+            echo calculateDraftData($_GET["id"]);
+            break;
         default:
             break;
     }
@@ -124,7 +127,7 @@ function SubmitFeedback()
          $newStatus = 9;
     }
     // update new po table
-    $query = "UPDATE `wc_t_po` SET 
+    $query = "UPDATE `wc_t_pi` SET
         `modifiedby` = $user_id,
         `modifiedfrom` = '$ip'
         WHERE `poid` = '$poid';";
@@ -207,7 +210,7 @@ function SubmitFeedback()
 
 function GetLastStatus($poid){
     $dal = new dal();
-    $sql = "SELECT `status` FROM `wc_t_po` WHERE `poid` = '$poid' ORDER BY `msgon` DESC LIMIT 1";
+    $sql = "SELECT `status` FROM `wc_t_pi` WHERE `poid` = '$poid' ORDER BY `msgon` DESC LIMIT 1";
     $dal->read($sql);
     $res = '';
     if(!empty($dal->data)){
@@ -220,7 +223,7 @@ function GetLastStatus($poid){
 }*/
 
 
-function getPOLines($id){
+function getPOLines($pono){
 //var_dump("ok");
     $objdal = new dal();
 
@@ -228,17 +231,26 @@ function getPOLines($id){
      * Query for Delivered PO Lines
      * **********************************/
     $sql = "SELECT 
-            l.`id`, l.`poNo`, DATE_FORMAT(l.`poDate`, '%M %d, %Y') as `poDate`, l.`itemCode`, REPLACE(l.`itemDesc`, CHAR(194), '') AS `itemDesc`,
-             l.`lineNo`, l.`uom`, l.`unitPrice`, l.`poQty`, AVG(l.`poTotal`) `poTotal`,
-             l.`reqId`,l.`status`,
-            SUM(IFNULL(IF(l.`status` = 0, l.`delivQty`, 0), 0)) AS `delivQty`,
-            SUM(IFNULL(IF(l.`status` = 0, l.`delivTotal`, 0), 0)) AS `delivTotal`
+            pil.`id`,
+            pil.`poNo`,
+            DATE_FORMAT(pil.`deliveryDate`, '%b %d, %Y') AS `deliveryDate`,
+            pil.`itemCode`,
+            REPLACE(pil.`itemDesc`, CHAR(194), '') AS `itemDesc`,
+            pi.`currency`,
+            pil.`lineNo`,
+            pil.`uom`,
+            pil.`unitPrice`,
+            pil.`poQty`,
+            pil.`poTotal`,
+            pil.`status`,
+            pil.`delivQty`,
+            pil.`delivTotal`
         FROM
-            `wc_t_po_line` l 
+            `wc_t_pi` AS pi
+                INNER JOIN
+            `pi_lines` pil ON pi.`poid` = pil.`poNo`
         WHERE
-            l.`poNo` = '$id' AND l.`reqId` IS NULL
-        GROUP BY l.`id`, l.`poNo`, l.`poDate`, l.`itemCode`, l.`itemDesc`, l.`lineNo`, 
-                 l.`uom`, l.`unitPrice`, l.`poQty`, l.`poTotal`,l.`reqId`,l.`status`;";
+            pil.`poNo` = '$pono';";
     //echo $sql;
     $objdal->read($sql);
 
@@ -258,9 +270,9 @@ function getPOLines($id){
     $sql = "SELECT 
             `poNo`, GROUP_CONCAT(`lineNo`) AS `rejectedlines`
         FROM
-            `wc_t_po_line`
+            `pi_lines`
         WHERE
-            `poNo` = '$id' AND `status` = 1
+            `poNo` = '$pono' AND `status` = 1
         GROUP BY `poNo`";
     $objdal->read($sql);
 
@@ -294,9 +306,49 @@ function calculateData($id){
             SUM(l.delivQty) as grandDelivQty, 
             SUM(l.delivTotal) as grandDelivTotal 
         FROM
-            `wc_t_po_line` l 
+            `pi_lines` l 
         WHERE
             l.`poNo` = '$id'
+        GROUP BY l.`poNo`;";
+    //echo $sql;
+    $objdal->read($sql);
+
+    if(!empty($objdal->data)) {
+        $podetail[0] = $objdal->data[0];
+    }
+    unset($objdal);
+
+    $json = json_encode(array($podetail));
+
+    return $json;
+
+}
+
+function calculateDraftData($id){
+//var_dump($id);
+//exit();
+    $objdal = new dal();
+
+    if(strpos($id, 'PI', 1)>1){
+        $strCriteria = "l.`poNo`";
+    } else {
+        $strCriteria = "pol.`poNo`";
+    }
+    /*!
+     * Query for Delivered PO Lines
+     * **********************************/
+    $sql = "SELECT 
+            SUM(l.poQty) as grandpoQty, 
+            SUM(l.poTotal) as grandPoTotal, 
+            SUM(l.delivQty) as grandDelivQty, 
+            SUM(l.delivTotal) as grandDelivTotal 
+        FROM
+            `pi_lines` l
+             LEFT JOIN
+            `po_lines` pol ON (pol.`poNo` = l.`buyersPo`
+                AND pol.`lineNo` = l.`lineNo`) 
+        WHERE
+            ".$strCriteria." = '$id'
         GROUP BY l.`poNo`;";
     //echo $sql;
     $objdal->read($sql);

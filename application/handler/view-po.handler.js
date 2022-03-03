@@ -71,6 +71,9 @@ $(document).ready(function() {
                         $('#pinum').html(podata['pinum']);
 
                         $('#pivalue').html('<b>' + commaSeperatedFormat(podata['pivalue']) + '</b> ' + podata['curname']);
+                        $('#pi_desc').html(podata['pidesc']);
+                        $('#producttype').html(podata['producttypeName']);
+                        $('#importAs').html(podata['importAsName']);
                         $('#shipmode').html(podata['shipmode'].toUpperCase());
 
                         $('#hscode').html(podata['hscode']);
@@ -263,7 +266,7 @@ $(document).ready(function() {
                     '<td class="text-center">' + d1[i]['lineNo'] + '</td>' +
                     '<td class="text-center">' + d1[i]['itemCode'] + '</td>' +
                     '<td class="text-left">' + d1[i]['itemDesc'] + '</td>' +
-                    '<td class="text-center">' + d1[i]['poDate'] + '</td>' +
+                    '<td class="text-center">' + d1[i]['deliveryDate'] + '</td>' +
                     '<td class="text-center">' + d1[i]['uom'] + '</td>' +
                     '<td class="text-right">' + commaSeperatedFormat(d1[i]['unitPrice'], 4) + '</td>' +
                     '<td class="text-center poBg">' + commaSeperatedFormat(d1[i]['poQty']) + '</td>' +

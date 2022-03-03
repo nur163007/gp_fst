@@ -85,6 +85,7 @@ $(document).ready(function() {
             $("#lcno3").val(lcinfo['lcno']);
             $("#lcno4").val(lcinfo['lcno']);
 
+            $("#lcbank").val(lcinfo['lcissuerbank']);
 
             // LC info
             $('#lctype').html(lcinfo['lctypename']);

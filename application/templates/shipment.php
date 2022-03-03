@@ -15,14 +15,14 @@ $actionLog = GetActionRef($_GET['ref']);
             <li><a>Shipment # </a></li>
             <li class="active"><?php echo $actionLog['shipNo']; ?></li>
         </ol>
-		<div class="page-header-actions">
-			&nbsp;
-		</div>        
+        <div class="page-header-actions">
+            &nbsp;
+        </div>
     </div>
     <div class="page-content container-fluid">
-    
+
         <div class="panel">
-        
+
             <div class="panel-body container-fluid">
                 <form class="form-horizontal" id="shipment-schedule-form" name="po-form" method="post" autocomplete="off">
                     <input name="pono" id="pono" type="hidden" value="<?php if(!empty($_GET['po'])){ echo $_GET['po']; } ?>" />
@@ -37,10 +37,16 @@ $actionLog = GetActionRef($_GET['ref']);
                     <input name="lastAction" id="lastAction" type="hidden" value="<?php echo $actionLog['1stLastAction']; ?>" />
                     <input name="ciAmountError" id="ciAmountError" type="hidden" value="0" />
                     <input name="shipno1" id="shipno1" type="hidden" value="<?php if(!empty($_GET['ship'])){ echo $_GET['ship']; } ?>" />
+                    <input name="bpo" id="bpo" type="hidden" value="" />
+                    <input name="pov" id="pov" type="hidden" value="" />
+                    <input name="piReqNo" id="piReqNo" type="hidden" value="" />
+                    <input name="validPIVal" id="validPIVal" type="hidden" value="" />
+                    <input name="hideShipmentType" id="hideShipmentType" type="hidden" value="" />
                     <div id="PO_submit_error" style="display:none;"></div>
-                    
+                    <input type="hidden" name="consolidatedPoLines" id="consolidatedPoLines" value="" />
+
                     <div class="row row-lg">
-                        
+
                         <div class="col-xlg-6 col-md-6">
                             <h4 class="well well-sm example-title">Order Information</h4>
                             <div class="form-group">
@@ -65,16 +71,16 @@ $actionLog = GetActionRef($_GET['ref']);
                                     <label class="control-label text-left"><b id="supplier"><img src="assets/images/busy.gif" /></b></label>
                                 </div>
                             </div>
-                                
+
                             <h4 class="well well-sm example-title">PI Information</h4>
                             <div class="form-group">
                                 <label class="col-sm-5 control-label">PI No:</label>
                                 <div class="col-sm-7">
-                                     <label class="control-label text-left" id="pinum"><img src="assets/images/busy.gif" /></label>
+                                    <label class="control-label text-left" id="pinum"><img src="assets/images/busy.gif" /></label>
                                 </div>
                                 <label class="col-sm-5 control-label">PI Value:</label>
                                 <div class="col-sm-7">
-                                     <label class="control-label text-left" id="pivalue"><img src="assets/images/busy.gif" /></label>
+                                    <label class="control-label text-left" id="pivalue"><img src="assets/images/busy.gif" /></label>
                                 </div>
                                 <label class="col-sm-5 control-label">Shipment Mode:</label>
                                 <div class="col-sm-7">
@@ -87,7 +93,7 @@ $actionLog = GetActionRef($_GET['ref']);
                                 <label class="col-sm-5 control-label">PI Date:</label>
                                 <div class="col-sm-7">
                                     <label class="control-label text-left" id="pidate"><img src="assets/images/busy.gif" /></label>
-                                </div>                                
+                                </div>
                                 <label class="col-sm-5 control-label">Insurance / Base Value:</label>
                                 <div class="col-sm-7">
                                     <label class="control-label text-left" id="basevalue"><img src="assets/images/busy.gif" /></label>
@@ -104,92 +110,98 @@ $actionLog = GetActionRef($_GET['ref']);
                                 <div class="col-sm-7">
                                     <label class="control-label text-left" id="shipport"><img src="assets/images/busy.gif" /></label>
                                 </div>
-                            </div>                        
-                            
+                            </div>
+
                         </div>
 
                         <div class="col-xlg-6 col-md-6">
                             <div id="usersAttachments" class="small">
-                    
+
                             </div>
                         </div>
-                        
+
                     </div>
 
                     <hr />
 
                     <div class="row row-lg">
                         <div class="col-xlg-12 col-md-12 margin-bottom-20">
-                            <h4 class="well well-sm example-title" style="background-color: #BFEDD8;">PO Lines</h4>
-                            <table class="table table-bordered table-striped table-highlight order margin-0 small" id="dtPOLinesDelivered">
-                                <thead>
-                                <tr>
-                                    <th style="width:5%" class="text-center" rowspan="2">Line #</th>
-                                    <th style="width:10%" class="text-center" rowspan="2">Item</th>
-                                    <th style="width:24%" class="text-center" rowspan="2">Item Description</th>
-                                    <th style="width:10%" class="text-center" rowspan="2">Delivery Date</th>
-                                    <th style="width:5%" class="text-center" rowspan="2">UOM</th>
-                                    <th style="width:10%" class="text-center" rowspan="2">Unit Price</th>
-                                    <th style="width:10%" class="text-center poBg" colspan="2">PO</th>
-                                    <th style="width:5%" class="text-center delivBg" colspan="2">Delivered</th>
-                                    <!--<th style="width:5%" class="text-center" rowspan="2">LD</th>-->
-                                </tr>
-                                <tr>
-                                    <th style="width:5%" class="text-center poBg">Qty.</th>
-                                    <th style="width:10%" class="text-center poBg">Total Price</th>
-                                    <th style="width:5%" class="text-cente delivBg">Qty.</th>
-                                    <th style="width:10%" class="text-center delivBg">Total Price</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td class="text-center"></td>
-                                    <td class="text-left"></td>
-                                    <td class="text-left"></td>
-                                    <td class="text-left"></td>
-                                    <td class="text-left"></td>
-                                    <td class="text-right"></td>
-                                    <td class="text-right poBg"></td>
-                                    <td class="text-right poBg"></td>
-                                    <td class="text-right delivBg"></td>
-                                    <td class="text-right delivBg"></td>
-                                    <!--<td class="text-right"></td>-->
-                                </tr>
-                                </tbody>
-                                <tfoot>
-                                <tr style="font-weight: bolder;">
-                                    <th colspan="6" class="text-right padding-top-15" style="font-weight: bold; font-size: inherit">Total: </th>
-                                    <th class="text-center poBg padding-top-15" id="poQtyTotal" style="font-weight: bold; font-size: inherit"></th>
-                                    <th class="text-right poBg padding-top-15" id="grandTotal" style="font-weight: bold; font-size: inherit"></th>
-                                    <th class="text-center delivBg padding-top-15" id="dlvQtyTotal" style="font-weight: bold; font-size: inherit"></th>
-                                    <th class="text-right delivBg padding-top-15" id="dlvGrandTotal" style="font-weight: bold; font-size: inherit"></th>
-                                    <!--<th class="text-right" id="ldAmntTotal"></th>-->
-                                </tr>
-                                </tfoot>
-                            </table>
+                            <h4 class="well well-sm example-title" style="background-color: #BFEDD8;">PI Lines</h4>
+                            <div class="tab-pane active" id="tabDeliverable" role="tabpanel">
+                                <table class="table table-bordered table-striped table-highlight order margin-0 small" id="dtPOLines">
+                                    <thead>
+                                    <tr>
+                                        <th style="width:5%" class="text-center" rowspan="2">
+                                                <span class="checkbox-custom checkbox-default">
+<!--                                                    <input type="checkbox" id="chkAllLine"><label for="chkAllLine" disabled></label>-->
+                                                </span>
+                                        </th>
+                                        <th style="width:5%" class="text-center" rowspan="2">Line #</th>
+                                        <th style="width:8%" class="text-center" rowspan="2">Item</th>
+                                        <th style="width:20%" class="text-center" rowspan="2">Item Description</th>
+                                        <th style="width:10%" class="text-center" rowspan="2">Delivery Date</th>
+                                        <th style="width:5%" class="text-center" rowspan="2">UOM</th>
+                                        <th style="width:10%" class="text-center" rowspan="2">Unit Price</th>
+                                        <th style="width:7%;" class="text-center poBg" colspan="2">PO</th>
+                                        <th style="width:10%;" class="text-center delivBg" colspan="2">Deliverable</th>
+                                  </tr>
+                                    <tr>
+                                        <th style="width:7%" class="text-center poBg">Qty.</th>
+                                        <th style="width:10%" class="text-center poBg">Total Price</th>
+                                        <th style="width:7%" class="text-center delivBg">Qty.</th>
+                                        <th style="width:10%" class="text-center delivBg">Total Price</th>
+                                    </tr>
+
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td class="text-center"><span class="checkbox-custom checkbox-default"><input type="checkbox" class="chkLine" name="chkLine[]" id="chkLine_1"><label for="chkLine_1"></label></span></td>
+                                        <td><input type="text" class="form-control input-sm text-center poLine" name="poLine[]" /></td>
+                                        <td><input type="text" class="form-control input-sm poItem" name="poItem[]" /></td>
+                                        <td><input type="text" class="form-control input-sm poDesc" name="poDesc[]" /></td>
+                                        <td><input type="text" class="form-control input-sm poDate" name="poDate[]" /></td>
+                                        <td><input type="text" class="form-control input-sm uom" name="uom[]" /></td>
+                                        <td><input type="text" class="form-control input-sm text-right unitPrice" name="unitPrice[]" value="0" /></td>
+                                        <td class="poBg"><input type="text" class="form-control input-sm text-right poQty " name="poQty[]" value="0" /></td>
+                                        <td class="poBg"><input type="text" class="form-control input-sm text-right lineTotal " name="lineTotal[]" value="0" readonly /></td>
+                                        <td class="delivBg"><input type="text" class="form-control input-sm text-right delivQty " name="delivQty[]" value="0" /></td>
+                                        <td class="delivBg"><input type="text" class="form-control input-sm text-right delivTotal " name="delivTotal[]" value="0" readonly /></td>
+                                    </tr>
+                                    </tbody>
+                                    <tfoot>
+                                    <tr>
+                                        <th colspan="7" class="text-right padding-top-15">Total: </th>
+                                        <th class="poBg"><input type="text" class="form-control input-sm text-right" id="poQtyTotal" readonly /></th>
+                                        <th class="poBg"><input type="text" class="form-control input-sm text-right" id="grandTotal" readonly /></th>
+                                        <th class="delivBg"><input type="text" class="form-control input-sm text-right" id="dlvQtyTotal" readonly /></th>
+                                        <th class="delivBg"><input type="text" class="form-control input-sm text-right" id="dlvGrandTotal" readonly /></th>
+                                    </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
                         </div>
                     </div>
 
                     <hr />
-                    
+
                     <div class="row row-lg" id="shipmentInputesRow">
-                        
+
                         <div class="col-md-12">
                             <h4 class="well well-sm example-title">Supplier's Shipment Inputs<span class="pull-right font-size-10" id="previousTotalCI"></span></h4>
                         </div>
-                        
+
                         <div class="col-xlg-6 col-md-6">
                             <div class="form-group">
-                                <label class="col-sm-5 control-label">Shipment Mode: </label>
-                                <div class="col-sm-7">
+                                <label class="col-sm-4 control-label">Shipment Mode: </label>
+                                <div class="col-sm-8">
                                     <ul class="list-unstyled list-inline margin-top-5 shippingmode">
                                         <li><input type="radio" id="shipmodesea" name="shipmode" value="sea" data-plugin="iCheck" data-radio-class="iradio_flat-blue" />&nbsp;Sea</li>
                                         <li><input type="radio" id="shipmodeair" name="shipmode" value="air" data-plugin="iCheck" data-radio-class="iradio_flat-green" />&nbsp;Air</li>
-                                        <li><input type="radio" id="shipmodeE-Delivery" name="shipmode" value="E-Delivery" data-plugin="iCheck" data-radio-class="iradio_flat-orange" />&nbsp;E-Delivery</li>
+                                        <li><input type="radio" id="shipmodeE-Delivery" name="shipmode" value="E-Delivery" data-plugin="iCheck" data-radio-class="iradio_flat-orange" />&nbsp;E-Delivery <span id="withoutlc">(without LC)</span><span id="withlc">(with LC)</span></li>
                                     </ul>
                                 </div>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label class="col-sm-5 control-label">Estimated Time of Arrival (ETA): </label>
                                 <div class="col-sm-7">
@@ -213,7 +225,7 @@ $actionLog = GetActionRef($_GET['ref']);
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label class="col-sm-5 control-label">MAWB Number: </label>
                                 <div class="col-sm-7">
@@ -244,9 +256,9 @@ $actionLog = GetActionRef($_GET['ref']);
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="col-xlg-6 col-md-6">
-                            
+
                             <div class="form-group">
                                 <label class="col-sm-5 control-label">CI Number: </label>
                                 <div class="col-sm-6">
@@ -264,11 +276,16 @@ $actionLog = GetActionRef($_GET['ref']);
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label class="col-sm-5 control-label">CI Amount: </label>
                                 <div class="col-sm-6">
-                                    <input type="text" class="form-control" name="ciAmount" id="ciAmount" />
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="ciAmount" id="ciAmount" readonly/>
+                                        <div class="input-group-addon">
+                                            <label id="ciAmountCur">CUR</label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -295,14 +312,14 @@ $actionLog = GetActionRef($_GET['ref']);
                                     <input type="text" class="form-control" name="ChargeableWeight" id="ChargeableWeight" />
                                 </div>
                             </div>
-                            
+
                         </div>
-                        
+
                     </div>
-                    
+
                     <div class="row row-lg" id="shipDocAttachmentsRow">
                         <div class="col-xlg-6 col-md-6">
-                            
+
                             <h4 class="well well-sm example-title">Shipping Documents Scan Copy</h4>
                             <div class="form-group">
                                 <label class="col-sm-5 control-label">AWB / BL: </label>
@@ -343,9 +360,9 @@ $actionLog = GetActionRef($_GET['ref']);
                                     <span id="attachPackListScanCopyLink"></span>
                                 </div>
                             </div>
-                            
+
                         </div>
-                        
+
                         <div class="col-xlg-6 col-md-6">
                             <h4 class="well well-sm example-title">Other Documents</h4>
                             <div class="form-group">
@@ -388,11 +405,11 @@ $actionLog = GetActionRef($_GET['ref']);
                                 </div>
                             </div>
                         </div>
-                        
+
                     </div>
-                    
+
                     <hr />
-                    
+
                     <div class="row row-lg">
                         <div class="col-xlg-6 col-md-6">
                             <div class="form-group">
@@ -415,7 +432,7 @@ $actionLog = GetActionRef($_GET['ref']);
                             </div>
                         </div>
                     </div>
-                    
+
                 </form>
             </div>
         </div>

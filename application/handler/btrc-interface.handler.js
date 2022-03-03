@@ -35,10 +35,13 @@ $(document).ready(function() {
                 $('#contractref').html(podata['contractrefName']);
                 $('#pr_no').html(podata['pr_no']);
                 $('#department').html(podata['department']);
-                $('#deliverydate').html(Date_toMDY(new Date(podata['deliverydate'])));
+                $('#deliverydate').html(Date_toDetailFormat(new Date(podata['deliverydate'])));
+                $('#actualPoDate').html(Date_toDetailFormat(new Date(podata['actualPoDate'])));
                 $('#buyercontact').html(podata['buyersName']);
                 $('#techcontact').html(podata['prName']);
                 $('#installbysupplier').html(getImplementedBy(podata["installbysupplier"]));
+                $('#noflcissue').html(podata['noflcissue']);
+                $('#nofshipallow').html(podata['nofshipallow']);
                 
                 // PI info
                 $('#pinum').html(podata['pinum']);
@@ -407,7 +410,7 @@ $(document).ready(function() {
                     '<td class="text-center">' + d1[i]['lineNo'] + '</td>' +
                     '<td class="text-center">' + d1[i]['itemCode'] + '</td>' +
                     '<td class="text-left">' + d1[i]['itemDesc'] + '</td>' +
-                    '<td class="text-center">' + d1[i]['poDate'] + '</td>' +
+                    '<td class="text-center">' + d1[i]['deliveryDate'] + '</td>' +
                     '<td class="text-center">' + d1[i]['uom'] + '</td>' +
                     '<td class="text-right">' + commaSeperatedFormat(d1[i]['unitPrice'], 4) + '</td>' +
                     '<td class="text-center poBg">' + commaSeperatedFormat(d1[i]['poQty']) + '</td>' +
@@ -482,7 +485,7 @@ function validate(){
 
 $(function () {
 
-    if($("#usertype").val()==role_public_regulatory_affairs){
+    if($("#usertype").val()==const_role_public_regulatory_affairs){
 
         var button = $('#btnUploadBTRCNOC'), interval;
         var txtbox = $('#attachBTRCNOC');

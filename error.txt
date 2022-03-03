@@ -1,0 +1,6 @@
+["23000",1062,"Duplicate entry '61001145-1' for key 'poNo'"]
+["23000",1062,"Duplicate entry '61001145-1' for key 'poNo'"]
+["23000",1062,"Duplicate entry '62001145-1' for key 'poNo'"]
+["23000",1062,"Duplicate entry '62001145-1' for key 'poNo'"]
+["23000",1062,"Duplicate entry '62201145-1' for key 'poNo'"]
+["23000",1062,"Duplicate entry '64201145-1' for key 'poNo'"]

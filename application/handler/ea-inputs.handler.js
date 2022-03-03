@@ -1123,7 +1123,7 @@ $(function () {
             window.clearInterval(interval);
         },
         onSubmit: function (file, ext) {
-            if (!(ext && /^(pdf)$/i.test(ext))) {
+            if (!(ext && /^(pdf|zip)$/i.test(ext))) {
                 alert('Invalid File Format.');
                 return false;
             }

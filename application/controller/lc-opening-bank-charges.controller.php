@@ -25,6 +25,9 @@ if (!empty($_GET["action"]) || isset($_GET["action"]))
         case 3:	
 			echo getChargeStatus($_GET['lc']);
 			break;
+		case 4:
+			echo getBankCharges($_GET['id']);
+			break;
 		default:
 			break;
 	}
@@ -317,6 +320,7 @@ function GetLCOCapex($lcno)
 }
 
 function GetLCO($lcno){
+
     $objdal = new dal();
 	$query = "SELECT *,
         (SELECT `filename` FROM `wc_t_attachments` WHERE `lcno`='$lcno' AND `title`='Bank Charge Advice' order by attachedon desc limit 1) `attachBankCharge`,
@@ -345,6 +349,29 @@ function getChargeStatus($lcno)
 	}
 	unset($objdal);
 	return $result;
+}
+
+function getBankCharges($id){
+
+	global $user_id;
+	global $loginRole;
+
+	$objdal = new dal();
+
+	$sql = "SELECT bc.`CableCharge`,bc.`OtherCharge`,bc.`StampCharge`,bc.`NonVatOtherCharge`
+            FROM `wc_t_company` c
+            LEFT JOIN `bank_charges` bc ON bc.`BankId` = c.`id`
+            WHERE c.`id` = $id LIMIT 1;";
+//    wc_t_contract
+	$objdal->read($sql);
+
+	if(!empty($objdal->data)){
+		$podetail[0] = $objdal->data[0];
+	}
+
+	unset($objdal);
+
+	return json_encode(array($podetail));
 }
 
 ?>

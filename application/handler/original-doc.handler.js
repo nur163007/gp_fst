@@ -19,8 +19,7 @@ $(document).ready(function() {
             refreshLCInfo();
         }
     });
-
-    $.getJSON("api/bankinsurance?action=4&type=bank", function (list) {
+    $.getJSON("api/company?action=4&type=bank", function (list) {
         $("#LcIssuingBank").select2({
             data: list,
             placeholder: "Select a Bank",
@@ -28,7 +27,7 @@ $(document).ready(function() {
             width: "100%"
         });
     });
-    $.getJSON("api/bankinsurance?action=4&type=insurance", function (list) {
+    $.getJSON("api/company?action=4&type=insurance", function (list) {
         $("#insurance").select2({
             data: list,
             placeholder: "Select a Insurance",
@@ -217,7 +216,7 @@ $(document).ready(function() {
                 $.ajax({
                     type: "POST",
                     url: "api/original-doc",
-                    data: $('#originaldoc-form').serialize() + "&insurance=" + $("#insurance").val() + "&pono=" + $("#poNumber").val() + "&refId=" + $("#refId").val() + "&userAction=" + $("#userAction").val(),
+                    data: $('#originaldoc-form').serialize() + "&insurance=" + $("#insurance").val() + "&pono=" + $("#poNumber").val() + "&shipno=" + $("#shipno").val() + "&refId=" + $("#refId").val() + "&userAction=1",
                     cache: false,
                     success: function (response) {
                         $("#btn_ForInsPolicy").prop('disabled', false);
@@ -227,6 +226,7 @@ $(document).ready(function() {
                             if (res['status'] == 1) {
                                 alertify.success(res['message']);
                                 // window.location.href = _dashboardURL;
+                                location.reload();
                             } else {
                                 alertify.error("FAILED to add!");
                                 return false;
@@ -270,13 +270,12 @@ $(document).ready(function() {
     });
 
     if($("#usertype").val()!=const_role_LC_Operation){
-         $("#LcNo").attr("disabled",true);
-         $("#bankNotifyDate").attr("disabled",true);
-         $("#discrepancyList").attr("disabled",true);
-         $("#chkDiscStatus_0").attr("disabled",true);
-         $("#chkDiscStatus_1").attr("disabled",true);
+        $("#LcNo").attr("disabled",true);
+        $("#bankNotifyDate").attr("disabled",true);
+        $("#discrepancyList").attr("disabled",true);
+        $("#chkDiscStatus_0").attr("disabled",true);
+        $("#chkDiscStatus_1").attr("disabled",true);
     }
-
 
     $.getJSON("api/category?action=4&id=32", function (list) {
         $("#lcType").select2({
@@ -297,7 +296,7 @@ $(document).ready(function() {
         });
     });
 
-    $.getJSON("api/bankinsurance?action=4&type=bank", function (list) {
+    $.getJSON("api/company?action=4&type=bank", function (list) {
         $("#bank").select2({
             data: list,
             placeholder: "Select a Source",
@@ -306,10 +305,10 @@ $(document).ready(function() {
         });
     });
 
-    $.get("api/category?action=8&id=17", function (list) {
+    /*$.get("api/category?action=8&id=17", function (list) {
         $("#currency").html('<option value="" data-icon="">Select Currency</option>').append(list);
         $("#currency").selectpicker('refresh');
-    });
+    });*/
 
     $("#ciNo").change(function(e){
         var ci = $("#ciNo").val();
@@ -324,7 +323,7 @@ $(document).ready(function() {
         });
     });
 
-    $("#docName").change(function(e){
+    /*$("#docName").change(function(e){
         var doc = $("#docName").val(),
             lc = $("#LcNo").val();
         //alert("api/buyers-lc-request?action=1&lc="+lc+"&term="+doc);
@@ -333,22 +332,24 @@ $(document).ready(function() {
             $("#paymentPercent").val(row['percentage']);
             $("#amount").val( commaSeperatedFormat(($("#ciValue").val()*row['percentage'])/100));
         });
-    });
+    });*/
     // Calculate Events ------
-    $("#exchangeRate, #stlmntCharge, #vatOnStlmntCharge").keyup(function() {
+    /*$("#exchangeRate, #stlmntCharge, #vatOnStlmntCharge").keyup(function() {
         CalculateAll();
         //alert('sfdf');
-    });
+    });*/
 
 });
 
-$("#bankNotifyDate").datepicker({
+
+
+/*$("#bankNotifyDate").datepicker({
     format: 'MM dd, yyyy',
     todayHighlight: true,
     autoclose: true
-});
+});*/
 
-$(function () {
+/*$(function () {
 
     var button = $('#btnUploadOriginalDoc'), interval;
     var txtbox = $('#attachOriginalDoc');
@@ -378,7 +379,7 @@ $(function () {
             }, 200);
         }
     });
-});
+});*/
 
 function refreshLCInfo(){
 
@@ -423,7 +424,12 @@ function refreshLCInfo(){
             $.get('api/original-doc?action=2&po='+poid+'&shipno='+$("#shipno").val(), function (data) {
                 if($.trim(data)){
                     var row = JSON.parse(data);
-                    $("#EAFeedback").html(row["UserMsg"]);
+                    if (row["UserMsg"] != ""){
+                        $("#EAFeedback").html(row["UserMsg"]);
+                    }else if (row["UserMsg"] == ""){
+                        $("#sourceMsg").hide();
+                    }
+
 
                     if(row["ActionID"]==ACTION_ORIGINAL_DOCUMENT_ACCEPTED_FOR_DOCUMENT_DELIVERY){
                         $("#originaldoc-form input, #originaldoc-form textarea, #originaldoc-form select, #originaldoc-form button").attr('disabled',true);
@@ -471,11 +477,25 @@ function refreshLCInfo(){
                 $("#bankNotifyDate").val(Date_toDetailFormat(new Date(row['banknotifydate'])));
                 $("#chkDiscStatus_"+row['status']).attr("checked", true).parent().addClass("checked");
                 $("#discrepancyList").val(row['discrepancy']);
+                $("#attachOriginalDocLink").html(attachmentLink(row['attachOriginalDoc']));
+
+                var d = new Date(row['banknotifydate']);
+                //alert(row['banknotifydate']);
+                $('#bankNotifyDate').datepicker('setDate', d);
+                $('#bankNotifyDate').datepicker('update');
             }
         });
+
         $.get('api/shipment?action=12&po='+poid, function(res){
             if($.trim(res)){
                 $("#previousTotalCI").html(commaSeperatedFormat(res) + ' ' + row['curname']);
+            }
+        });
+
+        $.get('api/purchaseorder?action=4&po=' + poid + '&step=' + ACTION_REQUEST_FOR_INS_POLICY_BY_TFO, function (r) {
+            console.log(r)
+            if (r == 1) {
+                $("#btn_ForInsPolicy").attr("disabled", true);
             }
         });
     });

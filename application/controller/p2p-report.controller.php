@@ -193,7 +193,7 @@ if (!empty($_GET["action"]) || isset($_GET["action"])){
                 INNER JOIN `wc_t_action` a2 ON al1.`ActionID` = a2.`ID`
                 WHERE al1.`PO` = al.`PO` AND IFNULL(al1.`shipNo`, 0) = IFNULL(s.`shipNo`, 0)
                 ORDER BY a2.`serialNo` DESC, al1.`ActionOn` DESC LIMIT 1) AS `Stage`
-     FROM `wc_t_po` p
+     FROM `wc_t_pi` p
         LEFT JOIN `wc_t_shipment` s ON p.`poid` = s.`pono`
         INNER JOIN `wc_t_action_log` al ON p.`poid` = al.`PO` AND IFNULL(s.`shipNo`, 0) = IFNULL(al.`shipNo`, 0)
         INNER JOIN `wc_t_action` a ON al.`ActionID` = a.`ID` GROUP BY p.`poid`, s.`shipNo` ORDER BY p.`poid` , s.`shipNo`) x

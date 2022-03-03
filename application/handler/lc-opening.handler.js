@@ -26,6 +26,7 @@ $(document).ready(function() {
 
             if (lcinfo["lcno"] == "" || lcinfo["lcno"] == null) {
                 $("#addOpeningCharge_btn, #addInsuranceCharge_btn, #SendLCCopyToSourcing_btn").attr('disabled', true);
+                // $("#addOpeningCharge_btn, #SendLCCopyToSourcing_btn").attr('disabled', true);
             }
 
             $.get('api/marine-insurance?action=3&po=' + poid, function (data) {
@@ -41,6 +42,8 @@ $(document).ready(function() {
                     //$("#SendLCCopyToSourcing_btn").attr('disabled',true);
                 }
             });
+
+            $("#btnBCSEXrate").hide();
 
             // PO info
             $('#ponum').html(poid);
@@ -112,7 +115,7 @@ $(document).ready(function() {
 
             if (lcinfo['lcno'] != "") {
                 $("#addOpeningCharge_btn").attr("href", "lc-opening-bank-charges?lc=" + lcinfo['lcno'] + "&po=" + poid + "&ref=" + $("#refId").val());
-                $("#addInsuranceCharge_btn").attr("href", "marine-insurance?po=" + poid + "&ref=" + $("#refId").val());
+
             }
 
             $("#serviceremark").val(lcinfo["serviceremark"]);
@@ -149,7 +152,8 @@ $(document).ready(function() {
 
             if (lcinfo["attachLCORequest"] != null) {
                 $("#attachLCOpenRequestOld").val(lcinfo["attachLCORequest"]);
-                $("#attachLCOpenRequest").val(lcinfo["attachLCORequest"]);
+                // $("#attachLCOpenRequest").val(lcinfo["attachLCORequest"]);
+                $("#attachLCOpenRequestLink").html(attachmentLink(lcinfo["attachLCORequest"]));
             }
 
             if (lcinfo["attachBankReceiveCopy"] != null) {
@@ -186,7 +190,7 @@ $(document).ready(function() {
 
                 var issuerBank = $("#lcissuerbank").val();
                 $('#lcissuerbankNew').val($("#lcissuerbank :selected").text());
-// alert("api/company?action=4&type=118&id=" + issuerBank);
+
                 $.getJSON("api/company?action=4&type=118&bankid=" + issuerBank, function (list) {
                     $("#bankaccount").empty();
                     $("#bankaccount").select2({
@@ -196,9 +200,9 @@ $(document).ready(function() {
                         allowClear: false,
                         width: "100%"
                     });
-                    if (lcinfo['bankaccount']!='' && lcinfo['bankaccount']!=null) {
+                    if (lcinfo['bankaccount'] != '' && lcinfo['bankaccount'] != null) {
                         $("#bankaccount").val(lcinfo['bankaccount']).change();
-                    } else{
+                    } else {
                         $.get("api/company?action=6&bankid=" + issuerBank, function (data) {
                             $("#bankaccount").val(data.trim()).change();
                         });
@@ -242,7 +246,7 @@ $(document).ready(function() {
                 });
                 if (lcinfo['lctype'] != "" && lcinfo['lctype'] != null) {
                     $("#lctype").val(lcinfo['lctype']).change();
-                } else{
+                } else {
                     $("#lctype").val(22).change();
                 }
             });
@@ -277,7 +281,7 @@ $(document).ready(function() {
                     width: "100%"
                 });
                 $("#producttype").val(podata['producttype']).change();
-                //alert(lcinfo['producttype']);
+                // alert(lcinfo['producttype']);
                 if (lcinfo['producttype'] != "" && lcinfo['producttype'] != 'null' && lcinfo['producttype'] != null && lcinfo['producttype'] != 0) {
                     $("#producttype").val(lcinfo['producttype']).change();
                 }
@@ -418,9 +422,8 @@ $(document).ready(function() {
     });
 
     //COVER NOTE SUBMIT
-
     $("#btnCoverNote").click(function (e) {
-        if($("#xr2").val()>0) {
+        if ($("#xr2").val() > 0) {
             $('#userAction').val('6');
             e.preventDefault();
             $("#btnCoverNote").prop('disabled', true);
@@ -456,7 +459,6 @@ $(document).ready(function() {
             return false;
         }
     });
-
 
     $("#SendLCCopyToSourcing_btn").click(function (e) {
         $('#userAction').val('2');
@@ -536,7 +538,6 @@ $(document).ready(function() {
         }
     });
 
-
     $("#producttype").change(function (e) {
 
         //commented on 15.12.21 because everything auto load popups a warning
@@ -545,7 +546,7 @@ $(document).ready(function() {
             alertify.warning("Please provide LC Date to calculate expiry!");
             return false;
         }*/
-        if ($("#lcissuedate").val() !='' && lcinfo['daysofexpiry'] == null) {
+        if ($("#lcissuedate").val() != '' && lcinfo['daysofexpiry'] == null) {
             var selected = $(this).find('option:selected');
             var tag = selected.data('tag');
 
@@ -586,19 +587,15 @@ $(document).ready(function() {
     });
 
     $("#xr1").keyup(function (e) {
-
         if (($("#xr1").val() != "") && (Number($("#xr1").val()))) {
             $("#LcValueInUSD").val(commaSeperatedFormat(lcinfo["lcvalue"] * parseToCurrency($("#xr1").val())));
         }
-
     });
 
     $("#xr2").keyup(function (e) {
-
         if (($("#xr2").val() != "") && (Number($("#xr2").val()))) {
             $("#LcValueInBDT").val(commaSeperatedFormat(parseToCurrency($("#LcValueInUSD").val()) * parseToCurrency($("#xr2").val())));
         }
-
     });
 
     $("#approverLevel").select2({
@@ -842,65 +839,82 @@ $(document).ready(function() {
 
     });
 
-
-    $.get('api/purchaseorder?action=4&po='+poid+'&step='+ACTION_COVER_NOTE_SUBMITTED_BY_IC, function(r){
+    $.get('api/purchaseorder?action=4&po=' + poid + '&step=' + ACTION_COVER_NOTE_SUBMITTED_BY_IC, function (r) {
         // console.log(r)
-        if(r==1){
+        if (r == 1) {
             // alert(1);
             $("#btnCoverNote").hide();
             $("#btnViewIC").show();
             // $("#btnViewIC").removeAttr("disabled");
-        }else{
-            $.get('api/purchaseorder?action=4&po='+poid+'&step='+ACTION_COVER_NOTE_REQUESTED_BY_TFO, function(r){
+            $("#addInsuranceCharge_btn").attr('disabled', false);
+            $("#addInsuranceCharge_btn").attr("href", "marine-insurance?po=" + poid + "&ref=" + $("#refId").val());
+        } else {
+            $.get('api/purchaseorder?action=4&po=' + poid + '&step=' + ACTION_COVER_NOTE_REQUESTED_BY_TFO, function (r) {
                 // console.log(r)
-                if(r==1){
-                    $("#btnCoverNote").attr('disabled',true)
+                if (r == 1) {
+                    // alert(2);
+                    $("#btnCoverNote").attr('disabled', true)
                     $("#btnViewIC").hide();
+                    $.get('api/cn-request?action=4&poid=' + poid, function (cnInfo) {
+                        var cni = JSON.parse(cnInfo);
+                        if (cni["cn_no"] != "") {
+                            $("#addInsuranceCharge_btn").attr('disabled', false);
+                            $("#addInsuranceCharge_btn").attr("href", "marine-insurance?po=" + poid + "&ref=" + $("#refId").val());
+                        } else {
+                            $("#addInsuranceCharge_btn").attr('disabled', true);
+                        }
+                    });
                 } else {
                     $("#btnViewIC").hide();
+                    // $("#addInsuranceCharge_btn").attr('disabled',true);
                 }
             });
         }
     });
 
-    $.get('api/purchaseorder?action=4&po='+poid+'&step='+ACTION_FINAL_LC_COPY_SENT_TO_GP, function(r){
+    $.get('api/purchaseorder?action=4&po=' + poid + '&step=' + ACTION_FINAL_LC_COPY_SENT_TO_GP, function (r) {
         // console.log(r)
-        if(r==1){
-            // alert(1);
-            // $("#SendLCCopyToSourcing_btn").attr('disabled',true)
+        if (r == 1) {
             $("#btnBCSEXrate").show();
-            // $("#btnViewIC").removeAttr("disabled");
-        }else {
-
-            $("#btnBCSEXrate").hide();
         }
     });
 
-    $.get('api/purchaseorder?action=4&po='+poid+'&step='+ACTION_BCS_EX_SENT_TO_FSO, function(r){
+    $.get('api/purchaseorder?action=4&po=' + poid + '&step=' + ACTION_BCS_EX_SENT_TO_FSO, function (r) {
         // console.log(r)
-        if(r==1){
+        if (r == 1) {
             // alert(1);
             $("#btnBCSEXrate").hide();
-            $("#SendLCCopyToSourcing_btn").attr('disabled',false)
+            $("#SendLCCopyToSourcing_btn").attr('disabled', false)
             // $("#btnViewIC").removeAttr("disabled");
         }
     });
 
     //LC request status
-    $.get('api/purchaseorder?action=4&po='+poid+'&step='+ACTION_DRAFT_LC_REQUEST_SENT_TO_BANK, function(r){
-        if(r==1){
-            //LC request status
-            $.get('api/purchaseorder?action=4&po='+poid+'&step='+ACTION_BUYER_SUPPLIER_FEEDBACK_ACCEPTED, function(r){
-                if(r==1){
-                    $("#draftLC").attr("disabled",true);
-                    $("#finalLC").attr("checked", true).parent().addClass("checked");
-                    /*$("#finalLC").attr("disabled",false);
-                    $("#btnLCRequestToBank").attr('disabled',false);*/
-                } else {
-                    $("#draftLC").attr("disabled",true);
-                    $("#finalLC").attr("disabled",true);
-                    $("#btnLCRequestToBank").attr('disabled',true);
-                    $("#btnLCRequestToBank").attr('title','Draft LC request sent');
+    $.get('api/purchaseorder?action=4&po=' + poid + '&step=' + ACTION_FINAL_LC_REQUEST_SENT_TO_BANK, function (r) {
+        if (r == 1) {
+            $("#draftLC").attr("disabled", true);
+            $("#finalLC").attr("disabled", true);
+            $("#finalLC").attr("checked", true).parent().addClass("checked");
+            $("#btnLCRequestToBank").attr('disabled', true);
+            $("#btnLCRequestToBank").attr('title', 'Final LC request sent');
+        } else {
+            $.get('api/purchaseorder?action=4&po=' + poid + '&step=' + ACTION_DRAFT_LC_REQUEST_SENT_TO_BANK, function (r) {
+                if (r == 1) {
+                    //LC request status
+                    $.get('api/purchaseorder?action=4&po=' + poid + '&step=' + ACTION_BUYER_SUPPLIER_FEEDBACK_ACCEPTED, function (r) {
+                        if (r == 1) {
+                            $("#draftLC").attr("checked", true).parent().addClass("checked");
+                            $("#draftLC").attr("disabled", true);
+                            $("#finalLC").attr("checked", true).parent().addClass("checked");
+                            /*$("#finalLC").attr("disabled",false);
+                            $("#btnLCRequestToBank").attr('disabled',false);*/
+                        } else {
+                            $("#draftLC").attr("disabled", true);
+                            $("#finalLC").attr("disabled", true);
+                            $("#btnLCRequestToBank").attr('disabled', true);
+                            $("#btnLCRequestToBank").attr('title', 'Draft LC request sent');
+                        }
+                    });
                 }
             });
         }
@@ -908,8 +922,8 @@ $(document).ready(function() {
 
 
     //all data show
-    $.get('api/purchaseorder?action=4&po='+poid+'&step='+ACTION_COVER_NOTE_SUBMITTED_BY_IC, function(r){
-        if(r==1) {
+    $.get('api/purchaseorder?action=4&po=' + poid + '&step=' + ACTION_COVER_NOTE_SUBMITTED_BY_IC, function (r) {
+        if (r == 1) {
             $.get('api/ici-interface?action=2&id=' + poid, function (data) {
 
                 if (!$.trim(data)) {
@@ -978,7 +992,6 @@ $(document).ready(function() {
     });
 
     //CN REJECT BUTTON
-
     $("#btnRejectCN").click(function (e) {
         // alert('clicked');
         $('#userAction1').val('8');
@@ -1013,36 +1026,72 @@ $(document).ready(function() {
                         alertify.error(textStatus + ": " + xhr.status + " " + error);
                     }
                 });
-            }else {
+            } else {
 
             }
-        }else{
+        } else {
             return false;
         }
     });
 
     //LC SENT TO BANK
-
     $("#btnLCRequestToBank").click(function (e) {
         $('#userAction').val('9');
         e.preventDefault();
         if (validateAttach() === true) {
             alertify.confirm('Are you sure you want submit?', function () {
-            var button = e.target;
-            button.disabled = true;
+                var button = e.target;
+                button.disabled = true;
+                $.ajax({
+                    type: "POST",
+                    url: "api/lc-opening",
+                    data: $('#lcrequest-form').serialize(),
+                    cache: false,
+                    success: function (response) {
+                        button.disabled = false;
+                        // alert(response);
+                        try {
+                            var res = JSON.parse(response);
+
+                            if (res['status'] == 1) {
+                                alertify.success(res['message']);
+                                window.location.href = _dashboardURL;
+                            } else {
+                                alertify.error("FAILED!");
+                                return false;
+                            }
+                        } catch (e) {
+                            alertify.error(response + ' Failed to process the request.', 20);
+                            return false;
+                        }
+                    }
+                });
+            });
+        } else {
+            return false;
+        }
+    });
+
+    //BCS EX RATE SUBMIT TO FSO
+    $("#btnBCSEXrate").click(function (e) {
+        $('#userAction').val('10');
+        e.preventDefault();
+        alertify.confirm('Are you sure you want submit?', function () {
+            $("#btnBCSEXrate").prop('disabled', true);
             $.ajax({
                 type: "POST",
                 url: "api/lc-opening",
                 data: $('#lcrequest-form').serialize(),
                 cache: false,
                 success: function (response) {
-                    button.disabled = false;
+                    $("#btnBCSEXrate").prop('disabled', false);
                     // alert(response);
                     try {
                         var res = JSON.parse(response);
 
                         if (res['status'] == 1) {
                             alertify.success(res['message']);
+
                             window.location.href = _dashboardURL;
                         } else {
                             alertify.error("FAILED!");
@@ -1054,50 +1103,12 @@ $(document).ready(function() {
                     }
                 }
             });
-            });
-        } else {
-            return false;
-        }
-    });
-
-    //BCS EX RATE SUBMIT TO FSO
-
-    $("#btnBCSEXrate").click(function (e) {
-        $('#userAction').val('10');
-        e.preventDefault();
-        alertify.confirm('Are you sure you want submit?', function () {
-        $("#btnBCSEXrate").prop('disabled', true);
-        $.ajax({
-            type: "POST",
-            url: "api/lc-opening",
-            data: $('#lcrequest-form').serialize(),
-            cache: false,
-            success: function (response) {
-                $("#btnBCSEXrate").prop('disabled', false);
-                // alert(response);
-                try {
-                    var res = JSON.parse(response);
-
-                    if (res['status'] == 1) {
-                        alertify.success(res['message']);
-
-                        window.location.href = _dashboardURL;
-                    } else {
-                        alertify.error("FAILED!");
-                        return false;
-                    }
-                } catch (e) {
-                    alertify.error(response + ' Failed to process the request.', 20);
-                    return false;
-                }
-            }
-        });
 
         });
     });
-
 
 });
+
 function validateAttach() {
 
     /*if ($("input[name='lcRequestType']").filter(":checked").length < 1){
@@ -1133,6 +1144,7 @@ function validateCN() {
     }
     return true;
 }
+
 function ResetForm() {
     $('#remarks').val("");
 

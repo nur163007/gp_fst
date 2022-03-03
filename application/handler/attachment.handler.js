@@ -1,52 +1,61 @@
-function commentsLogScript(comments, aBuyer, aSupplier){
+function commentsLogScript(comments, aBuyer, aSupplier) {
     // Buyer's comments log
-    $(aBuyer+'title').hide();
+    $(aBuyer + 'title').hide();
     $(aBuyer).hide();
     var commentsLog = '';
-    for(var i=0; i<comments.length; i++){
-        if(comments[i]['fromgroup']!=_supplier){
-            /*if(commentsLog.length>0){commentsLog += '<hr />';}
-            commentsLog += '<span class="comment-author">' + comments[i]['rolename'] + ': <span class="text-primary">' + comments[i]['username'] + '</span> <i class="icon wb-arrow-right"></i> '+ comments[i]['torole'] +'</span> <div class="comment-meta">'+comments[i]['msgon'] + '</div>';
+    for (var i = 0; i < comments.length; i++) {
+        if (comments[i]['fromgroup'] != _supplier) {
+            if (commentsLog.length > 0) {
+                commentsLog += '<hr />';
+            }
+            commentsLog += '<span class="comment-author">' + comments[i]['rolename'] + ': <span class="text-primary">' + comments[i]['username'] + '</span> <i class="icon wb-arrow-right"></i> ' + comments[i]['torole'] + '</span> <div class="comment-meta">' + comments[i]['msgon'] + '</div>';
             if (comments[i]['stage']) {
                 commentsLog += '<div class="comment-content"><span style="color: #F2A654">Stage: </span><span class="text-primary">' + comments[i]['stage'] + '</span></div>';
             }
-            commentsLog += '<div class="comment-content"><h5>' + comments[i]['title'] + '</h5></div>';*/
-            if (comments[i]['msg']!=null) {
-                commentsLog += '<div class="comment-content">&bull;&nbsp;' + htmlspecialchars_decode(comments[i]['msg']) + '</div>';
+            commentsLog += '<div class="comment-content"><h5>' + comments[i]['title'] + '</h5></div>';
+            if (comments[i]['msg'] != null) {
+                commentsLog += '<div class="comment-content" style=""><p>' + htmlspecialchars_decode(comments[i]['msg']) + '</p></div>';
             }
         }
     }
-    if(commentsLog!=''){
+    if (commentsLog != '') {
         $('#buyersmsg').html(commentsLog);
         $('#buyersmsgtitle').show();
         $('#buyersmsg').show();
+    } else {
+        $('#buyersmsgtitle').remove();
+        $('#buyersmsg').parent().remove();
     }
-    if(aSupplier!=""){
+    if (aSupplier != "") {
         // Supplier's comments log
-        $(aSupplier+'title').hide();
+        $(aSupplier + 'title').hide();
         $(aSupplier).hide();
         var commentsLog = '';
-        for(var i=0; i<comments.length; i++){
-            if(comments[i]['fromgroup']==_supplier){
-                /*if(commentsLog.length>0){commentsLog += '<hr />';}
-                commentsLog += '<span class="comment-author">' + comments[i]['rolename'] + ': <span class="text-primary">' + comments[i]['username'] + '</span> <i class="icon wb-arrow-right"></i> '+ comments[i]['torole'] +'</span> <div class="comment-meta">'+comments[i]['msgon'] + '</div>';
+        for (var i = 0; i < comments.length; i++) {
+            if (comments[i]['fromgroup'] == _supplier) {
+                if (commentsLog.length > 0) {
+                    commentsLog += '<hr />';
+                }
+                commentsLog += '<span class="comment-author">' + comments[i]['rolename'] + ': <span class="text-primary">' + comments[i]['username'] + '</span> <i class="icon wb-arrow-right"></i> ' + comments[i]['torole'] + '</span> <div class="comment-meta">' + comments[i]['msgon'] + '</div>';
                 if (comments[i]['stage']) {
                     commentsLog += '<div class="comment-content"><span style="color: #F2A654">Stage: </span><span class="text-primary">' + comments[i]['stage'] + '</span></div>';
                 }
-                commentsLog += '<div class="comment-content"><h5>' + comments[i]['title'] + '</h5></div>';*/
-                if(comments[i]['msg']!=null) {
-                    commentsLog += '<div class="comment-content">&bull;&nbsp;' + htmlspecialchars_decode(comments[i]['msg']) + '</div>';
+                commentsLog += '<div class="comment-content"><h5>' + comments[i]['title'] + '</h5></div>';
+                if (comments[i]['msg'] != null) {
+                    commentsLog += '<div class="comment-content">' + htmlspecialchars_decode(comments[i]['msg']) + '</div>';
                 }
             }
         }
-        if(commentsLog!=''){
+        if (commentsLog != '') {
             $('#suppliersmsg').html(commentsLog);
             $('#suppliersmsgtitle').show();
             $('#suppliersmsg').show();
+        } else {
+            $('#suppliersmsgtitle').remove();
+            $('#suppliersmsg').parent().remove();
         }
-        }
+    }
 }
-
 
 function commentsTFOLogScript(commentsTFO, Buyer, Supplier){
     // Buyer's comments log

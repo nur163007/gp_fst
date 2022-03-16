@@ -396,7 +396,7 @@ $poContact = getPOContacts($_GET["po"]);
                                         <div class="form-group">
                                             <label class="col-sm-4 control-label">Product Type: </label>
                                             <div class="col-sm-8">
-                                                <label class="control-label"><b id="producttype"><img src="assets/images/busy.gif" /></b></label>
+                                                <label class="control-label"><b id="producttypeLC"><img src="assets/images/busy.gif" /></b></label>
                                             </div>
                                         </div>
                                         <div class="form-group">

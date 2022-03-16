@@ -1006,12 +1006,12 @@ function addPOLine(row) {
             var addTick = "";
             /*var voidDelivQty = 0;
             var voidDelivAmount = 0*/
-            var voidDelivQty = row["delivQtyValid"];
-            var voidDelivAmount = row["delivAmountValid"]
+            var voidDelivQty = row["delivQty"];
+            var voidDelivAmount = row["delivTotal"]
         } else {
             addTick = "checked";
-            voidDelivQty = row["delivQtyValid"];
-            voidDelivAmount = row["delivAmountValid"];
+            voidDelivQty = row["delivQty"];
+            voidDelivAmount = row["delivTotal"];
         }
 
         $("#dtPOLines tbody:last").append('<tr>' +

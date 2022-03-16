@@ -978,6 +978,77 @@ function fileTransferTempToDocs($poNo, $dontDelete = 0)
 }
 
 
+
+/*!
+ * File transfer from 'temp' folder to PO wise 'docs' folder
+ * This function will be executed upon completion of po submit
+ * Added by: Hasan Masud
+ * Added on: 2020-02-16
+ * ************************************************************/
+
+function fileDeleteFromDocs($poNo, $Delete = 1)
+{
+
+    $objdal = new dal();
+
+    $sql = "SELECT 
+                a.`poid`, a.`shipno`, a.`filename`, a.`attachedon`, p.`createdon`
+            FROM `wc_t_attachments` a 
+                INNER JOIN `wc_t_pi` p ON p.`poid` = a.`poid`
+            WHERE a.`poid` = '$poNo';";
+    $documents = $objdal->read($sql);
+//    var_dump($sql);
+//die();
+    $target_dir = realpath(dirname(__FILE__) . "/../../docs/");
+
+    foreach ($documents as $document) {
+        /*!
+        * Create files with given name
+        * This is for test only
+        * ****************************/
+        //$myfile = fopen($old_dir.$document['filename'], "w");
+
+        $year = date('Y', strtotime($document['createdon']));
+        $month = date('M', strtotime($document['createdon']));
+        $poNo = $document['poid'];
+        $shipNo = $document['shipno'];
+
+        $target_path_year = $target_dir.'/'.$year;
+        if (!file_exists($target_path_year)) {
+            mkdir($target_path_year, 0777, true);
+        }
+
+        $target_path_month = $target_path_year . '/' . $month;
+        if (!file_exists($target_path_month)) {
+            mkdir($target_path_month, 0777, true);
+        }
+
+        $target_path_poNo = $target_path_month . '/' . $poNo;
+        if (!file_exists($target_path_poNo)) {
+            mkdir($target_path_poNo, 0777, true);
+        }
+
+        $target_path_shipNo = $target_path_poNo . '/' . $shipNo;
+        if (!file_exists($target_path_shipNo)) {
+            mkdir($target_path_shipNo, 0777, true);
+        }
+
+        $file = $document['filename'];
+        if ($file != '') {
+            if (file_exists($target_path_shipNo.'/'.$file)) {
+
+                    if ($Delete == 1) {
+                        unlink($target_path_shipNo . '/' . $file);
+                    }
+            }
+        }
+
+    }
+}
+
+
+
+
 /*!
  * File transfer from 'temp' folder to PO wise 'docs' folder
  * This function will be executed upon completion of po submit
@@ -1204,6 +1275,92 @@ function fileTransferLCDocs($lastLCId){
             if ($copy_status == 1) {
                 unlink($old_dir);
             }
+        }
+    }
+
+
+}
+
+//CREDIT REPORTS ATTACHMENTS STORE
+
+function fileTransferCreditDocs($lastCreditId){
+
+    global $loginRole;
+    $objdal = new dal();
+
+    $sql = "SELECT `crReport` FROM `update_credit_report` WHERE `id` = $lastCreditId;";
+
+    $document = $objdal->getRow($sql);
+
+//    var_dump($documents);
+//    die();
+
+    if ($document['crReport']) {
+
+        $old_dir = realpath(dirname(__FILE__) . "/../../temp/".$document['crReport']);
+
+        $target_dir = realpath(dirname(__FILE__) . "/../../docs/");
+
+/*        if ($loginRole == role_LC_Operation){
+            $folder = 'TFO';
+        }elseif ($loginRole == role_bank_lc){
+            $folder = 'BANK';
+        }*/
+
+
+        $target_dir_credit = $target_dir . '/' . 'CreditReport';
+        if (!is_dir($target_dir_credit)) {
+            mkdir($target_dir_credit, 0777, true);
+        }
+        $target_path = $target_dir_credit . '/' . 'BankandTFO';
+        if (!file_exists($target_path)) {
+            mkdir($target_path, 0777, true);
+        }
+
+        //
+
+        if (file_exists($old_dir)) {
+            $copy_status = copy($old_dir, $target_path . '/' . $document['crReport']);
+            if ($copy_status == 1) {
+                unlink($old_dir);
+            }
+        }
+    }
+
+
+}
+
+
+function fileDeleteCreditDocs($id){
+
+    global $loginRole;
+    $objdal = new dal();
+
+    $sql = "SELECT `crReport` FROM `update_credit_report` WHERE `id` = $id;";
+
+    $document = $objdal->getRow($sql);
+
+//    var_dump($documents);
+//    die();
+
+    if ($document['crReport']) {
+
+        $old_dir = realpath(dirname(__FILE__) . "/../../docs/CreditReport");
+
+//        if ($loginRole == role_LC_Operation){
+//            $folder = 'TFO';
+//        }elseif ($loginRole == role_bank_lc){
+//            $folder = 'BANK';
+//        }
+
+        $target_dir_credit = $old_dir . '/' . 'BankandTFO';
+
+        $target_path = $target_dir_credit .'/'.  $document['crReport'];
+        //
+
+        if (file_exists($target_path)) {
+                unlink($target_path);
+
         }
     }
 

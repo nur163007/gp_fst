@@ -122,6 +122,7 @@ $(document).ready(function() {
     }
     // alert('api/shipment?action=1&po='+poid+"&shipno="+shipNum);
     $.get('api/shipment?action=1&po=' + poid + "&shipno=" + shipNum, function (data) {
+        // alert(data);
         var ship = JSON.parse(data);
 
         shipinfo = ship;

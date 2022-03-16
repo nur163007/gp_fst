@@ -51,6 +51,11 @@ if (!empty($_GET["action"]) || isset($_GET["action"]))
         case 6:
             echo GetFinFXSettlePending();
             break;
+        case 7:
+            echo GetBankDocRecLog();
+            break;
+
+
         default:
             break;
     }
@@ -729,6 +734,38 @@ function GetBankNotification(){
 
 }
 
+function GetBankDocRecLog(){
+
+    global $user_id;
+    //$loginRole = $_SESSION[session_prefix.'wclogin_role'];
+    $objdal = new dal();
+    $query = "SELECT org.`id`, org.`lcno`, org.`shipno`, org.`discrepancy`,org.`status`,
+                date_format(org.`banknotifydate`,'%M %d,%Y') `banknotifydate`, s.`pono`,
+                (SELECT a.`filename` FROM `wc_t_attachments` a WHERE a.`poid`=s.`pono` AND a.`title`='Original Bank Document' ORDER BY a.`id` DESC LIMIT 1) AS `originalDoc`
+                FROM `wc_t_original_doc` org 
+                INNER JOIN wc_t_shipment s ON (org.`lcno` = s.`lcNo` and org.`shipno` = s.`shipNo`)
+            WHERE org.`banknotifydate` is not null and org.`submittedby` = $user_id;";
+//    echo $query;
+    $objdal->read($query);
+
+    $rows = array();
+    if (!empty($objdal->data)) {
+        foreach ($objdal->data as $row) {
+            $row['id'] = encryptId($row['id']);
+            $rows[] = $row;
+        }
+    }
+    unset($objdal);
+    $json = json_encode($rows);
+    if ($json == "" || $json == 'null') {
+        $json = "[]";
+    }
+    $table_data = '{"data": ' . $json . '}';
+    //return $table_data;
+    return $table_data;
+
+}
+
 function SubmitODocReceiptNotification()
 {
     global $user_id;
@@ -750,6 +787,7 @@ function SubmitODocReceiptNotification()
     $shipno = htmlspecialchars($_POST['shipno'],ENT_QUOTES, "ISO-8859-1");
     $discStatus = htmlspecialchars($_POST['discStatus'],ENT_QUOTES, "ISO-8859-1");
     $discrepancyList = htmlspecialchars($_POST['discrepancyList'],ENT_QUOTES, "ISO-8859-1");
+//    $Id = htmlspecialchars($_POST['actionId'],ENT_QUOTES, "ISO-8859-1");
 //    $bankNotifyDate = htmlspecialchars($_POST['bankNotifyDate'],ENT_QUOTES, "ISO-8859-1");
 //    $bankNotifyDate = date('Y-m-d', strtotime($bankNotifyDate));
 
@@ -811,19 +849,96 @@ function SubmitODocReceiptNotification()
         $newAction = action_Requested_to_Collect_Original_Doc;
         $msg = "'Request for original document against PO# ".$pono." and Shipment # ".$shipno."'";
     }*/
-    $msg = "'Notification of original document receive against PO# ".$PoNo." and Shipment # ".$shipNo."'";
+//    $msg = "'Notification of original document receive against PO# ".$PoNo." and Shipment # ".$shipNo."'";
     // Action Log --------------------------------//
-    $action = array(
-        'refid' => $refId,
-        'pono' => "'".$PoNo."'",
-        'shipno' => $shipNo,
-        'actionid' => action_Requested_to_Collect_Original_Doc,
-        'status' => 1,
-        'msg' => $msg,
-        'usermsg' => "'".$userMsg." ".$discrepancyList."'",
-    );
-//    var_dump($action);
-    UpdateAction($action);
+
+//    $sql = "SELECT `ID`,`RefID`,`PO`,`ActionID` from `wc_t_action_log`
+//    where `PO`='$PoNo' AND `ActionID` = " .action_Endorsement_Doc_Send_By_Bank. ";";
+//    $objdal->read($sql);
+//    $res = '';
+//    if (!empty($objdal->data)) {
+//        $res = $objdal->data[0];
+//        extract($res);
+//    }
+//    unset($objdal->data);
+//    $actionID = $res["ActionID"];
+    $allStatus = array();
+    $sql = "SELECT distinct `ActionID` FROM `wc_t_action_log` WHERE `PO` = '$PoNo';";
+    $objdal->read($sql);
+
+    if(!empty($objdal->data)){
+
+        $i = 0;
+        foreach ($objdal->data as $val){
+            extract($val);
+            $allStatus[$i] = $ActionID;
+            $i++;
+        }
+        //echo json_encode($allStatus);
+    }
+
+    if (in_array(action_Endorsement_Doc_Send_By_Bank, $allStatus)){
+
+        $query = "UPDATE `wc_t_shipment` SET `docType` = ".doctype_endorsed.", 
+		      `docDeliveredByFin` = current_timestamp()
+            WHERE `pono` = '$PoNo' AND `shipNo` = '$shipNo';";
+        $objdal->update(trim($query));
+
+        $action = array(
+            'refid' => $refId,
+            'pono' => "'".$PoNo."'",
+            'shipno' => $shipNo,
+            'actionid' => action_Requested_to_Collect_Original_Doc,
+            'status' => 1,
+            'newstatus' => 1,
+            'msg' => "'Acknowledgement'",
+            'usermsg' => "'".$userMsg." ".$discrepancyList."'",
+        );
+        UpdateAction($action);
+        $action = array(
+            'refid' => $refId,
+            'pono' => "'".$PoNo."'",
+            'shipno' => $shipNo,
+            'actionid' => action_Endorsed_Document_Delivered,
+            'msg' => "'Endorsed document delivered to sourcing.'",
+        );
+
+        UpdateAction($action);
+
+        SightPaymentForFXSettlement($PoNo, $shipNo, 6);
+    }
+    elseif (in_array(action_Request_For_Doc_Endorsement_Send_By_GP, $allStatus)){
+        $query = "UPDATE `wc_t_action_log` SET
+        `Status`=1,
+        `Msg`='Acknowledgement'
+        where `PO`='$PoNo' AND `ActionID`='".action_Request_For_Doc_Endorsement_Send_By_GP."';";
+        $objdal->update($query);
+
+        $action = array(
+            'refid' => $refId,
+            'pono' => "'".$PoNo."'",
+            'shipno' => $shipNo,
+            'actionid' => action_Requested_to_Collect_Original_Doc,
+            'status' => 1,
+            'msg' => "'Notification of original document receive against PO# ".$PoNo." and Shipment # ".$shipNo."'",
+            'usermsg' => "'".$userMsg." ".$discrepancyList."'",
+        );
+        UpdateAction($action);
+    }
+    else{
+        $action = array(
+            'refid' => $refId,
+            'pono' => "'".$PoNo."'",
+            'shipno' => $shipNo,
+            'actionid' => action_Requested_to_Collect_Original_Doc,
+            'status' => 1,
+            'msg' => "'Notification of original document receive against PO# ".$PoNo." and Shipment # ".$shipNo."'",
+            'usermsg' => "'".$userMsg." ".$discrepancyList."'",
+        );
+
+        UpdateAction($action);
+    }
+
 //    echo("success 2");
     // End Action Log -----------------------------
 
@@ -860,9 +975,12 @@ function GetFinFXSettlePending() {
             FORMAT(f.`amount`, 2) `amount`,
             FORMAT(f.`ciamount`, 2) `ciamount`,
             f.`lcno`,
+            DATE_FORMAT(f.`duedate`,'%M %d,%Y') AS `duedate`,
+            f.`cino`,
             f.`status`,
             c2.`name` AS `currency`,
-            co.`name` `lcbankaddress`
+            co.`name` `lcbankaddress`,
+            DATE_FORMAT(b.`banknotifydate`,'%M %d,%Y') AS `banknotifydate`
         FROM
             `fx_settelment_pending_fn` f
                 INNER JOIN
@@ -875,6 +993,8 @@ function GetFinFXSettlePending() {
             `wc_t_lc` lc ON po.`poid` = lc.`pono`
                 INNER JOIN
             `wc_t_company` co ON lc.`lcissuerbank` = co.`id`
+                INNER JOIN
+            `wc_t_original_doc` b ON f.`lcno` = b.`lcno`
         WHERE f.`status` = 0;";
 
     $objdal->read($strQuery);
@@ -895,4 +1015,28 @@ function GetFinFXSettlePending() {
     return $table_data;
 
 }
+
+function SightPaymentForFXSettlement($pono, $shipno, $doc)
+{
+    $objdal = new dal();
+
+    $sql = "INSERT INTO fx_settelment_pending_fn(`pono`, `shipment`, `partname`, `percentage`, `amount`, `ciamount`, `lcno`, `duedate`, `cino`)
+		SELECT s.pono, s.shipNo, p.partname, p.percentage, ROUND((s.ciAmount/100)*p.percentage,3), s.ciAmount, s.lcNo, 
+		(SELECT ADDDATE(org.banknotifydate, INTERVAL 5 DAY) FROM `wc_t_original_doc` org
+            WHERE org.shipNo = $shipno AND org.lcno = s.lcNo
+            ORDER BY Id DESC LIMIT 1) AS duedate,
+		s.ciNo
+		FROM wc_t_shipment s inner join wc_t_payment_terms p on s.pono = p.pono 
+		where s.pono = '$pono' and shipNo = $shipno and p.partname = $doc;";
+
+    try {
+        $objdal->insert($sql);
+        unset($objdal);
+        return 1;
+    } catch (Exception $e) {
+        unset($objdal);
+        return 0;
+    }
+}
+?>
 

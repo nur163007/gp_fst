@@ -880,6 +880,30 @@ if(isset($_REQUEST['q'])) {
             break;
 
 
+            case "update-credit-report":
+            $page_specific_css = array(
+                '<link rel="stylesheet" href="assets/vendor/daterangepicker/daterangepicker.css" />',
+                '<link rel="stylesheet" href="assets/vendor/bootstrap-datepicker/bootstrap-datepicker.css">',
+                '<link rel="stylesheet" href="assets/vendor/select2/select2.css">',
+                '<link rel="stylesheet" href="assets/vendor/bootstrap-select/bootstrap-select.css">',
+                '<link rel="stylesheet" href="assets/vendor/datatables-bootstrap/dataTables.bootstrap.css" />',
+                '<link rel="stylesheet" href="assets/vendor/asspinner/asSpinner.css">'
+            );
+            break;
+
+
+            case "document-receive-log":
+            $page_specific_css = array(
+                '<link rel="stylesheet" href="assets/vendor/daterangepicker/daterangepicker.css" />',
+                '<link rel="stylesheet" href="assets/vendor/bootstrap-datepicker/bootstrap-datepicker.css">',
+                '<link rel="stylesheet" href="assets/vendor/select2/select2.css">',
+                '<link rel="stylesheet" href="assets/vendor/bootstrap-select/bootstrap-select.css">',
+                '<link rel="stylesheet" href="assets/vendor/datatables-bootstrap/dataTables.bootstrap.css" />',
+                '<link rel="stylesheet" href="assets/vendor/asspinner/asSpinner.css">'
+            );
+            break;
+
+
 
         default:
             $page_specific_css = array();

@@ -1,3 +1,6 @@
+
+const today = new Date();
+// const toDate = today.getFullYear()+'/'+(today.getMonth()+1)+'/'+today.getDate();
 $(document).ready(function() {
 
     $('#tableFxSettlementPendingFn').dataTable({
@@ -17,8 +20,10 @@ $(document).ready(function() {
             {"data": "shipment", "class": "text-center"},
             {"data": "docname"},
             {"data": "percentage", "class": "text-right"},
+            {"data": "duedate", "class": "text-right"},
             {"data": "amount", "class": "text-right"},
             {"data": "ciamount", "class": "text-right"},
+            {"data": "cino", "class": "text-right"},
             {"data": "currency", "class": "text-center"},
             {"data": "lcbankaddress", "class": "text-right"},
             // {"data": "ciamount", "class": "text-right"}
@@ -41,12 +46,29 @@ $(document).ready(function() {
         "sDom": 'frtipS',
         "paging": true,
         "pageLength": 10,
+        "scrollX": '100%',
+        "scrollY": '300',
+        "bScrollCollapse": true,
+        "fixedColumns": {
+            "leftColumns": 4
+        },
         "drawCallback": function() {
             $('.valueDtPicker').datepicker({
                 todayHighlight: true,
                 autoclose: true
             });
-        }
+        },
+        "rowCallback": function( row, data, index ) {
+            const cDuedate = new Date(data['duedate']);
+            // const cDateDue = cDuedate.getFullYear()+'/'+(cDuedate.getMonth()+1)+'/'+cDuedate.getDate();
+            // console.log(cDateDue)
+            const diffTime = Math.abs(cDuedate - today);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                if (diffDays <= 5){
+                    $(row).find('td:eq(6)').css('color', 'red');
+                }
+
+        },
     });
 
     $("#btnSendForFXSettlement").click(function () {

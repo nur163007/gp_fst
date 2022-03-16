@@ -191,10 +191,10 @@ function SightPaymentForFXSettlement($pono, $shipno, $doc)
 	$objdal = new dal();
 
 	$sql = "INSERT INTO fx_settelment_pending_fn(`pono`, `shipment`, `partname`, `percentage`, `amount`, `ciamount`, `lcno`, `duedate`, `cino`)
-		SELECT s.pono, s.shipNo, p.partname, p.percentage, (s.ciAmount/100)*p.percentage, s.ciAmount, s.lcNo, 
-		(SELECT a1.ActionOn FROM `wc_t_action_log` a1 
-            WHERE PO = '$pono' AND shipNo = $shipno AND ActionID = " . action_Sent_for_Original_Document_Accpetance . " 
-            ORDER BY Id DESC LIMIT 1), 
+		SELECT s.pono, s.shipNo, p.partname, p.percentage, ROUND((s.ciAmount/100)*p.percentage,3), s.ciAmount, s.lcNo, 
+		(SELECT ADDDATE(org.banknotifydate, INTERVAL 5 DAY) FROM `wc_t_original_doc` org
+            WHERE org.shipNo = $shipno AND org.lcno = s.lcNo
+            ORDER BY Id DESC LIMIT 1) AS duedate,
 		s.ciNo
 		FROM wc_t_shipment s inner join wc_t_payment_terms p on s.pono = p.pono 
 		where s.pono = '$pono' and shipNo = $shipno and p.partname = $doc;";
@@ -330,9 +330,9 @@ function GetLetterInfo($bankId, $po)
          (SELECT `name` FROM `wc_t_category` WHERE `id`=(SELECT `currency` FROM `wc_t_pi` where `poid` = '$po')) `currency`,
          (SELECT `name` FROM `wc_t_company` WHERE `id`=(select `supplier` from `wc_t_pi` where `poid` = '$po')) `coname`,
          (SELECT `address` FROM `wc_t_company` WHERE `id`=(select `supplier` from `wc_t_pi` where `poid` = '$po')) `coaddress`,
-         (SELECT `name` FROM `wc_t_bank_insurance` WHERE `id`=(select `bankaccount` from `wc_t_lc` where `pono` = '$po')) `account`
+         (SELECT `name` FROM `wc_t_company` WHERE `id`=(select `bankaccount` from `wc_t_lc` where `pono` = '$po')) `account`
         FROM `wc_t_company` WHERE `id` = $bankId;";
-	//echo $query;
+//	echo $query;
     $objdal->read($query);
 	if(!empty($objdal->data)){
 		$res = $objdal->data[0];

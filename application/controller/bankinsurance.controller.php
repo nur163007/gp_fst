@@ -199,9 +199,9 @@ function GetAllBanks()
 function GetBankList($type, $bankId=0){
     $objdal=new dal();
     if($bankId==0){
-        $sql = "SELECT `id`, `name` FROM `wc_t_bank_insurance` WHERE `type`='$type';";
+        $sql = "SELECT `id`, `name` FROM `wc_t_company` WHERE `type`='$type';";
     } else {
-        $sql = "SELECT `id`, `name` FROM `wc_t_bank_insurance` WHERE `bank` = $bankId;";
+        $sql = "SELECT `id`, `name` FROM `wc_t_company` WHERE `bank` = $bankId;";
     }
 	
 	$objdal->read($sql); 

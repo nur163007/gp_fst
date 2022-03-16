@@ -419,7 +419,7 @@ function GetShipmentInfo($pono, $shipno=0)
         (SELECT `currency` FROM `wc_t_pi` WHERE `poid`='$pono') `currency`, $shipVal
         (SELECT MAX(`banknotifydate`) FROM `wc_t_original_doc` WHERE `lcno`=(SELECT `lcno` FROM `wc_t_lc` WHERE `pono`='$pono')) `banknotifydate`,
         (SELECT `ActionOn` FROM `wc_t_action_log` WHERE `PO` = '$pono' AND `shipNo` = $shipno AND `ActionID` = " . action_CD_BE_Copy_updated . " AND `Status` in (0,1)) `payOrderReqDate`,
-        (SELECT wp.`docName` FROM `wc_t_payment` wp LEFT JOIN `wc_t_shipment` ws ON (wp.`LcNo` = ws.`lcNo` and wp.`ciNo`= ws.`ciNo`) ) `docName`,
+        (SELECT `docName` FROM `wc_t_payment` WHERE `LcNo`=(SELECT `lcno` FROM `wc_t_lc` WHERE `pono`='$pono') and `ciNo`=(SELECT `ciNo` FROM `wc_t_shipment` WHERE `pono`='$pono' AND `shipNo`=$shipno)) `docName`,
         $attach
         
         FROM `wc_t_shipment` ";

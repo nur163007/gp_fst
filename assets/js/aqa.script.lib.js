@@ -417,6 +417,24 @@ function attachmentLink(filename, filetitle) {
     }
 }
 
+function creditAttachmentLink(crReport) {
+
+    // var userType = $("#usertype").val();
+    //
+    // if (userType == 11){
+    //     var folder = 'TFO';
+    // }else if (userType == 23){
+    //     var folder = 'BANK';
+    // }
+
+    if(crReport!="") {
+        return `<i class="icon fa-${crReport.substr(crReport.lastIndexOf(".") + 1).toLowerCase()}"></i>&nbsp;&nbsp;
+                <a href="docs/CreditReport/BankandTFO/${crReport}" title="Credit Report" download>${crReport}</a>`;
+    } else{
+        return 'N/A';
+    }
+}
+
 function validEmail(email){
     if(!/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i.test(email)){
         return false;

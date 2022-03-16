@@ -1,5 +1,14 @@
 <?php $title = "FX Settelment Pending to Finance"; ?>
 
+
+<style>
+    .DTFC_LeftBodyLiner{
+        position: relative;
+        top: 0px;
+        left: 0px;
+        overflow-x: hidden;
+    }
+</style>
 <!-- Page -->
 <div class="page animsition">
     <div class="page-header page-header-bordered">
@@ -21,7 +30,7 @@
                         <div class="col-xs-12">
                             <div class="example table-responsive">
                                 <form id="formFxSettlementPendingFn" name="formFxSettlementPendingFn">
-                                    <table class="table table-bordered table-hover dataTable table-striped width-full" id="tableFxSettlementPendingFn">
+                                    <table class="table table-bordered table-hover dataTable table-striped width-full small" id="tableFxSettlementPendingFn">
                                         <thead>
                                             <tr>
                                                 <th>ID</th>
@@ -31,8 +40,10 @@
                                                 <th>Ship#</th>
                                                 <th>Doc Name</th>
                                                 <th>Payment Part</th>
+                                                <th>Due Date</th>
                                                 <th>Amount</th>
                                                 <th>CI Amount</th>
+                                                <th>CI#</th>
                                                 <th>Cur.</th>
                                                 <th>Bank</th>
                                                 <th>Value Date</th>

@@ -226,6 +226,7 @@ function refreshLCInfo(){
             ship = JSON.parse(data);
 
             $("#CiNo").val(ship['ciNo']);
+            $("#shipmode").html(ship['shipmode'].toUpperCase());
             $("#ciValue").val(commaSeperatedFormat(ship['ciAmount']));
             if(ship['blNo']==""){
                 $("#awblNo").val(ship['mawbNo']);

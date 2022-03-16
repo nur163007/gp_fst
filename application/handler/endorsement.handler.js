@@ -7,6 +7,8 @@ var poid = $('#pono').val();
 var endno = $("#endorseNo").val();
 var u = $('#usertype').val();
 var shipno = $('#shipno').val();
+var usertype = $('#usertype').val();
+var actionId = $('#actionId').val();
 
 var podata;
 var comments;
@@ -43,54 +45,60 @@ $(document).ready(function() {
 
             var podata = row[0][0];
             //var comments = row[1];
-            var attach = row[2];
+             attach = row[2];
             //console.log(attach);
             var lcinfo = row[3][0];
             //var pterms = row[4];
-
-            var shipDocs = ["AWB/BL Scan Copy", "CI Scan Copy", "Packing List Scan Copy", "Certificate of Origine Scan Copy", "Shipment Other Docs", "Freight Certificate"];
-
-            var attachmentHtml = '', mailAttach = '', zipAttach = '';
-
-            attachmentHtml += '<table class="small" border="0" style="margin-bottom:20px;">';
-            for (var i = 0; i < attach.length; i++) {
-                if (shipDocs.indexOf(attach[i]['title']) >= 0) {
-                    attachmentHtml += '<tr><td class="col-sm-5 control-label" valign="top">' + attach[i]['title'] + '</td>' +
-                        '<td class="col-sm-7" valign="top">' +
-                        '<label class="control-label text-left"><i class="icon wb-file"></i>&nbsp;&nbsp;<a href="download-attachment/' + attach[i][0] + '" target="_blank">' + attach[i]['title'] + '</a></label>' +
-                        '</td></tr>';
-                    mailAttach += window.location.origin + _adminURL + "download-attachment/" + attach[i][0] + "%0D%0A";
-
-                    //<input type="checkbox" name="files[]" value="SampleFile.pdf" checked="" hidden=""/>
-                    $('div#filesToZip').append(
-                        $('<input>').attr({
-                            'type': 'checkbox',
-                            'name': 'files[]',
-                            'value': attach[i]['id'],
-                            'checked': '""',
-                            'hidden': '""'
-                        })
-                    );
-                    /*if(zipAttach==""){
-                     zipAttach=attach[i]['filename'];
-                     } else{
-                     zipAttach+=","+attach[i]['filename'];
-                     }*/
-                }
+            if (usertype == const_role_lc_bank){
+                var shipDocs = ["AWB/BL Scan Copy", "CI Scan Copy", "Packing List Scan Copy", "Certificate of Origine Scan Copy", "Shipment Other Docs", "Freight Certificate","Insurance Cover Note","Pay Order Receive Copy","Insurance Other Doc","Endorsement Request"];
             }
-            attachmentHtml += '</table>';
-            $('#usersAttachments').html(attachmentHtml);
+            else if (usertype == const_role_LC_Operation){
+                var shipDocs = ["AWB/BL Scan Copy", "CI Scan Copy", "Packing List Scan Copy", "Certificate of Origine Scan Copy", "Shipment Other Docs", "Freight Certificate","Insurance Cover Note","Pay Order Receive Copy","Insurance Other Doc","Endorsement Copy","Endorsement Advice","Endorsement Other Docs"];
+            }
 
-            $('#mailAttachemnt').val(mailAttach.replace(/ /g, "%20"));
+            // var attachmentHtml = '', mailAttach = '', zipAttach = '';
+
+            // attachmentHtml += '<table class="small" border="0" style="margin-bottom:20px;">';
+            // for (var i = 0; i < attach.length; i++) {
+            //     if (shipDocs.indexOf(attach[i]['title']) >= 0) {
+            //         attachmentHtml += '<tr><td class="col-sm-5 control-label" valign="top">' + attach[i]['title'] + '</td>' +
+            //             '<td class="col-sm-7" valign="top">' +
+            //             '<label class="control-label text-left"><i class="icon wb-file"></i>&nbsp;&nbsp;<a href="download-attachment/' + attach[i][0] + '" target="_blank">' + attach[i]['title'] + '</a></label>' +
+            //             '</td></tr>';
+            //         mailAttach += window.location.origin + _adminURL + "download-attachment/" + attach[i][0] + "%0D%0A";
+            //
+            //         //<input type="checkbox" name="files[]" value="SampleFile.pdf" checked="" hidden=""/>
+            //         $('div#filesToZip').append(
+            //             $('<input>').attr({
+            //                 'type': 'checkbox',
+            //                 'name': 'files[]',
+            //                 'value': attach[i]['id'],
+            //                 'checked': '""',
+            //                 'hidden': '""'
+            //             })
+            //         );
+            //         /*if(zipAttach==""){
+            //          zipAttach=attach[i]['filename'];
+            //          } else{
+            //          zipAttach+=","+attach[i]['filename'];
+            //          }*/
+            //     }
+            // }
+            // attachmentHtml += '</table>';
+            attachmentLogScript(attach, '#usersAttachments', 1, shipDocs);
+            // $('#usersAttachments').html(attachmentHtml);
+            //
+            // $('#mailAttachemnt').val(mailAttach.replace(/ /g, "%20"));
             //$('#filesToZip').val(zipAttach);
 
             $("#pono1").val(lcinfo['pono']);
             $("#LcValue").val(commaSeperatedFormat(lcinfo["lcvalue"]));
             $("#lcno").val(lcinfo['lcno']);
-            //$("#lcissuerbank").val(lcinfo['lcissuerbank']);
+            $("#hiddenlcissuerbank").val(lcinfo['lcissuerbank']);
+            $("#hiddenInsurance").val(lcinfo['insurance']);
             $(".curname").html(podata['curname']);
 
-            $.getJSON("api/bankinsurance?action=4&type=bank", function (list) {
+            $.getJSON("api/bankinsurance?action=4&type=118", function (list) {
                 $("#lcissuerbank").select2({
                     data: list,
                     placeholder: "Select a Bank",
@@ -100,7 +108,7 @@ $(document).ready(function() {
                 $('#lcissuerbank').val(lcinfo['lcissuerbank']).change();
             });
 
-            $.getJSON("api/bankinsurance?action=4&type=insurance", function (list) {
+            $.getJSON("api/bankinsurance?action=4&type=119", function (list) {
                 $("#insurance").select2({
                     data: list,
                     placeholder: "Select a Insurance",
@@ -148,9 +156,71 @@ $(document).ready(function() {
 
     });
 
-    $('#btn_mailForInsPolicy').click(function (event) {
+/*    $('#btn_mailForInsPolicy').click(function (event) {
 
         window.location = "mailto:?body=" + "Dear Concern" + "%0D%0A %0D%0A %0D%0A" + $("#mailAttachemnt").val() + "&subject=Insurance Policy.";
+
+    });*/
+
+    $('#btn_mailForInsPolicy').click(function (e) {
+
+        e.preventDefault();
+        alertify.confirm('Are you sure you want proceed?', function (e) {
+            if (e) {
+                $("#btn_mailForInsPolicy").prop('disabled', true);
+                $.ajax({
+                    type: "POST",
+                    url: "api/original-doc",
+                    data: $('#endorsement-form').serialize() + "&insurance=" + $("#hiddenInsurance").val() + "&pono=" + $('#pono').val() + "&shipno=" + $("#shipno").val() + "&refId=" + $("#refId").val() + "&userAction=1",
+                    cache: false,
+                    success: function (response) {
+                        $("#btn_mailForInsPolicy").prop('disabled', false);
+                        //alert(response);
+                        try {
+                            var res = JSON.parse(response);
+                            if (res['status'] == 1) {
+                                alertify.success(res['message']);
+                                // window.location.href = _dashboardURL;
+                                location.reload();
+                            } else {
+                                alertify.error("FAILED to add!");
+                                return false;
+                            }
+                        } catch (err) {
+                            alertify.error(response + ' Failed to process the request.', 20);
+                            return false;
+                        }
+                    },
+                    error: function (xhr) {
+                        console.log('Error: ' + xhr);
+                    }
+                });
+            } else { // canceled
+                //alertify.error(e);
+            }
+        });
+        // var domain = window.location.protocol+"//"+window.location.hostname+_adminURL,
+        //     mailAttachemnt = "";
+        // $('#usersAttachments').find('a').each(function(e) {
+        //     //mailAttachemnt += '<a href="' + domain + $(this).attr('href') + '>'+ $(this).attr('href').replace('temp/','') +'</a>'+"%0D%0A ";
+        //     mailAttachemnt += $(this).html() + ": " + domain + $(this).attr('href') + "%0D%0A";
+        //     //alert($(this).attr('href'));
+        // });
+        // //alert(mailAttachemnt);
+        // window.location = "mailto:?" +
+        //     "body=" + "Dear Concern" +
+        //         "%0A%0A" +
+        //         "Please issue Insurance Policy against Cover Note No " + $("#coverNoteNo").val() + " as per attached documents." +
+        //         "%0A%0A" +
+        //         "Best Regards," +
+        //         "%0A%0A" +
+        //         "Trade Finance Operation,%0D%0A" +
+        //         "Treasury, Finance%0D%0A" +
+        //         "Grameenphone Ltd.%0D%0A" +
+        //         "%0A%0A" +
+        //         "Please download the documents from the following links:%0D%0A" +
+        //         mailAttachemnt +
+        //         "&subject=Insurance Policy against Covernote-" + $("#coverNoteNo").val();
 
     });
 
@@ -168,6 +238,15 @@ $(document).ready(function() {
             if ($.trim(data)) {
                 var endorse = JSON.parse(data);
 
+                var charge = (endorse['endCharge']);
+                var vatCharge = (endorse['vatOnCharge']);
+                var vat = (vatCharge*100/charge);
+                if (charge !='' && vatCharge !=''){
+                    $('#vatRate').val(vat);
+                }
+
+                $('#hiddenEndId').val(endorse['id']);
+
                 if (endorse['endDate'] != null) {
                     $("#endDate").val(Date_toMDY(new Date(endorse['endDate'])));
                 }
@@ -176,15 +255,18 @@ $(document).ready(function() {
 
                 if (endorse["attachEndorsementCopy"] != null) {
                     $("#attachEndorsementCopyOld").val(endorse["attachEndorsementCopy"]);
-                    $("#attachEndorsementCopy").val(endorse["attachEndorsementCopy"]);
+                    // $("#attachEndorsementCopy").val(endorse["attachEndorsementCopy"]);
+                    // $("#attachEndorsementCopyOldLink").html(attachmentLink(endorse["attachEndorsementCopy"]));
                 }
                 if (endorse["attachEndorsementAdvice"] != null) {
                     $("#attachEndorsementAdviceOld").val(endorse["attachEndorsementAdvice"]);
-                    $("#attachEndorsementAdvice").val(endorse["attachEndorsementAdvice"]);
+                    // $("#attachEndorsementAdvice").val(endorse["attachEndorsementAdvice"]);
+                    // $("#attachEndorsementAdviceOldLink").html(attachmentLink(endorse["attachEndorsementAdvice"]));
                 }
                 if (endorse["attachEndorsementOtherDoc"] != null) {
                     $("#attachEndorsementOtherDocOld").val(endorse["attachEndorsementOtherDoc"]);
-                    $("#attachEndorsementOtherDoc").val(endorse["attachEndorsementOtherDoc"]);
+                    // $("#attachEndorsementOtherDoc").val(endorse["attachEndorsementOtherDoc"]);
+                    // $("#attachEndorsementOtherDocOldLink").html(attachmentLink(endorse["attachEndorsementOtherDoc"]));
                 }
 
                 if (endorse['docDelivered'] == 1) {
@@ -230,20 +312,20 @@ $(document).ready(function() {
         generate_endorsement_letter();
     });
 
-    $("#btn_save_endorsement").click(function (e) {
+    $("#btn_RequestDocEndorsement").click(function (e) {
         //alert('abcd');
         e.preventDefault();
         if (validate()) {
-            alertify.confirm('Are you sure you want to save endorsement inputs?', function (e) {
+            alertify.confirm('Are you sure you want to send this request?', function (e) {
                 if (e) {
-                    $("#btn_save_endorsement").prop('disabled', true);
+                    $("#btn_RequestDocEndorsement").prop('disabled', true);
                     $.ajax({
                         type: "POST",
                         url: "api/endorsement",
-                        data: $('#endorsement-form').serialize() + "&action=1",
+                        data: $('#endorsement-form').serialize() + "&useraction=3",
                         cache: false,
                         success: function (response) {
-                            $("#btn_save_endorsement").prop('disabled', false);
+                            $("#btn_RequestDocEndorsement").prop('disabled', false);
                             // alert(response);
                             try {
                                 var res = JSON.parse(response);
@@ -268,6 +350,83 @@ $(document).ready(function() {
         }
     });
 
+    $("#btn_send_endorsementGP").click(function (e) {
+        //alert('abcd');
+        e.preventDefault();
+        if (validate()) {
+            alertify.confirm('Are you sure you want to save endorsement inputs?', function (e) {
+                if (e) {
+                    $("#btn_send_endorsementGP").prop('disabled', true);
+                    $.ajax({
+                        type: "POST",
+                        url: "api/endorsement",
+                        data: $('#endorsement-form').serialize() + "&useraction=1",
+                        cache: false,
+                        success: function (response) {
+                            $("#btn_send_endorsementGP").prop('disabled', false);
+                            // alert(response);
+                            try {
+                                var res = JSON.parse(response);
+                                if (res['status'] == 1) {
+                                    //ResetForm();
+                                    alertify.success('Endorsement information saved.');
+                                    window.location.href = _dashboardURL;
+                                } else {
+                                    alertify.error("FAILED to add!");
+                                    return false;
+                                }
+                            } catch (e) {
+                                alertify.error(response + ' Failed to process the request.', 20);
+                                return false;
+                            }
+                        }
+                    });
+                }
+            });
+        } else {
+            return false;
+        }
+    });
+
+
+    $("#btn_save_endorsement").click(function (e) {
+        //alert('abcd');
+        e.preventDefault();
+        if (validate()) {
+            alertify.confirm('Are you sure you want to save endorsement inputs?', function (e) {
+                if (e) {
+                    $("#btn_save_endorsement").prop('disabled', true);
+                    $.ajax({
+                        type: "POST",
+                        url: "api/endorsement",
+                        data: $('#endorsement-form').serialize() + "&useraction=4",
+                        cache: false,
+                        success: function (response) {
+                            $("#btn_save_endorsement").prop('disabled', false);
+                            // alert(response);
+                            try {
+                                var res = JSON.parse(response);
+                                if (res['status'] == 1) {
+                                    //ResetForm();
+                                    alertify.success('Endorsement information saved.');
+                                    // window.location.href = _dashboardURL;
+                                    location.reload();
+                                } else {
+                                    alertify.error("FAILED to add!");
+                                    return false;
+                                }
+                            } catch (e) {
+                                alertify.error(response + ' Failed to process the request.', 20);
+                                return false;
+                            }
+                        }
+                    });
+                }
+            });
+        } else {
+            return false;
+        }
+    });
     $("#originalDocProcess_btn").click(function (e) {
         alertify.confirm('Are you sure you want to change the process?', function (e) {
             if (e) {
@@ -275,7 +434,7 @@ $(document).ready(function() {
                 $.ajax({
                     type: "POST",
                     url: "api/endorsement",
-                    data: $('#endorsement-form').serialize() + "&action=2",
+                    data: $('#endorsement-form').serialize() + "&useraction=2",
                     cache: false,
                     success: function (response) {
                         $("#originalDocProcess_btn").prop('disabled', false);
@@ -331,13 +490,43 @@ $(document).ready(function() {
         });
     });
 
+    $.get('api/purchaseorder?action=4&po=' + poid + '&step=' + ACTION_REQUEST_FOR_DOC_ENDORSEMENT_SEND_BY_GP, function (r) {
+        // console.log(r)
+        if (r == 1) {
+            // alert(1);
+            $("#btn_RequestDocEndorsement").hide();
+            $("#btn_generateEndorsement").hide();
+            }
+        else {
+            $("#btn_RequestDocEndorsement").show();
+            $("#btn_generateEndorsement").show();
+        }
+    });
+    $.get('api/purchaseorder?action=4&po=' + poid + '&step=' + ACTION_DOC_ENDORSEMENT_SEND_BY_BANK, function (r) {
+        // console.log(r)
+        if (r == 1) {
+            // alert(1);
+            $("#btn_mailForInsPolicy").show();
+        }
+        else {
+            $("#btn_mailForInsPolicy").hide();
+        }
+    });
+    $.get('api/purchaseorder?action=4&po=' + poid + '&step=' + ACTION_REQUEST_FOR_INS_POLICY_BY_TFO, function (r) {
+        // console.log(r)
+        if (r == 1) {
+            // alert(1);
+            $("#btn_mailForInsPolicy").attr('disabled',true);
+        }
+
+    });
 });
 
-`$('#endDate').datepicker({
+$('#endDate').datepicker({
         format: 'MM dd, yyyy',
         todayHighlight: true,
         autoclose: true
-});`
+});
 
 function validateZip(){
     return true;
@@ -353,21 +542,6 @@ function vatCalculation(){
 
 function validate()
 {
-    if($("#endDate").val()=="")
-    {
-        $("#endDate").focus();
-        alertify.error("Endorsement Date is required!");
-        return false;
-    }
-    if($("#endCharge").val()==""){
-        $("#endCharge").val(0);
-    }
-    if($("#chargeType").val()==""){
-        $("#chargeType").val("28").change();
-    }
-    if($("#vatOnCharge").val()==""){
-        vatCalculation();
-    }
     /*if($("#endCharge").val()=="")
     {
         $("#endCharge").focus();
@@ -408,30 +582,56 @@ function validate()
         alertify.error("Please select Charge Type!");
 		return false;
 	}*/
-    if($("#attachEndorsementCopy").val()=="")
-	{
-		$("#attachEndorsementCopy").focus();
-        alertify.error("Endorsement Copy attachment is required!");
-		return false;
-	} else {
-        if(!validAttachment($("#attachEndorsementCopy").val())){
-            alertify.error('Invalid File Format.');
+    if (usertype == const_role_LC_Operation && actionId == 70) {
+        if ($("#attachEndorsementLetter").val() == "") {
+            $("#attachEndorsementLetter").focus();
+            alertify.error("Endorsement Letter attachment is required!");
             return false;
         }
-	}
-    if($("#endCharge").val()!="" && parseToCurrency($("#endCharge").val())!=0){
-        if($("#attachEndorsementAdvice").val()=="")
-    	{
-    		$("#attachEndorsementAdvice").focus();
-            alertify.error("Endorsement Advice attachment is required!");
-    		return false;
-    	} else {
-            if(!validAttachment($("#attachEndorsementAdvice").val())){
-                alertify.error('Invalid File Format.');
-                return false;
-            }
-    	}
     }
+    // if (actionId ==118){
+    //     if($("#endDate").val()=="")
+    //     {
+    //         $("#endDate").focus();
+    //         alertify.error("Endorsement Date is required!");
+    //         return false;
+    //     }
+    //     if($("#endCharge").val()==""){
+    //         $("#endCharge").val(0);
+    //     }
+    //     if($("#chargeType").val()==""){
+    //         $("#chargeType").val("28").change();
+    //     }
+    //     if($("#vatOnCharge").val()==""){
+    //         vatCalculation();
+    //     }
+    //
+    //     if($("#attachEndorsementCopy").val()=="")
+    //     {
+    //         $("#attachEndorsementCopy").focus();
+    //         alertify.error("Endorsement Copy attachment is required!");
+    //         return false;
+    //     } else {
+    //         if(!validAttachment($("#attachEndorsementCopy").val())){
+    //             alertify.error('Invalid File Format.');
+    //             return false;
+    //         }
+    //     }
+    //     if($("#endCharge").val()!="" && parseToCurrency($("#endCharge").val())!=0){
+    //         if($("#attachEndorsementAdvice").val()=="")
+    //         {
+    //             $("#attachEndorsementAdvice").focus();
+    //             alertify.error("Endorsement Advice attachment is required!");
+    //             return false;
+    //         } else {
+    //             if(!validAttachment($("#attachEndorsementAdvice").val())){
+    //                 alertify.error('Invalid File Format.');
+    //                 return false;
+    //             }
+    //         }
+    //     }
+    // }
+
 	return true;	
 }
 
@@ -441,101 +641,7 @@ function ResetForm(){
     
 }
 
-$(function () {
 
-    var button = $('#btnUploadEndorsementCopy'), interval;
-    var txtbox = $('#attachEndorsementCopy');
-
-    new AjaxUpload(button, {
-        action: 'application/library/uploadhandler.php',
-        name: 'upl',
-        onComplete: function (file, response) {
-            var res = JSON.parse(response);
-            txtbox.val(res['filename']);
-            window.clearInterval(interval);
-        },
-        onSubmit: function (file, ext) {
-            if (!(ext && /^(jpg|png|xlsx|xls|doc|docx|pdf|zip)$/i.test(ext))) {
-                alert('Invalid File Format.');
-                return false;
-            }
-            txtbox.val("Uploading...");
-            // Uploding -> Uploading. -> Uploading...
-            interval = window.setInterval(function () {
-                var text = txtbox.val();
-                if (txtbox.val().length < 13) {
-                    txtbox.val(txtbox.val() + '.');
-                } else {
-                    txtbox.val('Uploading');
-                }
-            }, 200);
-        }
-    });
-});
-
-$(function () {
-
-    var button = $('#btnUploadEndorsementAdvice'), interval;
-    var txtbox = $('#attachEndorsementAdvice');
-
-    new AjaxUpload(button, {
-        action: 'application/library/uploadhandler.php',
-        name: 'upl',
-        onComplete: function (file, response) {
-            var res = JSON.parse(response);
-            txtbox.val(res['filename']);
-            window.clearInterval(interval);
-        },
-        onSubmit: function (file, ext) {
-            if (!(ext && /^(jpg|png|xlsx|xls|doc|docx|pdf|zip)$/i.test(ext))) {
-                alert('Invalid File Format.');
-                return false;
-            }
-            txtbox.val("Uploading...");
-            // Uploding -> Uploading. -> Uploading...
-            interval = window.setInterval(function () {
-                var text = txtbox.val();
-                if (txtbox.val().length < 13) {
-                    txtbox.val(txtbox.val() + '.');
-                } else {
-                    txtbox.val('Uploading');
-                }
-            }, 200);
-        }
-    });
-});
-
-$(function () {
-
-    var button = $('#btnUploadOtherDoc'), interval;
-    var txtbox = $('#attachOtherDoc');
-
-    new AjaxUpload(button, {
-        action: 'application/library/uploadhandler.php',
-        name: 'upl',
-        onComplete: function (file, response) {
-            var res = JSON.parse(response);
-            txtbox.val(res['filename']);
-            window.clearInterval(interval);
-        },
-        onSubmit: function (file, ext) {
-            if (!(ext && /^(jpg|png|xlsx|xls|doc|docx|pdf|zip)$/i.test(ext))) {
-                alert('Invalid File Format.');
-                return false;
-            }
-            txtbox.val("Uploading...");
-            // Uploding -> Uploading. -> Uploading...
-            interval = window.setInterval(function () {
-                var text = txtbox.val();
-                if (txtbox.val().length < 13) {
-                    txtbox.val(txtbox.val() + '.');
-                } else {
-                    txtbox.val('Uploading');
-                }
-            }, 200);
-        }
-    });
-});
 
 $("#btn_generateEndorsement").click(function(e) {
     e.preventDefault();
@@ -626,3 +732,136 @@ $("#btn_generateEndorsement").click(function(e) {
 function validateForLetter(){
     return true;
 }
+
+
+if (usertype == const_role_LC_Operation && actionId == 70){
+    $(function () {
+
+        var button = $('#btnUploadEndorsementLetter'), interval;
+        var txtbox = $('#attachEndorsementLetter');
+
+        new AjaxUpload(button, {
+            action: 'application/library/uploadhandler.php',
+            name: 'upl',
+            onComplete: function (file, response) {
+                var res = JSON.parse(response);
+                txtbox.val(res['filename']);
+                window.clearInterval(interval);
+            },
+            onSubmit: function (file, ext) {
+                if (!(ext && /^(jpg|png|xlsx|xls|doc|docx|pdf|zip)$/i.test(ext))) {
+                    alertify.error('Invalid File Format.');
+                    return false;
+                }
+                txtbox.val("Uploading...");
+                // Uploding -> Uploading. -> Uploading...
+                interval = window.setInterval(function () {
+                    var text = txtbox.val();
+                    if (txtbox.val().length < 13) {
+                        txtbox.val(txtbox.val() + '.');
+                    } else {
+                        txtbox.val('Uploading');
+                    }
+                }, 200);
+            }
+        });
+    });
+}
+if (actionId > 70){
+    $(function () {
+
+        var button = $('#btnUploadEndorsementCopy'), interval;
+        var txtbox = $('#attachEndorsementCopy');
+
+        new AjaxUpload(button, {
+            action: 'application/library/uploadhandler.php',
+            name: 'upl',
+            onComplete: function (file, response) {
+                var res = JSON.parse(response);
+                txtbox.val(res['filename']);
+                window.clearInterval(interval);
+            },
+            onSubmit: function (file, ext) {
+                if (!(ext && /^(jpg|png|xlsx|xls|doc|docx|pdf|zip)$/i.test(ext))) {
+                    alert('Invalid File Format.');
+                    return false;
+                }
+                txtbox.val("Uploading...");
+                // Uploding -> Uploading. -> Uploading...
+                interval = window.setInterval(function () {
+                    var text = txtbox.val();
+                    if (txtbox.val().length < 13) {
+                        txtbox.val(txtbox.val() + '.');
+                    } else {
+                        txtbox.val('Uploading');
+                    }
+                }, 200);
+            }
+        });
+    });
+
+    $(function () {
+
+        var button = $('#btnUploadEndorsementAdvice'), interval;
+        var txtbox = $('#attachEndorsementAdvice');
+
+        new AjaxUpload(button, {
+            action: 'application/library/uploadhandler.php',
+            name: 'upl',
+            onComplete: function (file, response) {
+                var res = JSON.parse(response);
+                txtbox.val(res['filename']);
+                window.clearInterval(interval);
+            },
+            onSubmit: function (file, ext) {
+                if (!(ext && /^(jpg|png|xlsx|xls|doc|docx|pdf|zip)$/i.test(ext))) {
+                    alert('Invalid File Format.');
+                    return false;
+                }
+                txtbox.val("Uploading...");
+                // Uploding -> Uploading. -> Uploading...
+                interval = window.setInterval(function () {
+                    var text = txtbox.val();
+                    if (txtbox.val().length < 13) {
+                        txtbox.val(txtbox.val() + '.');
+                    } else {
+                        txtbox.val('Uploading');
+                    }
+                }, 200);
+            }
+        });
+    });
+
+    $(function () {
+
+        var button = $('#btnUploadOtherDoc'), interval;
+        var txtbox = $('#attachEndorsementOtherDoc');
+
+        new AjaxUpload(button, {
+            action: 'application/library/uploadhandler.php',
+            name: 'upl',
+            onComplete: function (file, response) {
+                var res = JSON.parse(response);
+                txtbox.val(res['filename']);
+                window.clearInterval(interval);
+            },
+            onSubmit: function (file, ext) {
+                if (!(ext && /^(jpg|png|xlsx|xls|doc|docx|pdf|zip)$/i.test(ext))) {
+                    alert('Invalid File Format.');
+                    return false;
+                }
+                txtbox.val("Uploading...");
+                // Uploding -> Uploading. -> Uploading...
+                interval = window.setInterval(function () {
+                    var text = txtbox.val();
+                    if (txtbox.val().length < 13) {
+                        txtbox.val(txtbox.val() + '.');
+                    } else {
+                        txtbox.val('Uploading');
+                    }
+                }, 200);
+            }
+        });
+    });
+}
+

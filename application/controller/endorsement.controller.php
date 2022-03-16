@@ -31,14 +31,22 @@ if (!empty($_GET["action"]) || isset($_GET["action"]))
 if (!empty($_POST)){
 	if (!empty($_POST["pono"]) || isset($_POST["pono"])){
 		//echo json_encode($_POST);
-        switch ($_POST["action"])
+        switch ($_POST["useraction"])
         {
             case 1:
-                echo SaveEndorsement();
+                echo SendEndorsementToGP();
                 break;
             case 2:
                 echo goForOrgDocCollectionProcess();
                 break;
+            case 3:
+                echo sendEndorsementRequest();
+                break;
+            case 4:
+                echo SaveEndorsement();
+                break;
+
+
         }
 	}
 }
@@ -77,11 +85,16 @@ function goForOrgDocCollectionProcess(){
 }
 
 // Insert or update
-function SaveEndorsement()
+function SendEndorsementToGP()
 {
 	global $user_id;
 	global $loginRole;
-	
+    $refId = decryptId($_POST["refId"]);
+    if(!is_numeric($refId)){
+        $res["status"] = 0;
+        $res["message"] = 'Invalid reference code.';
+        return json_encode($res);
+    }
     $pono = htmlspecialchars($_POST['pono'],ENT_QUOTES, "ISO-8859-1");
     $lcno = htmlspecialchars($_POST['lcno'],ENT_QUOTES, "ISO-8859-1");
     $shipno = htmlspecialchars($_POST['shipno'],ENT_QUOTES, "ISO-8859-1");
@@ -99,7 +112,7 @@ function SaveEndorsement()
         $endDate = htmlspecialchars($_POST['endDate'],ENT_QUOTES, "ISO-8859-1");
         $endDate = date('Y-m-d', strtotime($endDate));
     } else{
-        $endDate = '';
+        $endDate = date('Y-m-d');
     }
     $endCharge = htmlspecialchars($_POST['endCharge'],ENT_QUOTES, "ISO-8859-1");
     $vatOnCharge = htmlspecialchars($_POST['vatOnCharge'],ENT_QUOTES, "ISO-8859-1");
@@ -164,8 +177,8 @@ function SaveEndorsement()
 	$res["status"] = 0;    // 0 = Failed, 1 = Success
 	$res["message"] = 'FAILED!';
 	//------------------------------------------------------------------------------
-	
-    $query = "INSERT INTO `wc_t_endorsement` SET
+
+    $sql = "INSERT INTO `wc_t_endorsement` SET
         `endNo` = $shipno,
         `pono` = '$pono',
         `lcno` = '$lcno',
@@ -181,33 +194,312 @@ function SaveEndorsement()
         `createdby` = $user_id,
         `createdfrom` = '$ip';";
 //    echo($query);
-    $objdal->insert($query);
 
-    
+    $objdal->insert($sql);
+
     $lastEndId =  $objdal->LastInsertId();
     
     //insert attachment
-    $query = "INSERT INTO `wc_t_attachments`(`poid`, `shipno`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`, `lcno`) VALUES 
+    if ($attachEndorsementCopy!=""){
+        $query = "INSERT INTO `wc_t_attachments`(`poid`, `shipno`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`, `lcno`) VALUES 
         ('$pono', $shipno, 'Endorsement Copy', '$attachEndorsementCopy', $user_id, '$ip', $loginRole, '$lcno')";
-    
+        $objdal->insert($query);
+    }
     if($attachEndorsementAdvice!=""){
-        $query .= ",('$pono', $shipno, 'Endorsement Advice', '$attachEndorsementAdvice', $user_id, '$ip', $loginRole, '$lcno')";
+        $query = "INSERT INTO `wc_t_attachments`(`poid`, `shipno`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`, `lcno`) VALUES 
+        ('$pono', $shipno, 'Endorsement Advice', '$attachEndorsementAdvice', $user_id, '$ip', $loginRole, '$lcno')";
+        $objdal->insert($query);
     }
     if($attachEndorsementOtherDoc!=""){
-        $query .= ",('$pono', $shipno, 'Endorsement Other Docs', '$attachEndorsementOtherDoc', $user_id, '$ip', $loginRole, '$lcno')";
+        $query = "INSERT INTO `wc_t_attachments`(`poid`, `shipno`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`, `lcno`) VALUES 
+        ('$pono', $shipno, 'Endorsement Other Docs', '$attachEndorsementOtherDoc', $user_id, '$ip', $loginRole, '$lcno')";
+        $objdal->insert($query);
     }
 
     //echo($query);
-	$objdal->insert($query);
+
     //Transfer file from 'temp' directory to respective 'docs' directory
     fileTransferTempToDocs($pono);
-    
+
+    $action = array(
+        'refid' => $refId,
+        'pono' => "'".$pono."'",
+        'shipno' => $shipno,
+        'actionid' => action_Endorsement_Doc_Send_By_Bank,
+        'status' => 1,
+        'msg' => "'Endorsement doc share to GP against PO# ".$pono." and Shipment# ".$shipno."'",
+    );
+    UpdateAction($action);
+
 	unset($objdal);
 	
 	$res["status"] = 1;
 	$res["message"] = 'SUCCESS!';
 	return json_encode($res);
     
+}
+function SaveEndorsement()
+{
+    global $user_id;
+    global $loginRole;
+    $refId = decryptId($_POST["refId"]);
+    if(!is_numeric($refId)){
+        $res["status"] = 0;
+        $res["message"] = 'Invalid reference code.';
+        return json_encode($res);
+    }
+    $pono = htmlspecialchars($_POST['pono'],ENT_QUOTES, "ISO-8859-1");
+    $lcno = htmlspecialchars($_POST['lcno'],ENT_QUOTES, "ISO-8859-1");
+    $shipno = htmlspecialchars($_POST['shipno'],ENT_QUOTES, "ISO-8859-1");
+    $hiddenEndId = htmlspecialchars($_POST['hiddenEndId'],ENT_QUOTES, "ISO-8859-1");
+    //$policyNum = htmlspecialchars($_POST['policyNum'],ENT_QUOTES, "ISO-8859-1");
+    //$policyValue = htmlspecialchars($_POST['policyValue'],ENT_QUOTES, "ISO-8859-1");
+    //$policyValue = str_replace(",", "", $policyValue);
+    $ciValue = htmlspecialchars($_POST['ciValue'],ENT_QUOTES, "ISO-8859-1");
+    $ciValue = str_replace(",", "", $ciValue);
+    $gerpVNo = htmlspecialchars($_POST['gerpVNo'],ENT_QUOTES, "ISO-8859-1");
+    //$gerpInvNo = htmlspecialchars($_POST['gerpInvNo'],ENT_QUOTES, "ISO-8859-1");
+    $ciNo = htmlspecialchars($_POST['ciNo'],ENT_QUOTES, "ISO-8859-1");
+    $ciDate = htmlspecialchars($_POST['ciDate'],ENT_QUOTES, "ISO-8859-1");
+    $ciDate = date('Y-m-d', strtotime($ciDate));
+    if($_POST['endDate']!=""){
+        $endDate = htmlspecialchars($_POST['endDate'],ENT_QUOTES, "ISO-8859-1");
+        $endDate = date('Y-m-d', strtotime($endDate));
+    } else{
+        $endDate = date('Y-m-d');
+    }
+    $endCharge = htmlspecialchars($_POST['endCharge'],ENT_QUOTES, "ISO-8859-1");
+    $endCharge = str_replace(",", "", $endCharge);
+    $vatOnCharge = htmlspecialchars($_POST['vatOnCharge'],ENT_QUOTES, "ISO-8859-1");
+    $chargeType = htmlspecialchars($_POST['chargeType'],ENT_QUOTES, "ISO-8859-1");
+    //$docDelivered = htmlspecialchars($_POST['docDelivered'],ENT_QUOTES, "ISO-8859-1");
+    if(!isset($_POST['docDelivered'])){
+        $docDelivered = 0;
+        $docDeliveredOn = 'NULL';
+    } else{
+        $docDelivered = 1;
+        $docDeliveredOn = 'CURRENT_DATE';
+    };
+
+    $attachEndorsementCopy = htmlspecialchars($_POST['attachEndorsementCopy'],ENT_QUOTES, "ISO-8859-1");
+    $attachEndorsementAdvice = htmlspecialchars($_POST['attachEndorsementAdvice'],ENT_QUOTES, "ISO-8859-1");
+    $attachEndorsementOtherDoc = htmlspecialchars($_POST['attachEndorsementOtherDoc'],ENT_QUOTES, "ISO-8859-1");
+
+
+    $attachEndorsementCopyOld = htmlspecialchars($_POST['attachEndorsementCopyOld'],ENT_QUOTES, "ISO-8859-1");
+    $attachEndorsementAdviceOld = htmlspecialchars($_POST['attachEndorsementAdviceOld'],ENT_QUOTES, "ISO-8859-1");
+    $attachEndorsementOtherDocOld = htmlspecialchars($_POST['attachEndorsementOtherDocOld'],ENT_QUOTES, "ISO-8859-1");
+
+
+    //$createdby = htmlspecialchars($_POST['createdby'],ENT_QUOTES, "ISO-8859-1");
+
+    $ip = htmlspecialchars($_SERVER['REMOTE_ADDR'],ENT_QUOTES, "ISO-8859-1");
+
+    //---To protect MySQL injection for Security purpose----------------------------
+    $pono = stripslashes($pono);
+    $lcno = stripslashes($lcno);
+    $shipno = stripslashes($shipno);
+    $hiddenEndId = stripslashes($hiddenEndId);
+    //$policyNum = stripslashes($policyNum);
+    //$policyValue = stripslashes($policyValue);
+    $ciValue = stripslashes($ciValue);
+    $gerpVNo = stripslashes($gerpVNo);
+    //$gerpInvNo = stripslashes($gerpInvNo);
+    $ciNo = stripslashes($ciNo);
+    $ciDate = stripslashes($ciDate);
+    $endDate = stripslashes($endDate);
+    $endCharge = stripslashes($endCharge);
+    $vatOnCharge = stripslashes($vatOnCharge);
+    $chargeType = stripslashes($chargeType);
+    //$docDelivered = stripslashes($docDelivered);
+    //$docDeliveredOn = stripslashes($docDeliveredOn);
+    //$createdby = stripslashes($createdby);
+
+    $objdal = new dal();
+
+    $pono = $objdal->real_escape_string($pono);
+    $lcno = $objdal->real_escape_string($lcno);
+    $shipno = $objdal->real_escape_string($shipno);
+    $hiddenEndId = $objdal->real_escape_string($hiddenEndId);
+    //$policyNum = $objdal->real_escape_string($policyNum);
+    //$policyValue = $objdal->real_escape_string($policyValue);
+    $ciValue = $objdal->real_escape_string($ciValue);
+    $gerpVNo = $objdal->real_escape_string($gerpVNo);
+    //$gerpInvNo = $objdal->real_escape_string($gerpInvNo);
+    $ciNo = $objdal->real_escape_string($ciNo);
+    $ciDate = $objdal->real_escape_string($ciDate);
+    $endDate = $objdal->real_escape_string($endDate);
+    $endCharge = $objdal->real_escape_string($endCharge);
+    $vatOnCharge = $objdal->real_escape_string($vatOnCharge);
+    $chargeType = $objdal->real_escape_string($chargeType);
+    //$docDelivered = $objdal->real_escape_string($docDelivered);
+    //$docDeliveredOn = $objdal->real_escape_string($docDeliveredOn);
+    //$createdby = $objdal->real_escape_string($createdby);
+    //------------------------------------------------------------------------------
+
+    //---return array---------------------------------------------------------------
+    $res["status"] = 0;    // 0 = Failed, 1 = Success
+    $res["message"] = 'FAILED!';
+    //------------------------------------------------------------------------------
+
+    if ($hiddenEndId != ""){
+        $sql = "UPDATE `wc_t_endorsement` SET
+        `endNo` = $shipno,
+        `pono` = '$pono',
+        `lcno` = '$lcno',
+        `ciValue` = $ciValue,
+        `gerpVNo` = '$gerpVNo',
+        `gerpInvNo` = NULL,
+        `ciNo` = '$ciNo',
+        `ciDate` = '$ciDate',
+        `endDate` = '$endDate',
+        `endCharge` = $endCharge,
+        `vatOnCharge` = $vatOnCharge,
+        `chargeType` = $chargeType,
+        `createdby` = $user_id,
+        `createdfrom` = '$ip'
+        WHERE `id` = $hiddenEndId;";
+//    echo($query);
+
+        $objdal->update($sql);
+        $lastEndId =  $hiddenEndId;
+    }
+    else{
+        $sql = "INSERT INTO `wc_t_endorsement` SET
+        `endNo` = $shipno,
+        `pono` = '$pono',
+        `lcno` = '$lcno',
+        `ciValue` = $ciValue,
+        `gerpVNo` = '$gerpVNo',
+        `gerpInvNo` = NULL,
+        `ciNo` = '$ciNo',
+        `ciDate` = '$ciDate',
+        `endDate` = '$endDate',
+        `endCharge` = $endCharge,
+        `vatOnCharge` = $vatOnCharge,
+        `chargeType` = $chargeType,
+        `createdby` = $user_id,
+        `createdfrom` = '$ip';";
+//    echo($query);
+
+        $objdal->insert($sql);
+
+        $lastEndId =  $objdal->LastInsertId();
+    }
+
+
+    //insert attachment
+    if ($attachEndorsementCopy!=""){
+        if ($attachEndorsementCopyOld == ""){
+            $query = "INSERT INTO `wc_t_attachments`(`poid`, `shipno`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`, `lcno`) VALUES 
+        ('$pono', $shipno, 'Endorsement Copy', '$attachEndorsementCopy', $user_id, '$ip', $loginRole, '$lcno')";
+            $objdal->insert($query);
+        }
+        else{
+            fileDeleteFromDocs($pono);
+            $query = "UPDATE `wc_t_attachments` SET
+                `filename`='$attachEndorsementCopy',
+                `replacedby`=$user_id,
+                `replacedfrom`='$ip'
+                WHERE `poid` = '$pono' AND `title`='Endorsement Copy' AND `filename` = '$attachEndorsementCopyOld'";
+            $objdal->update($query);
+        }
+    }
+    if($attachEndorsementAdvice!=""){
+        if ($attachEndorsementAdviceOld == ""){
+            $query = "INSERT INTO `wc_t_attachments`(`poid`, `shipno`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`, `lcno`) VALUES 
+        ('$pono', $shipno, 'Endorsement Advice', '$attachEndorsementAdvice', $user_id, '$ip', $loginRole, '$lcno')";
+            $objdal->insert($query);
+        }
+        else{
+            fileDeleteFromDocs($pono);
+            $query = "UPDATE `wc_t_attachments` SET
+                `filename`='$attachEndorsementAdvice',
+                `replacedby`=$user_id,
+                `replacedfrom`='$ip'
+                WHERE `poid` = '$pono' AND `title`='Endorsement Advice' AND `filename` = '$attachEndorsementAdviceOld'";
+            $objdal->update($query);
+        }
+    }
+    if($attachEndorsementOtherDoc!=""){
+        if ($attachEndorsementOtherDocOld == ""){
+            $query = "INSERT INTO `wc_t_attachments`(`poid`, `shipno`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`, `lcno`) VALUES 
+        ('$pono', $shipno, 'Endorsement Other Docs', '$attachEndorsementOtherDoc', $user_id, '$ip', $loginRole, '$lcno')";
+            $objdal->insert($query);
+        }
+        else{
+            fileDeleteFromDocs($pono);
+            $query = "UPDATE `wc_t_attachments` SET
+                `filename`='$attachEndorsementOtherDoc',
+                `replacedby`=$user_id,
+                `replacedfrom`='$ip'
+                WHERE `poid` = '$pono' AND `title`='Endorsement Other Docs' AND `filename` = '$attachEndorsementOtherDocOld'";
+            $objdal->update($query);
+        }
+    }
+
+    //Transfer file from 'temp' directory to respective 'docs' directory
+    fileTransferTempToDocs($pono);
+
+    unset($objdal);
+
+    $res["status"] = 1;
+    $res["message"] = 'SUCCESS!';
+    return json_encode($res);
+
+}
+function sendEndorsementRequest(){
+    global $user_id;
+    global $loginRole;
+
+    $refId = decryptId($_POST["refId"]);
+    if(!is_numeric($refId)){
+        $res["status"] = 0;
+        $res["message"] = 'Invalid reference code.';
+        return json_encode($res);
+    }
+    $pono = htmlspecialchars($_POST['pono'],ENT_QUOTES, "ISO-8859-1");
+    $lcno = htmlspecialchars($_POST['lcno'],ENT_QUOTES, "ISO-8859-1");
+    $shipno = htmlspecialchars($_POST['shipno'],ENT_QUOTES, "ISO-8859-1");
+    $lcissuerbank = htmlspecialchars($_POST['hiddenlcissuerbank'],ENT_QUOTES, "ISO-8859-1");
+    $attachEndorsementLetter = htmlspecialchars($_POST['attachEndorsementLetter'],ENT_QUOTES, "ISO-8859-1");
+    $ip = htmlspecialchars($_SERVER['REMOTE_ADDR'],ENT_QUOTES, "ISO-8859-1");
+
+    $pono = stripslashes($pono);
+    $lcno = stripslashes($lcno);
+    $shipno = stripslashes($shipno);
+    $lcissuerbank = stripslashes($lcissuerbank);
+
+    $objdal = new dal();
+
+    $pono = $objdal->real_escape_string($pono);
+    $lcno = $objdal->real_escape_string($lcno);
+    $shipno = $objdal->real_escape_string($shipno);
+    $lcissuerbank = $objdal->real_escape_string($lcissuerbank);
+
+if($attachEndorsementLetter!="") {
+    $query = "INSERT INTO `wc_t_attachments`(`poid`, `shipno`, `title`, `filename`, `attachedby`, `attachedfrom`, `groupid`, `lcno`) VALUES 
+    ('$pono', $shipno, 'Endorsement Request', '$attachEndorsementLetter', $user_id, '$ip', $loginRole, '$lcno')";
+    $objdal->insert($query);
+}
+
+    fileTransferTempToDocs($pono);
+
+    $action = array(
+        'refid' => $refId,
+        'pono' => "'".$pono."'",
+        'shipno' => $shipno,
+        'actionid' => action_Request_For_Doc_Endorsement_Send_By_GP,
+        'status' => 1,
+        'pendingtoco' => $lcissuerbank,
+        'msg' => "'Endorsement doc requested against PO# ".$pono." and Shipment# ".$shipno."'",
+    );
+    UpdateAction($action);
+
+    $res["status"] = 1;
+    $res["message"] = 'Endorsement Doc requested successfully!';
+    return json_encode($res);
+
 }
 
 function GetEndorsementInfo($pono, $shipno)
@@ -261,7 +553,7 @@ function DocDelivered($pono, $endno, $refId1, $shipno){
 	$objdal->update(trim($query));
 
     //echo $query;
-	unset($objdal);
+
     
     // Action Log --------------------------------//    
     $action = array(
@@ -274,7 +566,7 @@ function DocDelivered($pono, $endno, $refId1, $shipno){
     );
     UpdateAction($action);
     // End Action Log -----------------------------
-    
+    unset($objdal);
 	$res["status"] = 1;
 	$res["message"] = 'SUCCESS!';
 	return json_encode($res);

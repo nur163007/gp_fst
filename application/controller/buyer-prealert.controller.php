@@ -288,26 +288,28 @@ function mailToFinance(){
         'msg' => "'Acknowledgement'",
     );
     UpdateAction($action);
-    /*
+
     if($docType=="endorse"){
         $newAction = action_Sent_for_Document_Endorsement;
         $msg = "'Request for endorsed document against PO# ".$pono." and Shipment # ".$shipno."'";
+
+        // Action Log --------------------------------//
+        $action = array(
+            'refid' => $refId,
+            'pono' => "'".$pono."'",
+            'shipno' => $shipno,
+            'actionid' => $newAction,
+            'status' => 1,
+            'msg' => $msg,
+            'usermsg' => "'".$message."'",
+        );
+        UpdateAction($action);
+        // End Action Log -----------------------------
     } elseif($docType=="original"){
-        $newAction = action_Requested_to_Collect_Original_Doc;
-        $msg = "'Request for original document against PO# ".$pono." and Shipment # ".$shipno."'";
+//        $newAction = action_Requested_to_Collect_Original_Doc;
+//        $msg = "'Request for original document against PO# ".$pono." and Shipment # ".$shipno."'";
     }
-    // Action Log --------------------------------//    
-    $action = array(
-        'refid' => $refId,
-        'pono' => "'".$pono."'",
-        'shipno' => $shipno,
-        'actionid' => $newAction,
-        'status' => 1,
-        'msg' => $msg,
-        'usermsg' => "'".$message."'",
-    );
-    UpdateAction($action);
-    // End Action Log -----------------------------*/
+
     
     $query = "UPDATE `wc_t_shipment` SET 
         `GERPVoucherDate`='$voucherCreateDate', 

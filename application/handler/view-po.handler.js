@@ -73,6 +73,7 @@ $(document).ready(function() {
                         $('#pivalue').html('<b>' + commaSeperatedFormat(podata['pivalue']) + '</b> ' + podata['curname']);
                         $('#pi_desc').html(podata['pidesc']);
                         $('#producttype').html(podata['producttypeName']);
+                        $('#producttypeLC').html(podata['producttypeName']);
                         $('#importAs').html(podata['importAsName']);
                         $('#shipmode').html(podata['shipmode'].toUpperCase());
 

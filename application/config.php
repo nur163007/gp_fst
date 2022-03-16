@@ -280,6 +280,8 @@ define("action_Pre_Alert_To_Bank_for_Org_Doc",108);
 define("action_Shared_Shipment_Schedule_For_EDeliv_WO_LC",114);
 define("action_Amendment_Request_By_TFO",115);
 define("action_Amendment_Process_Done_By_Bank",116);
+define("action_Request_For_Doc_Endorsement_Send_By_GP",117);
+define("action_Endorsement_Doc_Send_By_Bank",118);
 
 //--------FX Action----------------------------------------
 define("action_fx_request_for_lc", 201);        //0 pending

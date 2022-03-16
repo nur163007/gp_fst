@@ -1,4 +1,8 @@
 <?php
+require_once(realpath(dirname(__FILE__) . "/../config.php"));
+require_once(LIBRARY_PATH . "/dal.php");
+require_once(LIBRARY_PATH . "/lib.php");
+$actionLog = GetActionRef($_GET['ref']);
 $title = "Received Document Information"; ?>
 
 
@@ -8,7 +12,8 @@ $title = "Received Document Information"; ?>
         <h1 class="page-title">Received Document Information</h1>
         <ol class="breadcrumb">
             <li>PO # <?php if(!empty($_GET['po'])){ echo $_GET['po']; } ?></li>
-            <li class="active">Shipment # <?php if(!empty($_GET['ship'])){ echo $_GET['ship']; } ?></li>
+            <li>Shipment # <?php if(!empty($_GET['ship'])){ echo $_GET['ship']; } ?></li>
+            <li class="active">Shipment Mode: <span id="shipmode" class="text-info"></span></li>
         </ol>
     </div>
     <div class="page-content container-fluid">
@@ -20,6 +25,7 @@ $title = "Received Document Information"; ?>
                     <input name="refId" id="refId" type="hidden" value="<?php if(!empty($_GET['ref'])){ echo $_GET['ref']; } ?>" />
                     <input name="shipno" id="shipno" type="hidden" value="<?php if(!empty($_GET['ship'])){ echo $_GET['ship']; } ?>" />
                     <input name="LcNo1" id="LcNo1" type="hidden" value="" />
+                    <input name="actionId" id="actionId" type="hidden" value="<?php echo $actionLog['ActionID']; ?>" />
                     <input name="userAction1" id="userAction1" type="hidden" value="6" />
                     <div class="row row-lg">
                         <div class="col-md-12">
